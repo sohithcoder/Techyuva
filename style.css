@@ -64,7 +64,34 @@ kbd {
 }
 
 /* ============================================================
-   PRELOADER
+   SCROLL PROGRESS BAR
+   ============================================================ */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px; z-index: 1001;
+  background: transparent;
+  pointer-events: none;
+}
+.scroll-progress span {
+  display: block; height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--java));
+  box-shadow: 0 0 12px rgba(228, 87, 46, .6);
+  transition: width .1s linear;
+}
+
+/* ============================================================
+   BINARY RAIN BACKGROUND
+   ============================================================ */
+.binary-rain {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .12;
+}
+
+/* ============================================================
+   PRELOADER (terminal boot screen)
    ============================================================ */
 .preloader {
   position: fixed; inset: 0; z-index: 1000;
@@ -72,38 +99,108 @@ kbd {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 2rem;
-  transition: transform 1s var(--ease);
-}
-.preloader.is-done { transform: translateY(-101%); }
-
-.preloader__inner {
-  display: flex; align-items: baseline; gap: 1.5rem;
   overflow: hidden;
+  transition: transform 1s var(--ease), opacity .6s;
 }
-.preloader__word {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  font-weight: 400; font-style: italic;
-  animation: pre-rise 1s var(--ease-out) both;
-}
-.preloader__count {
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-@keyframes pre-rise {
-  from { transform: translateY(110%); }
-  to   { transform: translateY(0); }
+.preloader.is-done { transform: translateY(-101%); opacity: 0; }
+
+/* faint binary bg behind boot screen */
+.preloader__bg {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(228,87,46,.08), transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(94,197,255,.06), transparent 50%);
+  opacity: .8;
 }
 
+/* the boot terminal window */
+.preloader__terminal {
+  position: relative; z-index: 2;
+  width: min(520px, 86vw);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0f0e0c;
+  border: 1px solid #2a2622;
+  box-shadow: 0 40px 90px -40px rgba(0,0,0,.8),
+              0 0 0 1px rgba(228, 87, 46, .12);
+  font-family: var(--font-mono);
+}
+.preloader__tbar {
+  display: flex; align-items: center; gap: 1rem;
+  padding: .7rem 1rem;
+  background: #1a1815;
+  border-bottom: 1px solid #2a2622;
+}
+.preloader__dots { display: flex; gap: .4rem; }
+.preloader__dots i {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.preloader__dots i:nth-child(1) { background: #ff5f57; }
+.preloader__dots i:nth-child(2) { background: #febc2e; }
+.preloader__dots i:nth-child(3) { background: #28c840; }
+.preloader__ttitle {
+  font-size: .72rem; color: rgba(243,239,231,.45);
+  letter-spacing: .04em;
+}
+
+.preloader__tbody {
+  padding: 1.1rem 1.2rem;
+  min-height: 180px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.preloader__log {
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  line-height: 1.65;
+  color: #8bd17c;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 140px;
+}
+.preloader__log .pl-prompt { color: #5d574d; }
+.preloader__log .pl-ok     { color: #28c840; }
+.preloader__log .pl-info   { color: #5ec5ff; }
+.preloader__log .pl-accent { color: var(--accent); }
+.preloader__log .pl-cursor {
+  display: inline-block; width: 7px; height: 1em;
+  background: var(--accent); vertical-align: text-bottom;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+.preloader__bottom {
+  display: flex; align-items: center; gap: .8rem;
+}
 .preloader__bar {
-  width: min(320px, 60vw); height: 1px;
-  background: rgba(243, 239, 231, .15);
+  flex: 1; height: 2px;
+  background: rgba(243, 239, 231, .12);
+  border-radius: 2px; overflow: hidden;
 }
 .preloader__bar span {
   display: block; height: 100%; width: 0%;
   background: var(--accent);
   transition: width .2s linear;
+}
+.preloader__count {
+  font-size: .72rem; color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch; text-align: right;
+}
+
+/* wordmark under the terminal */
+.preloader__word {
+  position: relative; z-index: 2;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 400; font-style: italic;
+  color: var(--dark-ink);
+  animation: pre-rise 1s var(--ease-out) both;
+}
+@keyframes pre-rise {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 
 /* ============================================================

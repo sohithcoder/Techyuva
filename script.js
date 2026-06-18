@@ -11,35 +11,180 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
 /* ============================================================
-   1. PRELOADER (counts 0→100, then slides away)
+   1. PRELOADER — terminal boot sequence
+   Types realistic boot lines, fills a progress bar, then slides away.
    ============================================================ */
 (() => {
   const pre   = $("#preloader");
+  const log   = $("#preLog");
   const count = $("#preCount");
   const bar   = $("#preBar");
-  let n = 0;
 
-  const tick = () => {
-    n = Math.min(100, n + Math.ceil(Math.random() * 12));
-    count.textContent = String(n).padStart(2, "0");
-    bar.style.width = n + "%";
-    if (n < 100) {
-      setTimeout(tick, 70 + Math.random() * 90);
-    } else {
+  // boot log lines: { txt, cls } — cls colors the line
+  const LINES = [
+    { t: "TechYuva OS v2.6.0 — booting",              c: "pl-accent" },
+    { t: "$ ./init.sh",                                 c: "pl-prompt" },
+    { t: "→ loading curriculum modules ........ [ ok ]", c: "" },
+    { t: "→ mounting student_zone .............. [ ok ]", c: "" },
+    { t: "→ warming up java | cpp | python runtimes . [ ok ]", c: "" },
+    { t: "→ calibrating practice engine ......... [ ok ]", c: "" },
+    { t: "→ 12,000+ students synced ............ [ ok ]", c: "" },
+    { t: "✓ all systems nominal",                         c: "pl-ok" },
+  ];
+
+  let lineI = 0;
+  let charI = 0;
+  let current = "";
+  let progress = 0;
+
+  const type = () => {
+    if (lineI >= LINES.length) {
+      // finish
+      count.textContent = "100%";
+      bar.style.width = "100%";
+      log.innerHTML += '<br><span class="pl-accent">welcome back, coder ▸</span> <span class="pl-cursor"></span>';
       setTimeout(() => {
         pre.classList.add("is-done");
         document.body.classList.add("is-loaded");
         $(".hero__title").classList.add("lines-in");
         setTimeout(() => pre.remove(), 1100);
-      }, 350);
+      }, 480);
+      return;
+    }
+
+    const line = LINES[lineI];
+    if (charI === 0) current = "";
+    if (charI < line.t.length) {
+      current += line.t[charI];
+      renderLog(line);
+      charI++;
+      setTimeout(type, 14 + Math.random() * 24);
+    } else {
+      // commit this line, advance progress, move on
+      committed.push({ t: line.t, c: line.c });
+      lineI++; charI = 0; current = "";
+      progress = Math.round((lineI / LINES.length) * 100);
+      count.textContent = progress + "%";
+      bar.style.width = progress + "%";
+      setTimeout(type, 90 + Math.random() * 120);
     }
   };
+
+  const committed = [];
+  function renderLog(currentLine) {
+    let html = committed.map(l =>
+      `<span class="${l.c}">${escapeHtml(l.t)}</span>`
+    ).join("\n");
+    if (currentLine) {
+      html += (committed.length ? "\n" : "") +
+              `<span class="${currentLine.c}">${escapeHtml(current)}</span>`;
+    }
+    log.innerHTML = html;
+  }
+  function escapeHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
 
   if (reducedMotion) {
     pre.remove();
     $(".hero__title").classList.add("lines-in");
   } else {
-    tick();
+    type();
+  }
+})();
+
+/* ============================================================
+   1b. BINARY RAIN — subtle 0s and 1s drifting in the background
+   ============================================================ */
+(() => {
+  const canvas = $("#binaryRain");
+  if (!canvas || reducedMotion) { if (canvas) canvas.style.display = "none"; return; }
+  const ctx = canvas.getContext("2d");
+
+  let w, h, cols, drops;
+  const FONT = 14;
+  const CHARS = "01";
+  const CHANCE = 0.965; // most cells blank → very sparse, not matrix-dense
+
+  function resize() {
+    w = canvas.width = innerWidth;
+    h = canvas.height = innerHeight;
+    cols = Math.floor(w / FONT);
+    drops = Array.from({ length: cols }, () => Math.random() * -h);
+  }
+  resize();
+  addEventListener("resize", resize);
+
+  let running = true;
+  // pause when tab hidden (perf)
+  document.addEventListener("visibilitychange", () => {
+    running = !document.hidden;
+    if (running) draw();
+  });
+
+  function draw() {
+    if (!running) return;
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = `${FONT}px "JetBrains Mono", monospace`;
+    for (let i = 0; i < cols; i++) {
+      if (Math.random() > CHANCE) {
+        const ch = CHARS[(Math.random() * CHARS.length) | 0];
+        // leading char brighter (accent), trailing ones faint
+        const bright = Math.random() > 0.85;
+        ctx.fillStyle = bright ? "rgba(228, 87, 46, 0.95)" : "rgba(120, 110, 95, 0.6)";
+        ctx.fillText(ch, i * FONT, drops[i]);
+      }
+      drops[i] = drops[i] > h && Math.random() > 0.975 ? 0 : drops[i] + 10;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ============================================================
+   1c. SCROLL PROGRESS BAR
+   ============================================================ */
+(() => {
+  const bar = $("#scrollProgress")?.querySelector("span");
+  if (!bar) return;
+  const update = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? (scrollY / max) * 100 : 0;
+    bar.style.width = p + "%";
+  };
+  addEventListener("scroll", update, { passive: true });
+  addEventListener("resize", update);
+  update();
+})();
+
+/* ============================================================
+   1d. HERO TERMINAL — 3D parallax (tracks cursor across hero)
+   ============================================================ */
+(() => {
+  if (isTouch || reducedMotion) return;
+  const stage = $(".hero__terminal");
+  if (!stage) return;
+  let rx = 0, ry = 0, tx = 0, ty = 0;
+  let raf = null;
+
+  addEventListener("mousemove", e => {
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    tx = (e.clientX - cx) / cx;   // -1 .. 1
+    ty = (e.clientY - cy) / cy;
+    if (!raf) raf = requestAnimationFrame(loop);
+  });
+
+  function loop() {
+    // ease toward target for smooth parallax
+    rx += (tx - rx) * 0.06;
+    ry += (ty - ry) * 0.06;
+    stage.style.transform =
+      `perspective(1400px) rotateY(${rx * 6}deg) rotateX(${-ry * 5}deg)`;
+    if (Math.abs(tx - rx) > 0.001 || Math.abs(ty - ry) > 0.001) {
+      raf = requestAnimationFrame(loop);
+    } else {
+      raf = null;
+    }
   }
 })();
 

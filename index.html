@@ -12,18 +12,34 @@
 </head>
 <body data-theme="paper">
 
-  <!-- ===== Preloader ===== -->
+  <!-- ===== Scroll progress bar ===== -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
+
+  <!-- ===== Preloader (terminal boot screen) ===== -->
   <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader__inner">
-      <span class="preloader__word">TechYuva</span>
-      <span class="preloader__count" id="preCount">00</span>
+    <div class="preloader__bg" aria-hidden="true"></div>
+    <div class="preloader__terminal">
+      <div class="preloader__tbar">
+        <div class="preloader__dots"><i></i><i></i><i></i></div>
+        <span class="preloader__ttitle">techyuva — boot</span>
+      </div>
+      <div class="preloader__tbody">
+        <pre class="preloader__log" id="preLog"></pre>
+        <div class="preloader__bottom">
+          <div class="preloader__bar"><span id="preBar"></span></div>
+          <span class="preloader__count" id="preCount">00%</span>
+        </div>
+      </div>
     </div>
-    <div class="preloader__bar"><span id="preBar"></span></div>
+    <span class="preloader__word">TechYuva</span>
   </div>
 
   <!-- ===== Custom cursor ===== -->
   <div class="cursor" id="cursor"></div>
   <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- ===== Binary rain background ===== -->
+  <canvas class="binary-rain" id="binaryRain" aria-hidden="true"></canvas>
 
   <!-- ===== Grain overlay ===== -->
   <div class="grain" aria-hidden="true"></div>
