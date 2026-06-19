@@ -3,70 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TechYuva — Learn Java · C++ · Python Online</title>
+  <title>TechYuva — Code Craft Institute</title>
   <meta name="description" content="TechYuva — an online coding institute. Master Java, C++ and Python with live classes, real projects, and a student zone built for results." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body data-theme="paper">
 
-  <!-- ===== Scroll progress bar ===== -->
+  <!-- ===== Scroll Progress ===== -->
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
 
-  <!-- ===== Preloader (terminal boot screen) ===== -->
-  <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader__bg" aria-hidden="true"></div>
-    <div class="preloader__terminal">
-      <div class="preloader__tbar">
-        <div class="preloader__dots"><i></i><i></i><i></i></div>
-        <span class="preloader__ttitle">techyuva — boot</span>
-      </div>
-      <div class="preloader__tbody">
-        <pre class="preloader__log" id="preLog"></pre>
-        <div class="preloader__bottom">
-          <div class="preloader__bar"><span id="preBar"></span></div>
-          <span class="preloader__count" id="preCount">00%</span>
-        </div>
-      </div>
-    </div>
-    <span class="preloader__word">TechYuva</span>
-  </div>
-
-  <!-- ===== Custom cursor ===== -->
+  <!-- ===== Custom Cursor ===== -->
   <div class="cursor" id="cursor"></div>
   <div class="cursor-dot" id="cursorDot"></div>
 
-  <!-- ===== Binary rain background ===== -->
-  <canvas class="binary-rain" id="binaryRain" aria-hidden="true"></canvas>
+  <!-- ===== ASCII Fluid Background ===== -->
+  <canvas class="ascii-fluid" id="asciiFluid" aria-hidden="true"></canvas>
 
-  <!-- ===== Grain overlay ===== -->
+  <!-- ===== Grain Overlay ===== -->
   <div class="grain" aria-hidden="true"></div>
 
-  <!-- ===== 3D floating shapes (decorative, background) ===== -->
-  <div class="shapes" aria-hidden="true">
-    <div class="shape shape--cube"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="shape shape--pyramid"><i></i><i></i><i></i><i></i></div>
-    <div class="shape shape--ring"></div>
-  </div>
-
-  <!-- ===== Navigation ===== -->
+  <!-- ===== File Explorer Nav ===== -->
   <header class="nav" id="nav">
-    <a href="#top" class="nav__logo" data-magnetic>
-      <span class="nav__logo-mark">T.</span>echYuva
-    </a>
-    <nav class="nav__links">
-      <a href="#about" class="nav__link" data-magnetic>Why</a>
-      <a href="#courses" class="nav__link" data-magnetic>Courses</a>
-      <a href="#zone" class="nav__link" data-magnetic>Student Zone</a>
-      <a href="#analysis" class="nav__link" data-magnetic>Practice</a>
-    </nav>
-    <a href="#courses" class="btn btn--small" data-magnetic>
-      <span>Enroll now</span>
-      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
+    <button class="nav__expand" id="navExpand" aria-label="Show explorer">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="nav__explorer" id="navExplorer">
+      <div class="nav__explorer-head">
+        <span class="nav__explorer-title">EXPLORER</span>
+        <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="nav__tree" id="navTree">
+        <div class="nav__tree-item nav__tree-item--root">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span>techyuva</span>
+        </div>
+        <div class="nav__tree-children">
+          <a href="#top" class="nav__tree-item is-active" data-file="index.html">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>index.html</span>
+          </a>
+          <a href="#about" class="nav__tree-item" data-file="about.md">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>about.md</span>
+          </a>
+          <div class="nav__tree-folder">
+            <div class="nav__tree-item nav__tree-item--folder" data-folder="courses">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+              <span>courses/</span>
+            </div>
+            <div class="nav__tree-children is-collapsed" id="folder-courses">
+              <a href="#courses" class="nav__tree-item" data-file="java.md">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>java.md</span>
+              </a>
+              <a href="#courses" class="nav__tree-item" data-file="cpp.md">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>cpp.md</span>
+              </a>
+              <a href="#courses" class="nav__tree-item" data-file="python.md">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>python.md</span>
+              </a>
+            </div>
+          </div>
+          <a href="#zone" class="nav__tree-item" data-file="student-zone/">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>student-zone/</span>
+          </a>
+          <a href="#analysis" class="nav__tree-item" data-file="practice.md">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>practice.md</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="nav__bar">
+      <a href="#top" class="nav__logo" data-magnetic>
+        <span class="nav__logo-mark">>_</span>TechYuva
+      </a>
+      <div class="nav__actions">
+        <button class="nav__cmd" id="cmdPalette" data-magnetic>
+          <kbd>⌘</kbd><kbd>K</kbd>
+        </button>
+        <a href="#courses" class="btn btn--small" data-magnetic>
+          <span>$ enroll</span>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
   </header>
+
+  <!-- ===== Command Palette ===== -->
+  <div class="cmd-palette" id="cmdPaletteOverlay" hidden>
+    <div class="cmd-palette__backdrop"></div>
+    <div class="cmd-palette__modal">
+      <div class="cmd-palette__input-wrap">
+        <span class="cmd-palette__prompt">$</span>
+        <input type="text" class="cmd-palette__input" id="cmdInput" placeholder="Type a command or search..." autocomplete="off" />
+      </div>
+      <div class="cmd-palette__results" id="cmdResults"></div>
+    </div>
+  </div>
 
   <main id="top">
 
@@ -74,7 +116,7 @@
     <section class="hero">
       <div class="hero__content">
         <p class="hero__eyebrow reveal">Online coding institute · Live + self-paced</p>
-        <h1 class="hero__title">
+        <h1 class="hero__title" id="heroTitle">
           <span class="line"><span>Code with</span></span>
           <span class="line"><span><em>intention</em>,</span></span>
           <span class="line"><span>build with <em class="accent">insight</em>.</span></span>
@@ -86,11 +128,11 @@
             turns every lesson into measurable progress.
           </p>
           <div class="hero__actions reveal">
-            <a href="#courses" class="btn btn--primary" data-magnetic>
-              <span>Explore courses</span>
+            <a href="#courses" class="btn btn--primary" data-magnetic id="heroEnroll">
+              <span class="btn__text">$ techyuva enroll</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a href="#zone" class="link-arrow" data-magnetic>Student zone</a>
+            <a href="#zone" class="link-arrow" data-magnetic>Student zone →</a>
           </div>
         </div>
 
@@ -101,7 +143,7 @@
         </div>
       </div>
 
-      <!-- Terminal as the hero centerpiece -->
+      <!-- White Paper Terminal -->
       <div class="hero__terminal">
         <div class="hero__orb" aria-hidden="true"></div>
         <div class="hero__ring hero__ring--1" aria-hidden="true"></div>
@@ -127,7 +169,6 @@
           </div>
         </div>
 
-        <!-- friendly floating language / symbol chips -->
         <div class="hero__chips" aria-hidden="true">
           <span class="hero__chip is-accent" style="top:2%;left:-5%;--rot:-8deg;animation-delay:0s">Java</span>
           <span class="hero__chip" style="top:9%;right:-6%;--rot:6deg;animation-delay:.8s">C++</span>
@@ -154,7 +195,7 @@
     <section class="section" id="about">
       <div class="section__head">
         <span class="section__index reveal">01</span>
-        <h2 class="section__title reveal">Built for the way<br/>you actually <em>learn</em> to code</h2>
+        <h2 class="section__title reveal" data-ascii-title>Built for the way<br/>you actually <em>learn</em> to code</h2>
       </div>
       <div class="features">
         <article class="feature reveal" data-tilt>
@@ -184,75 +225,93 @@
     <section class="section section--dark" id="courses">
       <div class="section__head">
         <span class="section__index reveal">02</span>
-        <h2 class="section__title reveal">Pick a course.<br/><em>Begin.</em></h2>
+        <h2 class="section__title reveal" data-ascii-title>Pick a course.<br/><em>Begin.</em></h2>
         <p class="section__sub reveal">Three core tracks. Each ends with projects, a certificate, and access to the student zone.</p>
       </div>
 
       <div class="courses" id="courseList">
 
         <!-- Java -->
-        <article class="course reveal" data-magnetic>
-          <div class="course__head">
-            <span class="course__index">01</span>
-            <span class="course__lang">Java</span>
-            <span class="course__badge">Backend · OOP · DSA</span>
-          </div>
-          <h3 class="course__name">Java Mastery</h3>
-          <p class="course__desc">From syntax to Spring-ready backends. Strong OOP, collections, multithreading and competitive DSA.</p>
-          <ul class="course__modules">
-            <li>Core syntax &amp; control flow</li>
-            <li>OOP, interfaces, generics</li>
-            <li>Collections &amp; Streams API</li>
-            <li>DSA patterns in Java</li>
-            <li>Mini project: REST backend</li>
-          </ul>
-          <div class="course__foot">
-            <span class="course__duration">12 weeks · 48 sessions</span>
-            <button class="course__cta" data-subject="java" data-magnetic>Enroll <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <article class="course reveal" data-magnetic data-course="java">
+          <div class="course__ascii" id="ascii-java"></div>
+          <div class="course__content">
+            <div class="course__head">
+              <span class="course__index">01</span>
+              <span class="course__lang">Java</span>
+              <span class="course__badge">Backend · OOP · DSA</span>
+            </div>
+            <h3 class="course__name">Java Mastery</h3>
+            <p class="course__desc">From syntax to Spring-ready backends. Strong OOP, collections, multithreading and competitive DSA.</p>
+            <ul class="course__modules">
+              <li>Core syntax &amp; control flow</li>
+              <li>OOP, interfaces, generics</li>
+              <li>Collections &amp; Streams API</li>
+              <li>DSA patterns in Java</li>
+              <li>Mini project: REST backend</li>
+            </ul>
+            <div class="course__foot">
+              <span class="course__duration">12 weeks · 48 sessions</span>
+              <button class="course__cta" data-subject="java" data-magnetic>
+                <span class="cta__text">$ techyuva enroll --course=java</span>
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
         </article>
 
         <!-- C++ -->
-        <article class="course reveal" data-magnetic>
-          <div class="course__head">
-            <span class="course__index">02</span>
-            <span class="course__lang">C++</span>
-            <span class="course__badge">Systems · CP · DSA</span>
-          </div>
-          <h3 class="course__name">C++ Engineering</h3>
-          <p class="course__desc">Memory, pointers and the STL. Built for competitive programming and system-level performance.</p>
-          <ul class="course__modules">
-            <li>Modern C++ syntax</li>
-            <li>Pointers, references, memory</li>
-            <li>STL &amp; algorithm complexity</li>
-            <li>OOP &amp; templates</li>
-            <li>Mini project: CP problem set</li>
-          </ul>
-          <div class="course__foot">
-            <span class="course__duration">10 weeks · 40 sessions</span>
-            <button class="course__cta" data-subject="cpp" data-magnetic>Enroll <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <article class="course reveal" data-magnetic data-course="cpp">
+          <div class="course__ascii" id="ascii-cpp"></div>
+          <div class="course__content">
+            <div class="course__head">
+              <span class="course__index">02</span>
+              <span class="course__lang">C++</span>
+              <span class="course__badge">Systems · CP · DSA</span>
+            </div>
+            <h3 class="course__name">C++ Engineering</h3>
+            <p class="course__desc">Memory, pointers and the STL. Built for competitive programming and system-level performance.</p>
+            <ul class="course__modules">
+              <li>Modern C++ syntax</li>
+              <li>Pointers, references, memory</li>
+              <li>STL &amp; algorithm complexity</li>
+              <li>OOP &amp; templates</li>
+              <li>Mini project: CP problem set</li>
+            </ul>
+            <div class="course__foot">
+              <span class="course__duration">10 weeks · 40 sessions</span>
+              <button class="course__cta" data-subject="cpp" data-magnetic>
+                <span class="cta__text">$ techyuva enroll --course=cpp</span>
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
         </article>
 
         <!-- Python -->
-        <article class="course reveal" data-magnetic>
-          <div class="course__head">
-            <span class="course__index">03</span>
-            <span class="course__lang">Python</span>
-            <span class="course__badge">Automation · Data · Web</span>
-          </div>
-          <h3 class="course__name">Python Pro</h3>
-          <p class="course__desc">Scripting to data science. Clean Python, libraries, and a launchpad into ML and web automation.</p>
-          <ul class="course__modules">
-            <li>Pythonic syntax &amp; data types</li>
-            <li>Functions, OOP, modules</li>
-            <li>NumPy, Pandas, Matplotlib</li>
-            <li>Web scraping &amp; automation</li>
-            <li>Mini project: Data dashboard</li>
-          </ul>
-          <div class="course__foot">
-            <span class="course__duration">8 weeks · 32 sessions</span>
-            <button class="course__cta" data-subject="python" data-magnetic>Enroll <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <article class="course reveal" data-magnetic data-course="python">
+          <div class="course__ascii" id="ascii-python"></div>
+          <div class="course__content">
+            <div class="course__head">
+              <span class="course__index">03</span>
+              <span class="course__lang">Python</span>
+              <span class="course__badge">Automation · Data · Web</span>
+            </div>
+            <h3 class="course__name">Python Pro</h3>
+            <p class="course__desc">Scripting to data science. Clean Python, libraries, and a launchpad into ML and web automation.</p>
+            <ul class="course__modules">
+              <li>Pythonic syntax &amp; data types</li>
+              <li>Functions, OOP, modules</li>
+              <li>NumPy, Pandas, Matplotlib</li>
+              <li>Web scraping &amp; automation</li>
+              <li>Mini project: Data dashboard</li>
+            </ul>
+            <div class="course__foot">
+              <span class="course__duration">8 weeks · 32 sessions</span>
+              <button class="course__cta" data-subject="python" data-magnetic>
+                <span class="cta__text">$ techyuva enroll --course=python</span>
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
         </article>
       </div>
@@ -267,7 +326,7 @@
     <section class="section" id="zone">
       <div class="section__head">
         <span class="section__index reveal">03</span>
-        <h2 class="section__title reveal">Student <em>Zone</em></h2>
+        <h2 class="section__title reveal" data-ascii-title>Student <em>Zone</em></h2>
         <p class="section__sub reveal">Everything you need after enrollment — track progress, download notes, join cohorts, and message mentors.</p>
       </div>
 
@@ -372,7 +431,7 @@
     <section class="results section" id="analysis" hidden>
       <div class="section__head">
         <span class="section__index">04</span>
-        <h2 class="section__title">Your <em>analysis</em></h2>
+        <h2 class="section__title" data-ascii-title>Your <em>analysis</em></h2>
       </div>
 
       <div class="results__grid">
@@ -414,20 +473,43 @@
     <!-- ===== CTA ===== -->
     <section class="cta">
       <div class="cta__orb" aria-hidden="true"></div>
-      <h2 class="cta__title">
+      <h2 class="cta__title" data-ascii-title>
         <span class="line"><span>Ready when</span></span>
         <span class="line"><span><em>you</em> are.</span></span>
       </h2>
-      <a href="#courses" class="btn btn--primary btn--big" data-magnetic><span>Start coding</span></a>
+      <a href="#courses" class="btn btn--primary btn--big" data-magnetic id="ctaEnroll">
+        <span class="btn__text">$ techyuva enroll --now</span>
+      </a>
     </section>
   </main>
 
   <!-- ===== Footer ===== -->
   <footer class="footer">
-    <span class="footer__logo">T.echYuva</span>
+    <span class="footer__logo">>_TechYuva</span>
     <p>Online coding institute. Built for learners, by engineers.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
+
+  <!-- ===== ASCII Mascot ===== -->
+  <div class="mascot" id="mascot" aria-hidden="true">
+    <div class="mascot__body">
+      <pre class="mascot__ascii" id="mascotAscii">  o_o
+ /|\
+ / \</pre>
+    </div>
+    <div class="mascot__bubble" id="mascotBubble" hidden>
+      <span id="mascotText"></span>
+    </div>
+  </div>
+
+  <!-- ===== Thinking Overlay ===== -->
+  <div class="thinking" id="thinkingOverlay" hidden>
+    <div class="thinking__backdrop"></div>
+    <div class="thinking__content">
+      <pre class="thinking__log" id="thinkingLog"></pre>
+      <div class="thinking__cursor"></div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
