@@ -217,8 +217,8 @@ const CommandPalette = (() => {
   let selectedIndex = -1;
 
   const COMMANDS = [
-    { label: "Go to Courses", action: () => $("#courses")?.scrollIntoView({ behavior: "smooth" }), shortcut: "↵", keywords: "courses enroll learn" },
-    { label: "Go to Student Zone", action: () => $("#zone")?.scrollIntoView({ behavior: "smooth" }), shortcut: "↵", keywords: "student zone login dashboard" },
+    { label: "Go to Courses", action: () => { window.location.href = "menu.html"; }, shortcut: "↵", keywords: "courses enroll learn" },
+    { label: "Go to Student Zone", action: () => { window.location.href = "studyzone.html"; }, shortcut: "↵", keywords: "student zone login dashboard" },
     { label: "Take Placement Test", action: () => $("#takePlacement")?.click(), shortcut: "↵", keywords: "placement test quiz assessment" },
     { label: "Practice — Java", action: () => Quiz.start("java"), shortcut: "↵", keywords: "java practice quiz test" },
     { label: "Practice — C++", action: () => Quiz.start("cpp"), shortcut: "↵", keywords: "cpp c++ practice quiz" },
