@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner — TechYuva</title>
+  <meta name="description" content="TechYuva Owner Dashboard — Student registration, fee tracking, course reports, and analytics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ============================================================
+       OWNER PAGE — Dedicated Dashboard Styles
+       ============================================================ */
+
+    .owner-page {
+      padding-top: clamp(5rem, 12vh, 8rem);
+      padding-left: calc(var(--nav-edge) + var(--pad));
+      padding-right: var(--pad);
+      padding-bottom: clamp(4rem, 10vh, 7rem);
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Page Header ---------- */
+    .owner-head {
+      margin-bottom: clamp(2.5rem, 5vh, 4rem);
+      position: relative;
+    }
+    .owner-head::before {
+      content: "owner/";
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1rem;
+    }
+    .owner-head h1 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      line-height: 1.05;
+      letter-spacing: -.01em;
+    }
+    .owner-head h1 em { font-style: italic; color: var(--accent); }
+    .owner-head p {
+      color: var(--ink-soft);
+      margin-top: 1rem;
+      max-width: 52ch;
+      font-size: .98rem;
+      line-height: 1.65;
+    }
+
+    /* ---------- Section Box Component (matches studyzone) ---------- */
+    .owner-section {
+      margin-bottom: clamp(2.5rem, 5vh, 3.5rem);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--paper);
+      transition: border-color .4s, box-shadow .4s;
+    }
+    .owner-section:hover {
+      border-color: rgba(184, 92, 56, .3);
+      box-shadow: 0 20px 50px -20px rgba(28, 25, 21, .1);
+    }
+
+    .owner-section__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.2rem 1.6rem;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper-2);
+      flex-wrap: wrap;
+      position: sticky;
+      top: 64px;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: color-mix(in srgb, var(--paper-2) 92%, transparent);
+    }
+    .owner-section__title {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+    .owner-section__icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      display: grid; place-items: center;
+      color: var(--accent);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .owner-section__icon--green { background: rgba(74, 124, 89, .1); color: var(--good); }
+    .owner-section__icon--orange { background: rgba(196, 160, 48, .1); color: #c4a030; }
+    .owner-section__icon--blue { background: rgba(90, 107, 138, .1); color: #5a6b8a; }
+    .owner-section__icon--red { background: rgba(160, 48, 48, .1); color: var(--bad); }
+
+    .owner-section__title h2 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      line-height: 1.1;
+    }
+    .owner-section__title span {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--ink-soft);
+      margin-top: .2rem;
+    }
+    .owner-section__action {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      transition: gap .3s;
+      white-space: nowrap;
+      border: 1px solid var(--accent);
+      border-radius: 100px;
+      padding: .4rem 1rem;
+      background: none;
+      cursor: none;
+    }
+    .owner-section__action:hover {
+      gap: .5rem;
+      background: var(--accent);
+      color: var(--paper);
+    }
+    .owner-section__action svg { width: 1em; height: 1em; }
+    .owner-section__action:hover svg { transform: translateX(2px); }
+
+    .owner-section__body {
+      padding: clamp(1.2rem, 2.5vw, 1.8rem);
+    }
+
+    /* ---------- Summary Cards ---------- */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.6rem 1.4rem;
+      background: var(--paper);
+      transition: transform .4s var(--ease-out), border-color .35s, box-shadow .4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 36px -16px rgba(28, 25, 21, .14);
+    }
+    .stat-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      transform: scaleX(0); transform-origin: center;
+      transition: transform .5s var(--ease);
+    }
+    .stat-card:hover::before { transform: scaleX(1); }
+
+    .stat-card--green:hover { border-color: var(--good); }
+    .stat-card--green::before { background: linear-gradient(90deg, transparent, var(--good), transparent); }
+    .stat-card--orange:hover { border-color: #c4a030; }
+    .stat-card--orange::before { background: linear-gradient(90deg, transparent, #c4a030, transparent); }
+    .stat-card--red:hover { border-color: var(--bad); }
+    .stat-card--red::before { background: linear-gradient(90deg, transparent, var(--bad), transparent); }
+
+    .stat-card__label {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--ink-soft);
+      margin-bottom: .6rem;
+    }
+    .stat-card__value {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      color: var(--ink);
+    }
+    .stat-card__meta {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      color: var(--ink-soft);
+      margin-top: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .stat-card__meta i {
+      width: 6px; height: 6px; border-radius: 50%;
+      display: inline-block;
+    }
+    .stat-card__meta .up { background: var(--good); }
+    .stat-card__meta .down { background: var(--bad); }
+    .stat-card__meta .flat { background: var(--accent); }
+
+    /* ---------- Forms (matches zone login) ---------- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+    .field { display: grid; gap: .3rem; }
+    .field span {
+      font-size: .68rem; text-transform: uppercase; letter-spacing: .12em;
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+    }
+    .field input, .field select {
+      font: inherit; color: var(--ink);
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: .7rem .9rem;
+      transition: border-color .3s, background-color .3s, box-shadow .3s;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+    }
+    .field input::placeholder, .field select::placeholder { color: var(--ink-faint); }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--paper);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .field--full { grid-column: 1 / -1; }
+
+    .form-actions {
+      display: flex;
+      gap: .8rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    /* ---------- Tables ---------- */
+    .owner-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: .78rem;
+    }
+    .owner-table thead { background: var(--paper-2); }
+    .owner-table th {
+      padding: .9rem 1rem;
+      text-align: left;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-size: .65rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .owner-table td {
+      padding: .9rem 1rem;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+      font-weight: 400;
+      vertical-align: middle;
+    }
+    .owner-table tr:last-child td { border-bottom: none; }
+    .owner-table tr:hover td { background: var(--paper-2); transition: background .2s; }
+    .owner-table__name { font-weight: 500; color: var(--ink); }
+    .owner-table__meta { font-size: .65rem; color: var(--ink-soft); display: block; margin-top: .15rem; }
+
+    /* ---------- Badges ---------- */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: .25em .7em;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .badge--paid { background: rgba(74, 124, 89, .1); color: var(--good); border: 1px solid rgba(74, 124, 89, .2); }
+    .badge--partial { background: rgba(196, 160, 48, .1); color: #a08020; border: 1px solid rgba(196, 160, 48, .2); }
+    .badge--pending { background: rgba(160, 48, 48, .1); color: var(--bad); border: 1px solid rgba(160, 48, 48, .2); }
+
+    /* ---------- Progress Bar ---------- */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .progress-bar {
+      width: 60px;
+      height: 4px;
+      background: var(--paper-3);
+      border-radius: 100px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .progress-fill {
+      display: block;
+      height: 100%;
+      border-radius: 100px;
+      transition: width .6s var(--ease);
+    }
+    .progress-fill--green { background: var(--good); }
+    .progress-fill--orange { background: #c4a030; }
+    .progress-fill--red { background: var(--bad); }
+    .progress-text {
+      font-size: .65rem;
+      color: var(--ink-soft);
+      min-width: 32px;
+    }
+
+    /* ---------- Action Buttons ---------- */
+    .action-btns { display: flex; gap: .4rem; }
+    .action-btn {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      transition: all .25s;
+      background: var(--paper);
+      cursor: none;
+      padding: 0;
+    }
+    .action-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+    .action-btn--danger:hover { border-color: var(--bad); background: rgba(160,48,48,.1); }
+    .action-btn--success:hover { border-color: var(--good); background: rgba(74,124,89,.1); }
+
+    /* ---------- Toolbar ---------- */
+    .toolbar {
+      display: flex;
+      gap: .8rem;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 340px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: .6rem .9rem .6rem 2.2rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: var(--ink);
+      background: var(--paper-2);
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .search-box input::placeholder { color: var(--ink-faint); }
+    .search-icon {
+      position: absolute;
+      left: .8rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-faint);
+      font-size: .8rem;
+      font-family: var(--font-mono);
+    }
+    .filter-select {
+      padding: .6rem .9rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--ink);
+      background: var(--paper-2);
+      transition: border-color .3s;
+      cursor: none;
+    }
+    .filter-select:focus { outline: none; border-color: var(--accent); }
+
+    /* ---------- Course Cards (mini) ---------- */
+    .course-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+    .course-mini-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.4rem;
+      background: var(--paper);
+      transition: transform .4s var(--ease-out), border-color .35s, box-shadow .4s;
+    }
+    .course-mini-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 32px -16px rgba(28, 25, 21, .12);
+    }
+    .course-mini-card__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.2rem;
+    }
+    .course-mini-card__name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    .course-mini-card__students {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--accent);
+    }
+    .course-mini-card__students-label {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+    }
+    .course-mini-card__stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .8rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+    }
+    .course-mini-card__stat-label {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ink-soft);
+    }
+    .course-mini-card__stat-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-top: .1rem;
+    }
+    .course-mini-card__stat-value--green { color: var(--good); }
+    .course-mini-card__stat-value--red { color: var(--bad); }
+
+    /* ---------- Chart Cards ---------- */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+    .chart-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.4rem;
+      background: var(--paper);
+      transition: border-color .4s, box-shadow .4s;
+    }
+    .chart-card:hover {
+      border-color: rgba(184, 92, 56, .3);
+      box-shadow: 0 16px 36px -16px rgba(28, 25, 21, .12);
+    }
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      letter-spacing: -.02em;
+    }
+    .chart-container { position: relative; height: 240px; }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    .analytics-full { grid-column: 1 / -1; }
+
+    /* ---------- Modal ---------- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 25, 21, .35);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .modal-overlay.is-active { display: flex; }
+    .modal {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 40px 80px -20px rgba(28, 25, 21, .2);
+      animation: modalIn .35s var(--ease-out);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(12px) scale(.98); }
+      to { opacity: 1; transform: none; }
+    }
+    .modal__header {
+      padding: 1.4rem 1.6rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal__title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 400;
+    }
+    .modal__close {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--ink-soft);
+      transition: color .2s;
+      cursor: none;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+    }
+    .modal__close:hover { color: var(--ink); background: var(--paper-2); }
+    .modal__body { padding: 1rem 1.6rem 1.4rem; }
+    .modal__footer {
+      padding: 0 1.6rem 1.4rem;
+      display: flex;
+      gap: .6rem;
+      justify-content: flex-end;
+    }
+
+    /* ---------- Fee Breakdown ---------- */
+    .fee-breakdown {
+      background: var(--paper-2);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-top: .8rem;
+      border: 1px solid var(--line);
+    }
+    .fee-breakdown__item {
+      display: flex;
+      justify-content: space-between;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: .8rem;
+    }
+    .fee-breakdown__item:last-child {
+      border-bottom: none;
+      font-weight: 600;
+      color: var(--ink);
+      padding-top: .6rem;
+      margin-top: .2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ---------- Toast ---------- */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    .toast {
+      background: var(--ink);
+      color: var(--paper);
+      padding: .8rem 1.2rem;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      font-weight: 500;
+      box-shadow: 0 16px 32px -12px rgba(28, 25, 21, .3);
+      animation: toastIn .3s var(--ease-out);
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      min-width: 240px;
+      border-left: 3px solid var(--accent);
+    }
+    .toast--success { border-left-color: var(--good); }
+    .toast--error { border-left-color: var(--bad); }
+    @keyframes toastIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ---------- Empty State ---------- */
+    .empty-state {
+      padding: 3rem 1rem;
+      text-align: center;
+      color: var(--ink-faint);
+    }
+    .empty-state__icon { font-size: 2rem; margin-bottom: .6rem; opacity: .5; }
+    .empty-state__title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink-soft);
+      margin-bottom: .3rem;
+    }
+    .empty-state__desc {
+      font-size: .82rem;
+      color: var(--ink-faint);
+    }
+
+    /* ---------- Tabs ---------- */
+    .owner-tabs {
+      display: flex;
+      gap: .3rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0;
+      flex-wrap: wrap;
+    }
+    .owner-tab {
+      padding: .6rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      border: none;
+      background: none;
+      border-radius: 8px 8px 0 0;
+      transition: color .25s, background .25s;
+      cursor: none;
+      position: relative;
+      letter-spacing: .02em;
+    }
+    .owner-tab:hover { color: var(--ink); background: var(--paper-2); }
+    .owner-tab.is-active {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .owner-tab.is-active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px; left: 1rem; right: 1rem;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .owner-tab-panel { display: none; }
+    .owner-tab-panel.is-active { display: block; animation: fadeIn .35s var(--ease-out); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .course-cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .owner-page { padding-left: var(--pad); }
+      .charts-row { grid-template-columns: 1fr; }
+      .analytics-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .course-cards-grid { grid-template-columns: 1fr; }
+      .owner-table { display: block; overflow-x: auto; white-space: nowrap; }
+      .owner-table th, .owner-table td { padding: .7rem .6rem; }
+    }
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .owner-table th, .owner-table td { font-size: .7rem; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-box { max-width: none; }
+    }
+  </style>
+</head>
+<body data-theme="paper">
+
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- Grain -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- File Explorer Nav -->
+  <header class="nav" id="nav">
+    <button class="nav__expand" id="navExpand" aria-label="Show explorer">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="nav__explorer" id="navExplorer">
+      <div class="nav__explorer-head">
+        <span class="nav__explorer-title">EXPLORER</span>
+        <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="nav__tree" id="navTree">
+        <div class="nav__tree-item nav__tree-item--root">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span>techyuva</span>
+        </div>
+        <div class="nav__tree-children">
+          <a href="index.html#top" class="nav__tree-item" data-file="index.html">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>index.html</span>
+          </a>
+          <a href="index.html#about" class="nav__tree-item" data-file="about.md">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>about.md</span>
+          </a>
+          <div class="nav__tree-folder">
+            <div class="nav__tree-item nav__tree-item--folder" data-folder="courses">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+              <span>courses/</span>
+            </div>
+            <div class="nav__tree-children is-collapsed" id="folder-courses">
+              <a href="menu.html#java" class="nav__tree-item" data-file="java.md">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>java.md</span>
+              </a>
+              <a href="menu.html#cpp" class="nav__tree-item" data-file="cpp.md">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>cpp.md</span>
+              </a>
+              <a href="menu.html#python" class="nav__tree-item" data-file="python.md">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>python.md</span>
+              </a>
+            </div>
+          </div>
+          <a href="studyzone.html" class="nav__tree-item" data-file="student-zone/">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>student-zone/</span>
+          </a>
+          <a href="index.html#analysis" class="nav__tree-item" data-file="practice.md">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>practice.md</span>
+          </a>
+          <a href="owner.html" class="nav__tree-item is-active" data-file="owner.html">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>owner.html</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="nav__bar">
+      <a href="index.html#top" class="nav__logo" data-magnetic>
+        <span class="nav__logo-mark">>_</span>TechYuva
+      </a>
+      <div class="nav__actions">
+        <a href="index.html" class="link-arrow" style="font-size:.78rem;" data-magnetic>← Back home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="owner-page">
+
+    <!-- Page Header -->
+    <div class="owner-head reveal">
+      <h1>Owner <em>Dashboard</em></h1>
+      <p>Manage registrations, track fees, and analyze course performance. Everything your institute needs in one view.</p>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="stats-grid reveal">
+      <div class="stat-card">
+        <div class="stat-card__label">Total Students</div>
+        <div class="stat-card__value" id="dashTotalStudents">0</div>
+        <div class="stat-card__meta"><i class="flat"></i>All active enrollments</div>
+      </div>
+      <div class="stat-card stat-card--green">
+        <div class="stat-card__label">Fees Collected</div>
+        <div class="stat-card__value" id="dashFeesCollected">₹0</div>
+        <div class="stat-card__meta"><i class="up"></i>Total received</div>
+      </div>
+      <div class="stat-card stat-card--orange">
+        <div class="stat-card__label">Pending Fees</div>
+        <div class="stat-card__value" id="dashPendingFees">₹0</div>
+        <div class="stat-card__meta"><i class="down"></i>Outstanding amount</div>
+      </div>
+      <div class="stat-card stat-card--red">
+        <div class="stat-card__label">Active Courses</div>
+        <div class="stat-card__value" id="dashActiveCourses">0</div>
+        <div class="stat-card__meta"><i class="flat"></i>Currently running</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row reveal">
+      <div class="chart-card">
+        <div class="chart-title">Payment Status</div>
+        <div class="chart-container"><canvas id="paymentStatusChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Students per Course</div>
+        <div class="chart-container"><canvas id="courseDistributionChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="owner-tabs reveal">
+      <button class="owner-tab is-active" data-tab="register">Register</button>
+      <button class="owner-tab" data-tab="students">Students</button>
+      <button class="owner-tab" data-tab="fees">Fees</button>
+      <button class="owner-tab" data-tab="courses">Courses</button>
+      <button class="owner-tab" data-tab="analytics">Analytics</button>
+    </div>
+
+    <!-- TAB: Register -->
+    <div class="owner-tab-panel is-active" id="panel-register">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon">+</div>
+            <div>
+              <h2>New Student Registration</h2>
+              <span>Add a student to the institute</span>
+            </div>
+          </div>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid">
+            <div class="field">
+              <span>Full Name</span>
+              <input type="text" id="studentName" placeholder="Enter student name" />
+            </div>
+            <div class="field">
+              <span>Email</span>
+              <input type="email" id="studentEmail" placeholder="student@email.com" />
+            </div>
+            <div class="field">
+              <span>Phone Number</span>
+              <input type="tel" id="studentPhone" placeholder="+91 98765 43210" />
+            </div>
+            <div class="field">
+              <span>Course</span>
+              <select id="studentCourse">
+                <option value="">Select Course</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Mobile App Development">Mobile App Development</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Cloud Computing">Cloud Computing</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="AI & Machine Learning">AI & Machine Learning</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+              </select>
+            </div>
+            <div class="field">
+              <span>Joining Date</span>
+              <input type="date" id="studentJoinDate" />
+            </div>
+            <div class="field">
+              <span>Total Course Fee (₹)</span>
+              <input type="number" id="studentTotalFee" placeholder="25000" />
+            </div>
+            <div class="field">
+              <span>Amount Paid (₹)</span>
+              <input type="number" id="studentPaidFee" placeholder="0" value="0" />
+            </div>
+            <div class="field">
+              <span>Payment Status</span>
+              <select id="studentStatus">
+                <option value="Pending">Pending</option>
+                <option value="Partial">Partial</option>
+                <option value="Paid">Paid</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn--primary" onclick="addStudent()" data-magnetic>
+              <span>$ register student</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="btn" onclick="clearStudentForm()" data-magnetic>
+              <span>$ clear</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Students -->
+    <div class="owner-tab-panel" id="panel-students">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--blue">👤</div>
+            <div>
+              <h2>All Students</h2>
+              <span>Manage student records</span>
+            </div>
+          </div>
+          <button class="owner-section__action" onclick="exportToCSV('students')">
+            <span>Export CSV</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="owner-section__body">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">$</span>
+              <input type="text" placeholder="Search students..." id="studentSearch" onkeyup="filterStudents()" />
+            </div>
+            <select class="filter-select" id="studentCourseFilter" onchange="filterStudents()">
+              <option value="">All Courses</option>
+            </select>
+            <select class="filter-select" id="studentStatusFilter" onchange="filterStudents()">
+              <option value="">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+          <table class="owner-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Join Date</th>
+                <th>Total Fee</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Fees -->
+    <div class="owner-tab-panel" id="panel-fees">
+      <div class="stats-grid reveal" style="margin-bottom:2rem;">
+        <div class="stat-card stat-card--green">
+          <div class="stat-card__label">Total Collected</div>
+          <div class="stat-card__value" id="feeTotalCollected">₹0</div>
+          <div class="stat-card__meta"><i class="up"></i>Across all students</div>
+        </div>
+        <div class="stat-card stat-card--orange">
+          <div class="stat-card__label">Total Pending</div>
+          <div class="stat-card__value" id="feeTotalPending">₹0</div>
+          <div class="stat-card__meta"><i class="down"></i>Yet to receive</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Fully Paid</div>
+          <div class="stat-card__value" id="feeFullyPaid">0</div>
+          <div class="stat-card__meta"><i class="up"></i>Students</div>
+        </div>
+        <div class="stat-card stat-card--red">
+          <div class="stat-card__label">Partial / Pending</div>
+          <div class="stat-card__value" id="feePartialPending">0</div>
+          <div class="stat-card__meta"><i class="down"></i>Need follow-up</div>
+        </div>
+      </div>
+
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--orange">💰</div>
+            <div>
+              <h2>Fee Payments</h2>
+              <span>Track payment status</span>
+            </div>
+          </div>
+          <button class="owner-section__action" onclick="exportToCSV('fees')">
+            <span>Export CSV</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="owner-section__body">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">$</span>
+              <input type="text" placeholder="Search by name or course..." id="feeSearch" onkeyup="filterFees()" />
+            </div>
+            <select class="filter-select" id="feeStatusFilter" onchange="filterFees()">
+              <option value="">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+          <table class="owner-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Total Fee</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="feesTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Courses -->
+    <div class="owner-tab-panel" id="panel-courses">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--green">📊</div>
+            <div>
+              <h2>Course Reports</h2>
+              <span>Performance by course</span>
+            </div>
+          </div>
+          <button class="owner-section__action" onclick="exportToCSV('courses')">
+            <span>Export CSV</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="owner-section__body">
+          <table class="owner-table" style="margin-bottom:1.4rem;">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Students</th>
+                <th>Total Revenue</th>
+                <th>Collected</th>
+                <th>Pending</th>
+                <th>Collection Rate</th>
+              </tr>
+            </thead>
+            <tbody id="coursesTable"></tbody>
+          </table>
+          <div class="course-cards-grid" id="courseCards"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Analytics -->
+    <div class="owner-tab-panel" id="panel-analytics">
+      <div class="analytics-grid reveal">
+        <div class="chart-card">
+          <div class="chart-title">Monthly Enrollment</div>
+          <div class="chart-container"><canvas id="enrollmentTrendChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Fee Collection</div>
+          <div class="chart-container"><canvas id="collectionTrendChart"></canvas></div>
+        </div>
+        <div class="chart-card analytics-full">
+          <div class="chart-title">Course Revenue</div>
+          <div class="chart-container" style="height:280px;"><canvas id="revenueComparisonChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" style="padding-left: calc(var(--nav-edge) + var(--pad)); border-top:1px solid var(--line);">
+    <span class="footer__logo">>_TechYuva</span>
+    <p>Owner dashboard. Built for analysis, not distraction.</p>
+    <span class="footer__year">© 2026 TechYuva</span>
+  </footer>
+
+  <!-- Payment Modal -->
+  <div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+      <div class="modal__header">
+        <div class="modal__title">Record Payment</div>
+        <button class="modal__close" onclick="closePaymentModal()">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div class="field">
+          <span>Student</span>
+          <input type="text" id="paymentStudentName" readonly />
+        </div>
+        <div class="form-grid" style="margin-top:.6rem;">
+          <div class="field">
+            <span>Total Fee</span>
+            <input type="text" id="paymentTotalFee" readonly />
+          </div>
+          <div class="field">
+            <span>Already Paid</span>
+            <input type="text" id="paymentAlreadyPaid" readonly />
+          </div>
+        </div>
+        <div class="field">
+          <span>Remaining Balance</span>
+          <input type="text" id="paymentRemaining" readonly style="color:var(--bad); font-weight:600;" />
+        </div>
+        <div class="field" style="margin-top:.6rem;">
+          <span>Amount to Pay Now (₹)</span>
+          <input type="number" id="paymentAmount" placeholder="Enter amount" />
+        </div>
+        <div class="fee-breakdown" id="paymentBreakdown"></div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn" onclick="closePaymentModal()" data-magnetic><span>$ cancel</span></button>
+        <button class="btn btn--primary" onclick="recordPayment()" data-magnetic>
+          <span>$ record payment</span>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal__header">
+        <div class="modal__title">Edit Student</div>
+        <button class="modal__close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal__body">
+        <input type="hidden" id="editStudentId" />
+        <div class="form-grid">
+          <div class="field">
+            <span>Full Name</span>
+            <input type="text" id="editName" />
+          </div>
+          <div class="field">
+            <span>Email</span>
+            <input type="email" id="editEmail" />
+          </div>
+          <div class="field">
+            <span>Phone</span>
+            <input type="tel" id="editPhone" />
+          </div>
+          <div class="field">
+            <span>Course</span>
+            <select id="editCourse">
+              <option value="Web Development">Web Development</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Mobile App Development">Mobile App Development</option>
+              <option value="UI/UX Design">UI/UX Design</option>
+              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="Cybersecurity">Cybersecurity</option>
+              <option value="AI & Machine Learning">AI & Machine Learning</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+            </select>
+          </div>
+          <div class="field">
+            <span>Total Fee (₹)</span>
+            <input type="number" id="editTotalFee" />
+          </div>
+          <div class="field">
+            <span>Amount Paid (₹)</span>
+            <input type="number" id="editPaidFee" />
+          </div>
+          <div class="field">
+            <span>Status</span>
+            <select id="editStatus">
+              <option value="Pending">Pending</option>
+              <option value="Partial">Partial</option>
+              <option value="Paid">Paid</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn" onclick="closeEditModal()" data-magnetic><span>$ cancel</span></button>
+        <button class="btn btn--primary" onclick="saveEditStudent()" data-magnetic>
+          <span>$ save changes</span>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ==================== DATA ====================
+    let students = JSON.parse(localStorage.getItem('techyuva_students')) || [];
+    let currentPaymentId = null;
+    let charts = {};
+    const COURSES = [
+      'Web Development','Data Science','Mobile App Development','UI/UX Design',
+      'Cloud Computing','Cybersecurity','AI & Machine Learning','Digital Marketing'
+    ];
+
+    function loadDemoData() {
+      if (students.length === 0) {
+        students = [
+          { id:1, name:'Rahul Sharma', email:'rahul.s@email.com', phone:'+91 98765 43210', course:'Web Development', joinDate:'2025-01-15', totalFee:25000, paidFee:25000, status:'Paid' },
+          { id:2, name:'Priya Patel', email:'priya.p@email.com', phone:'+91 87654 32109', course:'Data Science', joinDate:'2025-01-20', totalFee:35000, paidFee:17500, status:'Partial' },
+          { id:3, name:'Amit Kumar', email:'amit.k@email.com', phone:'+91 76543 21098', course:'Web Development', joinDate:'2025-02-01', totalFee:25000, paidFee:10000, status:'Partial' },
+          { id:4, name:'Sneha Gupta', email:'sneha.g@email.com', phone:'+91 65432 10987', course:'UI/UX Design', joinDate:'2025-02-10', totalFee:20000, paidFee:20000, status:'Paid' },
+          { id:5, name:'Vikram Rao', email:'vikram.r@email.com', phone:'+91 54321 09876', course:'Mobile App Development', joinDate:'2025-02-15', totalFee:30000, paidFee:0, status:'Pending' },
+          { id:6, name:'Ananya Desai', email:'ananya.d@email.com', phone:'+91 43210 98765', course:'Cloud Computing', joinDate:'2025-03-01', totalFee:28000, paidFee:28000, status:'Paid' },
+          { id:7, name:'Karan Mehta', email:'karan.m@email.com', phone:'+91 32109 87654', course:'Web Development', joinDate:'2025-03-05', totalFee:25000, paidFee:5000, status:'Partial' },
+          { id:8, name:'Divya Iyer', email:'divya.i@email.com', phone:'+91 21098 76543', course:'Cybersecurity', joinDate:'2025-03-10', totalFee:32000, paidFee:0, status:'Pending' },
+          { id:9, name:'Arjun Nair', email:'arjun.n@email.com', phone:'+91 10987 65432', course:'AI & Machine Learning', joinDate:'2025-03-15', totalFee:40000, paidFee:20000, status:'Partial' },
+          { id:10, name:'Meera Joshi', email:'meera.j@email.com', phone:'+91 09876 54321', course:'Digital Marketing', joinDate:'2025-03-20', totalFee:18000, paidFee:18000, status:'Paid' },
+          { id:11, name:'Raj Malhotra', email:'raj.m@email.com', phone:'+91 98760 12345', course:'Data Science', joinDate:'2025-04-01', totalFee:35000, paidFee:0, status:'Pending' },
+          { id:12, name:'Kavita Reddy', email:'kavita.r@email.com', phone:'+91 87651 23456', course:'Web Development', joinDate:'2025-04-05', totalFee:25000, paidFee:25000, status:'Paid' }
+        ];
+        saveData();
+        showToast('Demo data loaded for preview', 'success');
+      }
+    }
+    function saveData() { localStorage.setItem('techyuva_students', JSON.stringify(students)); }
+
+    // ==================== SHARED UTILITIES (from style.css) ====================
+    const $ = (s, c=document) => c.querySelector(s);
+    const $$ = (s, c=document) => [...c.querySelectorAll(s)];
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
+
+    // Nav
+    const nav = $('#nav');
+    $('#explorerToggle')?.addEventListener('click', () => nav.classList.add('is-collapsed'));
+    $('#navExpand')?.addEventListener('click', () => nav.classList.remove('is-collapsed'));
+    $$('[data-folder]').forEach(folder => {
+      folder.addEventListener('click', () => {
+        const id = folder.dataset.folder;
+        const children = $(`#folder-${id}`);
+        if (children) { children.classList.toggle('is-collapsed'); folder.classList.toggle('is-open'); }
+      });
+    });
+
+    // Scroll Progress
+    const bar = $('#scrollProgress')?.querySelector('span');
+    if (bar) {
+      const update = () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        bar.style.width = max > 0 ? (scrollY / max) * 100 + '%' : '0%';
+      };
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+      update();
+    }
+
+    // Custom Cursor
+    if (!isTouch) {
+      const ring = $('#cursor'), dot = $('#cursorDot');
+      let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+      addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+      });
+      addEventListener('mousedown', () => ring.classList.add('is-down'));
+      addEventListener('mouseup', () => ring.classList.remove('is-down'));
+      const loop = () => {
+        rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
+        ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+        requestAnimationFrame(loop);
+      };
+      loop();
+      document.addEventListener('mouseover', e => { if (e.target.closest('a, button, [data-magnetic], input, select, .owner-tab, .action-btn')) ring.classList.add('is-hover'); });
+      document.addEventListener('mouseout', e => { if (e.target.closest('a, button, [data-magnetic], input, select, .owner-tab, .action-btn')) ring.classList.remove('is-hover'); });
+    }
+
+    // Magnetic Elements
+    if (!isTouch && !reducedMotion) {
+      $$('[data-magnetic]').forEach(el => {
+        const strength = 0.3;
+        el.addEventListener('mousemove', e => {
+          const r = el.getBoundingClientRect();
+          el.style.transform = `translate(${(e.clientX - r.left - r.width/2)*strength}px, ${(e.clientY - r.top - r.height/2)*strength}px)`;
+          el.style.transition = 'transform .12s ease-out';
+        });
+        el.addEventListener('mouseleave', () => {
+          el.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)';
+          el.style.transform = '';
+        });
+      });
+    }
+
+    // Scroll Reveals
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (!en.isIntersecting) return; en.target.classList.add('is-visible'); revealObserver.unobserve(en.target); });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    $$('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ==================== TABS ====================
+    $$('.owner-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const panelId = tab.dataset.tab;
+        $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
+        $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
+        tab.classList.add('is-active');
+        $(`#panel-${panelId}`).classList.add('is-active');
+        if (panelId === 'students') { updateStudentsTable(); updateCourseFilters(); }
+        if (panelId === 'fees') updateFeesTable();
+        if (panelId === 'courses') updateCourses();
+        if (panelId === 'analytics') updateAnalytics();
+      });
+    });
+
+    // ==================== DASHBOARD ====================
+    function updateDashboard() {
+      const totalStudents = students.length;
+      const totalCollected = students.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const totalPending = students.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const activeCourses = [...new Set(students.map(s => s.course))].filter(c => c).length;
+
+      $('#dashTotalStudents').textContent = totalStudents;
+      $('#dashFeesCollected').textContent = '₹' + totalCollected.toLocaleString('en-IN');
+      $('#dashPendingFees').textContent = '₹' + totalPending.toLocaleString('en-IN');
+      $('#dashActiveCourses').textContent = activeCourses;
+
+      const paidCount = students.filter(s => s.status === 'Paid').length;
+      const partialCount = students.filter(s => s.status === 'Partial').length;
+      const pendingCount = students.filter(s => s.status === 'Pending').length;
+
+      if (charts.paymentStatus) charts.paymentStatus.destroy();
+      charts.paymentStatus = new Chart($('#paymentStatusChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Paid', 'Partial', 'Pending'],
+          datasets: [{
+            data: [paidCount, partialCount, pendingCount],
+            backgroundColor: ['#4a7c59', '#c4a030', '#a03030'],
+            borderWidth: 0, hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 16, font: { family: 'JetBrains Mono', size: 11 }, usePointStyle: true, boxWidth: 8 } }
+          }
+        }
+      });
+
+      const courseCounts = {};
+      students.forEach(s => { courseCounts[s.course] = (courseCounts[s.course] || 0) + 1; });
+
+      if (charts.courseDist) charts.courseDist.destroy();
+      charts.courseDist = new Chart($('#courseDistributionChart'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(courseCounts),
+          datasets: [{
+            label: 'Students',
+            data: Object.values(courseCounts),
+            backgroundColor: '#b85c38',
+            borderRadius: 5, barThickness: 22
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#e8e3d6' }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#9CA3AF' } },
+            x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#6B7280', maxRotation: 35 } }
+          }
+        }
+      });
+    }
+
+    // ==================== STUDENTS ====================
+    function updateStudentsTable() {
+      const search = $('#studentSearch').value.toLowerCase();
+      const courseFilter = $('#studentCourseFilter').value;
+      const statusFilter = $('#studentStatusFilter').value;
+      let filtered = students.filter(s => {
+        const matchSearch = s.name.toLowerCase().includes(search) || s.email.toLowerCase().includes(search) || s.course.toLowerCase().includes(search);
+        const matchCourse = !courseFilter || s.course === courseFilter;
+        const matchStatus = !statusFilter || s.status === statusFilter;
+        return matchSearch && matchCourse && matchStatus;
+      });
+      const tbody = $('#studentsTable');
+      tbody.innerHTML = filtered.map(s => {
+        const balance = (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0);
+        return `
+          <tr>
+            <td>
+              <div class="owner-table__name">${s.name}</div>
+              <div class="owner-table__meta">${s.email} · ${s.phone}</div>
+            </td>
+            <td>${s.course}</td>
+            <td>${formatDate(s.joinDate)}</td>
+            <td>₹${(parseFloat(s.totalFee) || 0).toLocaleString('en-IN')}</td>
+            <td>₹${(parseFloat(s.paidFee) || 0).toLocaleString('en-IN')}</td>
+            <td style="color:${balance>0?'var(--bad)':'var(--good)'}; font-weight:600;">₹${balance.toLocaleString('en-IN')}</td>
+            <td>${getBadge(s.status)}</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" onclick="editStudent(${s.id})" title="Edit">✏</button>
+                <button class="action-btn action-btn--success" onclick="openPaymentModal(${s.id})" title="Record Payment">₹</button>
+                <button class="action-btn action-btn--danger" onclick="deleteStudent(${s.id})" title="Delete">✕</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || emptyRow(8, 'No students found', 'Add a student or adjust filters');
+    }
+
+    function updateCourseFilters() {
+      const select = $('#studentCourseFilter');
+      const currentVal = select.value;
+      select.innerHTML = '<option value="">All Courses</option>' + COURSES.map(c => `<option value="${c}">${c}</option>`).join('');
+      select.value = currentVal;
+    }
+    function filterStudents() { updateStudentsTable(); }
+
+    function addStudent() {
+      const name = $('#studentName').value.trim();
+      const email = $('#studentEmail').value.trim();
+      const phone = $('#studentPhone').value.trim();
+      const course = $('#studentCourse').value;
+      const joinDate = $('#studentJoinDate').value;
+      const totalFee = parseFloat($('#studentTotalFee').value) || 0;
+      const paidFee = parseFloat($('#studentPaidFee').value) || 0;
+      const status = $('#studentStatus').value;
+      if (!name || !course || !joinDate) { showToast('Please fill name, course, and join date', 'error'); return; }
+      const newStudent = {
+        id: Date.now(), name, email, phone, course, joinDate, totalFee, paidFee,
+        status: paidFee >= totalFee && totalFee > 0 ? 'Paid' : paidFee > 0 ? 'Partial' : status
+      };
+      students.push(newStudent); saveData(); clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
+      showToast('Student registered successfully!', 'success');
+      // Switch to students tab
+      $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
+      $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
+      $(`[data-tab="students"]`).classList.add('is-active');
+      $('#panel-students').classList.add('is-active');
+    }
+
+    function clearStudentForm() {
+      $('#studentName').value = ''; $('#studentEmail').value = ''; $('#studentPhone').value = '';
+      $('#studentCourse').value = ''; $('#studentJoinDate').value = '';
+      $('#studentTotalFee').value = ''; $('#studentPaidFee').value = '0'; $('#studentStatus').value = 'Pending';
+    }
+    function deleteStudent(id) { if (!confirm('Delete this student?')) return; students = students.filter(s => s.id !== id); saveData(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses(); showToast('Student deleted', 'success'); }
+    function editStudent(id) {
+      const s = students.find(x => x.id === id); if (!s) return;
+      $('#editStudentId').value = s.id; $('#editName').value = s.name; $('#editEmail').value = s.email;
+      $('#editPhone').value = s.phone; $('#editCourse').value = s.course; $('#editTotalFee').value = s.totalFee;
+      $('#editPaidFee').value = s.paidFee; $('#editStatus').value = s.status;
+      $('#editModal').classList.add('is-active');
+    }
+    function saveEditStudent() {
+      const id = parseInt($('#editStudentId').value);
+      const s = students.find(x => x.id === id); if (!s) return;
+      s.name = $('#editName').value.trim(); s.email = $('#editEmail').value.trim(); s.phone = $('#editPhone').value.trim();
+      s.course = $('#editCourse').value; s.totalFee = parseFloat($('#editTotalFee').value) || 0;
+      s.paidFee = parseFloat($('#editPaidFee').value) || 0; s.status = $('#editStatus').value;
+      if (s.paidFee >= s.totalFee && s.totalFee > 0) s.status = 'Paid';
+      else if (s.paidFee > 0) s.status = 'Partial';
+      else s.status = 'Pending';
+      saveData(); closeEditModal(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
+      showToast('Student updated successfully!', 'success');
+    }
+    function closeEditModal() { $('#editModal').classList.remove('is-active'); }
+
+    // ==================== FEES ====================
+    function updateFeesTable() {
+      const totalCollected = students.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const totalPending = students.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const fullyPaid = students.filter(s => s.status === 'Paid').length;
+      const partialPending = students.filter(s => s.status !== 'Paid').length;
+      $('#feeTotalCollected').textContent = '₹' + totalCollected.toLocaleString('en-IN');
+      $('#feeTotalPending').textContent = '₹' + totalPending.toLocaleString('en-IN');
+      $('#feeFullyPaid').textContent = fullyPaid;
+      $('#feePartialPending').textContent = partialPending;
+
+      const search = $('#feeSearch').value.toLowerCase();
+      const statusFilter = $('#feeStatusFilter').value;
+      let filtered = students.filter(s => {
+        const matchSearch = s.name.toLowerCase().includes(search) || s.course.toLowerCase().includes(search);
+        const matchStatus = !statusFilter || s.status === statusFilter;
+        return matchSearch && matchStatus;
+      });
+      const tbody = $('#feesTable');
+      tbody.innerHTML = filtered.map(s => {
+        const total = parseFloat(s.totalFee) || 0; const paid = parseFloat(s.paidFee) || 0;
+        const balance = total - paid; const pct = total > 0 ? Math.round((paid / total) * 100) : 0;
+        let pcls = pct >= 100 ? 'progress-fill--green' : pct >= 50 ? 'progress-fill--orange' : 'progress-fill--red';
+        return `
+          <tr>
+            <td>
+              <div class="owner-table__name">${s.name}</div>
+              <div class="owner-table__meta">${s.email}</div>
+            </td>
+            <td>${s.course}</td>
+            <td>₹${total.toLocaleString('en-IN')}</td>
+            <td>₹${paid.toLocaleString('en-IN')}</td>
+            <td style="color:var(--bad); font-weight:600;">₹${balance.toLocaleString('en-IN')}</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${pct}%"></div></div>
+                <span class="progress-text">${pct}%</span>
+              </div>
+            </td>
+            <td>${getBadge(s.status)}</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn action-btn--success" onclick="openPaymentModal(${s.id})" title="Record Payment">₹</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || emptyRow(8, 'No fee records', 'Add students to see data');
+    }
+    function filterFees() { updateFeesTable(); }
+
+    function openPaymentModal(id) {
+      const s = students.find(x => x.id === id); if (!s) return;
+      currentPaymentId = id;
+      const total = parseFloat(s.totalFee) || 0; const paid = parseFloat(s.paidFee) || 0; const balance = total - paid;
+      $('#paymentStudentName').value = s.name; $('#paymentTotalFee').value = '₹' + total.toLocaleString('en-IN');
+      $('#paymentAlreadyPaid').value = '₹' + paid.toLocaleString('en-IN');
+      $('#paymentRemaining').value = '₹' + balance.toLocaleString('en-IN');
+      $('#paymentAmount').value = ''; $('#paymentAmount').max = balance; $('#paymentAmount').placeholder = 'Max ₹' + balance.toLocaleString('en-IN');
+      $('#paymentBreakdown').innerHTML = `
+        <div class="fee-breakdown__item"><span>Total Fee</span><span>₹${total.toLocaleString('en-IN')}</span></div>
+        <div class="fee-breakdown__item"><span>Paid So Far</span><span>₹${paid.toLocaleString('en-IN')}</span></div>
+        <div class="fee-breakdown__item"><span>Remaining</span><span>₹${balance.toLocaleString('en-IN')}</span></div>
+      `;
+      $('#paymentModal').classList.add('is-active');
+    }
+    function closePaymentModal() { $('#paymentModal').classList.remove('is-active'); currentPaymentId = null; }
+    function recordPayment() {
+      if (!currentPaymentId) return;
+      const amount = parseFloat($('#paymentAmount').value) || 0;
+      if (amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
+      const s = students.find(x => x.id === currentPaymentId);
+      const balance = (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0);
+      if (amount > balance) { showToast('Amount exceeds balance', 'error'); return; }
+      s.paidFee = (parseFloat(s.paidFee) || 0) + amount;
+      if (s.paidFee >= s.totalFee && s.totalFee > 0) s.status = 'Paid';
+      else if (s.paidFee > 0) s.status = 'Partial';
+      saveData(); closePaymentModal(); updateFeesTable(); updateStudentsTable(); updateDashboard(); updateCourses();
+      showToast(`Payment of ₹${amount.toLocaleString('en-IN')} recorded`, 'success');
+    }
+
+    // ==================== COURSES ====================
+    function updateCourses() {
+      const courseData = {};
+      COURSES.forEach(c => { courseData[c] = { students:0, totalRevenue:0, collected:0, pending:0 }; });
+      students.forEach(s => { if (courseData[s.course]) { courseData[s.course].students++; courseData[s.course].totalRevenue += parseFloat(s.totalFee) || 0; courseData[s.course].collected += parseFloat(s.paidFee) || 0; courseData[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); }});
+      const tbody = $('#coursesTable');
+      tbody.innerHTML = Object.entries(courseData).map(([course, data]) => {
+        const rate = data.totalRevenue > 0 ? Math.round((data.collected / data.totalRevenue) * 100) : 0;
+        let pcls = rate >= 80 ? 'progress-fill--green' : rate >= 50 ? 'progress-fill--orange' : 'progress-fill--red';
+        return `
+          <tr>
+            <td><div class="owner-table__name">${course}</div></td>
+            <td><strong>${data.students}</strong></td>
+            <td>₹${data.totalRevenue.toLocaleString('en-IN')}</td>
+            <td style="color:var(--good); font-weight:600;">₹${data.collected.toLocaleString('en-IN')}</td>
+            <td style="color:var(--bad); font-weight:600;">₹${data.pending.toLocaleString('en-IN')}</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${rate}%"></div></div>
+                <span class="progress-text">${rate}%</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      $('#courseCards').innerHTML = Object.entries(courseData).map(([course, data]) => `
+        <div class="course-mini-card">
+          <div class="course-mini-card__head">
+            <div class="course-mini-card__name">${course}</div>
+            <div>
+              <div class="course-mini-card__students">${data.students}</div>
+              <div class="course-mini-card__students-label">students</div>
+            </div>
+          </div>
+          <div class="course-mini-card__stats">
+            <div>
+              <div class="course-mini-card__stat-label">Collected</div>
+              <div class="course-mini-card__stat-value course-mini-card__stat-value--green">₹${data.collected.toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              <div class="course-mini-card__stat-label">Pending</div>
+              <div class="course-mini-card__stat-value course-mini-card__stat-value--red">₹${data.pending.toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              <div class="course-mini-card__stat-label">Total</div>
+              <div class="course-mini-card__stat-value">₹${data.totalRevenue.toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              <div class="course-mini-card__stat-label">Rate</div>
+              <div class="course-mini-card__stat-value">${data.students > 0 ? Math.round((data.collected / data.totalRevenue) * 100) : 0}%</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==================== ANALYTICS ====================
+    function updateAnalytics() {
+      const monthlyData = {};
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); monthlyData[d.toLocaleString('en-US', { month: 'short' })] = 0; }
+      students.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyData.hasOwnProperty(key)) monthlyData[key]++; });
+      if (charts.enrollmentTrend) charts.enrollmentTrend.destroy();
+      charts.enrollmentTrend = new Chart($('#enrollmentTrendChart'), {
+        type: 'line',
+        data: { labels: Object.keys(monthlyData), datasets: [{ label: 'New Students', data: Object.values(monthlyData), borderColor: '#b85c38', backgroundColor: 'rgba(184,92,56,0.08)', fill: true, tension: 0.4, pointRadius: 5, pointBackgroundColor: '#b85c38', pointBorderColor: '#f7f4ed', pointBorderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#e8e3d6' }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#9CA3AF' } }, x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#6B7280' } } } }
+      });
+      const monthlyCollection = {};
+      for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); monthlyCollection[d.toLocaleString('en-US', { month: 'short' })] = 0; }
+      students.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyCollection.hasOwnProperty(key)) monthlyCollection[key] += parseFloat(s.paidFee) || 0; });
+      if (charts.collectionTrend) charts.collectionTrend.destroy();
+      charts.collectionTrend = new Chart($('#collectionTrendChart'), {
+        type: 'bar',
+        data: { labels: Object.keys(monthlyCollection), datasets: [{ label: 'Fees Collected (₹)', data: Object.values(monthlyCollection), backgroundColor: '#4a7c59', borderRadius: 5, barThickness: 24 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#e8e3d6' }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#9CA3AF', callback: v => '₹' + (v / 1000) + 'k' } }, x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#6B7280' } } } }
+      });
+      const courseRevenue = {};
+      COURSES.forEach(c => { courseRevenue[c] = { collected: 0, pending: 0 }; });
+      students.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); } });
+      if (charts.revenueCompare) charts.revenueCompare.destroy();
+      charts.revenueCompare = new Chart($('#revenueComparisonChart'), {
+        type: 'bar',
+        data: { labels: Object.keys(courseRevenue), datasets: [
+          { label: 'Collected', data: Object.values(courseRevenue).map(d => d.collected), backgroundColor: '#4a7c59', borderRadius: 5, barThickness: 18 },
+          { label: 'Pending', data: Object.values(courseRevenue).map(d => d.pending), backgroundColor: '#a03030', borderRadius: 5, barThickness: 18 }
+        ] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, padding: 16, font: { family: 'JetBrains Mono', size: 11 } } } }, scales: { y: { beginAtZero: true, grid: { color: '#e8e3d6' }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#9CA3AF', callback: v => '₹' + (v / 1000) + 'k' } }, x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#6B7280', maxRotation: 30 } } } }
+      });
+    }
+
+    // ==================== EXPORT CSV ====================
+    function exportToCSV(type) {
+      let data = [], headers = [], filename = '';
+      if (type === 'students') {
+        filename = 'students.csv'; headers = ['ID','Name','Email','Phone','Course','Join Date','Total Fee','Paid Fee','Balance','Status'];
+        data = students.map(s => ({ ID:s.id, Name:s.name, Email:s.email, Phone:s.phone, Course:s.course, 'Join Date':s.joinDate, 'Total Fee':s.totalFee, 'Paid Fee':s.paidFee, Balance:(parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0), Status:s.status }));
+      } else if (type === 'fees') {
+        filename = 'fee_payments.csv'; headers = ['Name','Course','Total Fee','Paid Fee','Balance','Status'];
+        data = students.map(s => ({ Name:s.name, Course:s.course, 'Total Fee':s.totalFee, 'Paid Fee':s.paidFee, Balance:(parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0), Status:s.status }));
+      } else if (type === 'courses') {
+        filename = 'course_reports.csv'; headers = ['Course','Students','Total Revenue','Collected','Pending','Collection Rate %'];
+        const cd = {}; COURSES.forEach(c => { cd[c] = { students:0, total:0, collected:0, pending:0 }; });
+        students.forEach(s => { if (cd[s.course]) { cd[s.course].students++; cd[s.course].total += parseFloat(s.totalFee)||0; cd[s.course].collected += parseFloat(s.paidFee)||0; cd[s.course].pending += (parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0); } });
+        data = Object.entries(cd).map(([course, d]) => ({ Course:course, Students:d.students, 'Total Revenue':d.total, Collected:d.collected, Pending:d.pending, 'Collection Rate %':d.total > 0 ? Math.round((d.collected/d.total)*100) : 0 }));
+      }
+      if (data.length === 0) { showToast('No data to export', 'error'); return; }
+      const csv = [headers.join(','), ...data.map(row => headers.map(h => `"${row[h]}"`).join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = filename; link.click();
+      showToast(`Exported ${filename}`, 'success');
+    }
+
+    // ==================== UTILITIES ====================
+    function getBadge(status) {
+      const classes = { 'Paid':'badge--paid', 'Partial':'badge--partial', 'Pending':'badge--pending' };
+      return `<span class="badge ${classes[status] || 'badge--pending'}">${status}</span>`;
+    }
+    function formatDate(dateStr) { if (!dateStr) return '-'; const d = new Date(dateStr); return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
+    function showToast(message, type = 'success') {
+      const container = $('#toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast--${type}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${message}`;
+      container.appendChild(toast); setTimeout(() => toast.remove(), 3000);
+    }
+    function emptyRow(cols, title, desc) {
+      return `<tr><td colspan="${cols}"><div class="empty-state"><div class="empty-state__icon">—</div><div class="empty-state__title">${title}</div><div class="empty-state__desc">${desc}</div></div></td></tr>`;
+    }
+
+    // Modal overlay click
+    $$('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('is-active'); }); });
+
+    // Auto-calculate status
+    $('#studentPaidFee')?.addEventListener('input', function() {
+      const total = parseFloat($('#studentTotalFee').value) || 0; const paid = parseFloat(this.value) || 0;
+      const status = $('#studentStatus'); if (paid >= total && total > 0) status.value = 'Paid'; else if (paid > 0) status.value = 'Partial'; else status.value = 'Pending';
+    });
+    $('#studentTotalFee')?.addEventListener('input', function() {
+      const total = parseFloat(this.value) || 0; const paid = parseFloat($('#studentPaidFee').value) || 0;
+      const status = $('#studentStatus'); if (paid >= total && total > 0) status.value = 'Paid'; else if (paid > 0) status.value = 'Partial'; else status.value = 'Pending';
+    });
+
+    // Set default join date
+    $('#studentJoinDate').value = new Date().toISOString().split('T')[0];
+
+    // Init
+    loadDemoData();
+    updateDashboard();
+    updateStudentsTable();
+    updateCourseFilters();
+  </script>
+</body>
+</html>
