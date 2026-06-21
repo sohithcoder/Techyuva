@@ -697,7 +697,7 @@
     /* Fix date input width consistency */
     .toolbar input[type="date"] { min-width: 130px; }
     /* Fix table ensures no overflow clipping */
-    .owner-table { width: 100%; }
+    .owner-table { width: 100%; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .owner-table td, .owner-table th { white-space: nowrap; }
     .owner-table td:first-child, .owner-table th:first-child { padding-left: .6rem; }
     /* Ensure nowhere on the page clips content */
@@ -1004,7 +1004,6 @@
                 <th>Expected End</th>
                 <th>Total Fee</th>
                 <th>Paid</th>
-                <th>Balance</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -1636,7 +1635,6 @@
             <td>${endLabel}</td>
             <td>₹${(parseFloat(s.totalFee) || 0).toLocaleString('en-IN')}</td>
             <td>₹${(parseFloat(s.paidFee) || 0).toLocaleString('en-IN')}</td>
-            <td style="color:${balance>0?'var(--bad)':'var(--good)'}; font-weight:600;">₹${balance.toLocaleString('en-IN')}</td>
             <td>${getBadge(s.status)}</td>
             <td>
               <div class="action-btns">
@@ -1647,7 +1645,7 @@
             </td>
           </tr>
         `;
-      }).join('') || emptyRow(10, 'No students found', 'Add a student or adjust filters');
+      }).join('') || emptyRow(9, 'No students found', 'Add a student or adjust filters');
     }
 
     function updateCourseFilters() {
