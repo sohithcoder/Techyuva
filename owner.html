@@ -60,7 +60,7 @@
       margin-bottom: clamp(2.5rem, 5vh, 3.5rem);
       border: 1px solid var(--line);
       border-radius: 16px;
-      overflow: hidden;
+      overflow: visible;
       background: var(--paper);
       transition: border-color .4s, box-shadow .4s;
     }
@@ -221,9 +221,9 @@
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 1.2rem;
+      gap: 1rem;
     }
-    .field { display: grid; gap: .3rem; }
+    .field { display: grid; gap: .3rem; min-width: 0; }
     .field span {
       font-size: .68rem; text-transform: uppercase; letter-spacing: .12em;
       color: var(--ink-soft);
@@ -234,12 +234,15 @@
       background: var(--paper-2);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: .7rem .9rem;
+      padding: .7rem .8rem;
       transition: border-color .3s, background-color .3s, box-shadow .3s;
       font-family: var(--font-mono);
-      font-size: .85rem;
+      font-size: .82rem;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
     }
-    .field input::placeholder, .field select::placeholder { color: var(--ink-faint); }
+    .field input::placeholder, .field select::placeholder { color: var(--ink-faint); overflow: visible; }
     .field input:focus, .field select:focus {
       outline: none;
       border-color: var(--accent);
@@ -683,7 +686,31 @@
       to { opacity: 1; transform: none; }
     }
 
+    /* ---------- Visual Bug Fixes ---------- */
+    /* Fix sticky header z-index conflict with nav bar */
+    .owner-section__header { z-index: 5; }
+    /* Fix cursor on form elements */
+    select, input, button, textarea { cursor: auto; }
+    @media (hover: hover) and (pointer: fine) {
+      select, input, button, textarea { cursor: none; }
+    }
+    /* Fix date input width consistency */
+    .toolbar input[type="date"] { min-width: 130px; }
+    /* Fix table ensures no overflow clipping */
+    .owner-table { width: 100%; }
+    .owner-table td, .owner-table th { white-space: nowrap; }
+    .owner-table td:first-child, .owner-table th:first-child { padding-left: .6rem; }
+    /* Ensure nowhere on the page clips content */
+    .owner-section__body { overflow: visible; }
+    /* Fix form inputs on constrained widths */
+    .field input, .field select { width: 100%; min-width: 0; }
+    /* Ensure expected end date field spans properly */
+    .field--full { grid-column: 1 / -1 !important; }
+
     /* ---------- Responsive ---------- */
+    @media (max-width: 1200px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 1100px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .course-cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -692,16 +719,21 @@
       .owner-page { padding-left: var(--pad); }
       .charts-row { grid-template-columns: 1fr; }
       .analytics-grid { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
       .course-cards-grid { grid-template-columns: 1fr; }
-      .owner-table { display: block; overflow-x: auto; white-space: nowrap; }
+      .owner-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
       .owner-table th, .owner-table td { padding: .7rem .6rem; }
+      .toolbar { flex-wrap: wrap; }
+      .toolbar input[type="date"] { width: 120px !important; min-width: 0; }
+      .toolbar > * { flex: 1 1 auto; min-width: 120px; }
+      .search-box { min-width: 140px; }
     }
     @media (max-width: 640px) {
       .stats-grid { grid-template-columns: 1fr; }
       .owner-table th, .owner-table td { font-size: .7rem; }
       .toolbar { flex-direction: column; align-items: stretch; }
-      .search-box { max-width: none; }
+      .toolbar input[type="date"] { width: 100% !important; }
+      .search-box { max-width: none; min-width: 0; }
+      .owner-section__header { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -838,6 +870,7 @@
       <button class="owner-tab" data-tab="students">Students</button>
       <button class="owner-tab" data-tab="fees">Fees</button>
       <button class="owner-tab" data-tab="courses">Courses</button>
+      <button class="owner-tab" data-tab="expenses">Expenses</button>
       <button class="owner-tab" data-tab="analytics">Analytics</button>
     </div>
 
@@ -860,8 +893,8 @@
               <input type="text" id="studentName" placeholder="Enter student name" />
             </div>
             <div class="field">
-              <span>Email</span>
-              <input type="email" id="studentEmail" placeholder="student@email.com" />
+              <span>Registration No.</span>
+              <input type="text" id="studentRegNo" placeholder="e.g. TY2025001" />
             </div>
             <div class="field">
               <span>Phone Number</span>
@@ -869,7 +902,7 @@
             </div>
             <div class="field">
               <span>Course</span>
-              <select id="studentCourse">
+              <select id="studentCourse" onchange="updateBatchesForCourse()">
                 <option value="">Select Course</option>
                 <option value="Web Development">Web Development</option>
                 <option value="Data Science">Data Science</option>
@@ -882,8 +915,22 @@
               </select>
             </div>
             <div class="field">
+              <span>Batch</span>
+              <select id="studentBatch">
+                <option value="">Select Batch</option>
+                <option value="Batch 1 (45 days)">Batch 1 (45 days)</option>
+                <option value="Batch 2 (45 days)">Batch 2 (45 days)</option>
+                <option value="Batch 3 (45 days)">Batch 3 (45 days)</option>
+                <option value="Batch 4 (45 days)">Batch 4 (45 days)</option>
+              </select>
+            </div>
+            <div class="field">
               <span>Joining Date</span>
               <input type="date" id="studentJoinDate" />
+            </div>
+            <div class="field field--full">
+              <span>Expected End Date</span>
+              <input type="date" id="studentExpectedEndDate" readonly />
             </div>
             <div class="field">
               <span>Total Course Fee (₹)</span>
@@ -892,14 +939,6 @@
             <div class="field">
               <span>Amount Paid (₹)</span>
               <input type="number" id="studentPaidFee" placeholder="0" value="0" />
-            </div>
-            <div class="field">
-              <span>Payment Status</span>
-              <select id="studentStatus">
-                <option value="Pending">Pending</option>
-                <option value="Partial">Partial</option>
-                <option value="Paid">Paid</option>
-              </select>
             </div>
           </div>
           <div class="form-actions">
@@ -935,10 +974,13 @@
           <div class="toolbar">
             <div class="search-box">
               <span class="search-icon">$</span>
-              <input type="text" placeholder="Search students..." id="studentSearch" onkeyup="filterStudents()" />
+              <input type="text" placeholder="Search by name or reg no..." id="studentSearch" onkeyup="filterStudents()" />
             </div>
             <select class="filter-select" id="studentCourseFilter" onchange="filterStudents()">
               <option value="">All Courses</option>
+            </select>
+            <select class="filter-select" id="studentBatchFilter" onchange="filterStudents()">
+              <option value="">All Batches</option>
             </select>
             <select class="filter-select" id="studentStatusFilter" onchange="filterStudents()">
               <option value="">All Status</option>
@@ -946,13 +988,20 @@
               <option value="Partial">Partial</option>
               <option value="Pending">Pending</option>
             </select>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <input type="date" id="studentDateFrom" onchange="filterStudents()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+              <span style="color:var(--ink-faint);font-size:.7rem;">to</span>
+              <input type="date" id="studentDateTo" onchange="filterStudents()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+            </div>
           </div>
           <table class="owner-table">
             <thead>
               <tr>
+                <th>Reg No</th>
                 <th>Student</th>
-                <th>Course</th>
+                <th>Course + Batch</th>
                 <th>Join Date</th>
+                <th>Expected End</th>
                 <th>Total Fee</th>
                 <th>Paid</th>
                 <th>Balance</th>
@@ -1017,6 +1066,11 @@
               <option value="Partial">Partial</option>
               <option value="Pending">Pending</option>
             </select>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <input type="date" id="feeDateFrom" onchange="filterFees()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+              <span style="color:var(--ink-faint);font-size:.7rem;">to</span>
+              <input type="date" id="feeDateTo" onchange="filterFees()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+            </div>
           </div>
           <table class="owner-table">
             <thead>
@@ -1068,6 +1122,110 @@
             <tbody id="coursesTable"></tbody>
           </table>
           <div class="course-cards-grid" id="courseCards"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Expenses -->
+    <div class="owner-tab-panel" id="panel-expenses">
+      <div class="stats-grid reveal" style="margin-bottom:2rem;">
+        <div class="stat-card stat-card--red">
+          <div class="stat-card__label">Total Expenses</div>
+          <div class="stat-card__value" id="expTotalAmount">₹0</div>
+          <div class="stat-card__meta"><i class="down"></i>All time spending</div>
+        </div>
+        <div class="stat-card stat-card--orange">
+          <div class="stat-card__label">This Month</div>
+          <div class="stat-card__value" id="expMonthAmount">₹0</div>
+          <div class="stat-card__meta"><i class="down"></i>Current month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Total Entries</div>
+          <div class="stat-card__value" id="expTotalEntries">0</div>
+          <div class="stat-card__meta"><i class="flat"></i>Records</div>
+        </div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-card__label">Avg per Entry</div>
+          <div class="stat-card__value" id="expAvgAmount">₹0</div>
+          <div class="stat-card__meta"><i class="up"></i>Average spend</div>
+        </div>
+      </div>
+
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--red">📝</div>
+            <div>
+              <h2>Add Expense</h2>
+              <span>Record institute expenditure</span>
+            </div>
+          </div>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid">
+            <div class="field">
+              <span>Expense Name</span>
+              <input type="text" id="expName" placeholder="e.g. Electricity bill, Stationery..." />
+            </div>
+            <div class="field">
+              <span>Amount (₹)</span>
+              <input type="number" id="expAmount" placeholder="0" />
+            </div>
+            <div class="field">
+              <span>Date</span>
+              <input type="date" id="expDate" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn--primary" onclick="addExpense()" data-magnetic>
+              <span>$ add expense</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="btn" onclick="clearExpenseForm()" data-magnetic>
+              <span>$ clear</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--red">📋</div>
+            <div>
+              <h2>All Expenses</h2>
+              <span>Expenditure records</span>
+            </div>
+          </div>
+          <button class="owner-section__action" onclick="exportExpensesCSV()">
+            <span>Export CSV</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="owner-section__body">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">$</span>
+              <input type="text" placeholder="Search expenses..." id="expSearch" onkeyup="renderExpenses()" />
+            </div>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <input type="date" id="expDateFrom" onchange="renderExpenses()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+              <span style="color:var(--ink-faint);font-size:.7rem;">to</span>
+              <input type="date" id="expDateTo" onchange="renderExpenses()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+            </div>
+          </div>
+          <table class="owner-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Expense Name</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTable"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1156,8 +1314,8 @@
             <input type="text" id="editName" />
           </div>
           <div class="field">
-            <span>Email</span>
-            <input type="email" id="editEmail" />
+            <span>Registration No.</span>
+            <input type="text" id="editRegNo" />
           </div>
           <div class="field">
             <span>Phone</span>
@@ -1174,6 +1332,15 @@
               <option value="Cybersecurity">Cybersecurity</option>
               <option value="AI & Machine Learning">AI & Machine Learning</option>
               <option value="Digital Marketing">Digital Marketing</option>
+            </select>
+          </div>
+          <div class="field">
+            <span>Batch</span>
+            <select id="editBatch">
+              <option value="Batch 1 (45 days)">Batch 1 (45 days)</option>
+              <option value="Batch 2 (45 days)">Batch 2 (45 days)</option>
+              <option value="Batch 3 (45 days)">Batch 3 (45 days)</option>
+              <option value="Batch 4 (45 days)">Batch 4 (45 days)</option>
             </select>
           </div>
           <div class="field">
@@ -1210,34 +1377,62 @@
   <script>
     // ==================== DATA ====================
     let students = JSON.parse(localStorage.getItem('techyuva_students')) || [];
+    let expenses = JSON.parse(localStorage.getItem('techyuva_expenses')) || [];
     let currentPaymentId = null;
     let charts = {};
     const COURSES = [
       'Web Development','Data Science','Mobile App Development','UI/UX Design',
       'Cloud Computing','Cybersecurity','AI & Machine Learning','Digital Marketing'
     ];
+    const BATCHES = [
+      'Batch 1 (45 days)', 'Batch 2 (45 days)', 'Batch 3 (45 days)', 'Batch 4 (45 days)'
+    ];
+
+    function getBatchDuration(batch) {
+      const match = batch && batch.match(/(\d+)\s*days/);
+      return match ? parseInt(match[1]) : 45;
+    }
+
+    function calcExpectedEndDate(joinDate, batch) {
+      if (!joinDate || !batch) return '';
+      const d = new Date(joinDate);
+      const dur = getBatchDuration(batch);
+      d.setDate(d.getDate() + dur);
+      return d.toISOString().split('T')[0];
+    }
 
     function loadDemoData() {
       if (students.length === 0) {
         students = [
-          { id:1, name:'Rahul Sharma', email:'rahul.s@email.com', phone:'+91 98765 43210', course:'Web Development', joinDate:'2025-01-15', totalFee:25000, paidFee:25000, status:'Paid' },
-          { id:2, name:'Priya Patel', email:'priya.p@email.com', phone:'+91 87654 32109', course:'Data Science', joinDate:'2025-01-20', totalFee:35000, paidFee:17500, status:'Partial' },
-          { id:3, name:'Amit Kumar', email:'amit.k@email.com', phone:'+91 76543 21098', course:'Web Development', joinDate:'2025-02-01', totalFee:25000, paidFee:10000, status:'Partial' },
-          { id:4, name:'Sneha Gupta', email:'sneha.g@email.com', phone:'+91 65432 10987', course:'UI/UX Design', joinDate:'2025-02-10', totalFee:20000, paidFee:20000, status:'Paid' },
-          { id:5, name:'Vikram Rao', email:'vikram.r@email.com', phone:'+91 54321 09876', course:'Mobile App Development', joinDate:'2025-02-15', totalFee:30000, paidFee:0, status:'Pending' },
-          { id:6, name:'Ananya Desai', email:'ananya.d@email.com', phone:'+91 43210 98765', course:'Cloud Computing', joinDate:'2025-03-01', totalFee:28000, paidFee:28000, status:'Paid' },
-          { id:7, name:'Karan Mehta', email:'karan.m@email.com', phone:'+91 32109 87654', course:'Web Development', joinDate:'2025-03-05', totalFee:25000, paidFee:5000, status:'Partial' },
-          { id:8, name:'Divya Iyer', email:'divya.i@email.com', phone:'+91 21098 76543', course:'Cybersecurity', joinDate:'2025-03-10', totalFee:32000, paidFee:0, status:'Pending' },
-          { id:9, name:'Arjun Nair', email:'arjun.n@email.com', phone:'+91 10987 65432', course:'AI & Machine Learning', joinDate:'2025-03-15', totalFee:40000, paidFee:20000, status:'Partial' },
-          { id:10, name:'Meera Joshi', email:'meera.j@email.com', phone:'+91 09876 54321', course:'Digital Marketing', joinDate:'2025-03-20', totalFee:18000, paidFee:18000, status:'Paid' },
-          { id:11, name:'Raj Malhotra', email:'raj.m@email.com', phone:'+91 98760 12345', course:'Data Science', joinDate:'2025-04-01', totalFee:35000, paidFee:0, status:'Pending' },
-          { id:12, name:'Kavita Reddy', email:'kavita.r@email.com', phone:'+91 87651 23456', course:'Web Development', joinDate:'2025-04-05', totalFee:25000, paidFee:25000, status:'Paid' }
+          { id:1, regNo:'TY2025001', name:'Rahul Sharma', phone:'+91 98765 43210', course:'Web Development', batch:'Batch 1 (45 days)', joinDate:'2025-01-15', expectedEndDate:'2025-03-01', totalFee:25000, paidFee:25000, status:'Paid' },
+          { id:2, regNo:'TY2025002', name:'Priya Patel', phone:'+91 87654 32109', course:'Data Science', batch:'Batch 1 (45 days)', joinDate:'2025-01-20', expectedEndDate:'2025-03-06', totalFee:35000, paidFee:17500, status:'Partial' },
+          { id:3, regNo:'TY2025003', name:'Amit Kumar', phone:'+91 76543 21098', course:'Web Development', batch:'Batch 2 (45 days)', joinDate:'2025-02-01', expectedEndDate:'2025-03-18', totalFee:25000, paidFee:10000, status:'Partial' },
+          { id:4, regNo:'TY2025004', name:'Sneha Gupta', phone:'+91 65432 10987', course:'UI/UX Design', batch:'Batch 1 (45 days)', joinDate:'2025-02-10', expectedEndDate:'2025-03-27', totalFee:20000, paidFee:20000, status:'Paid' },
+          { id:5, regNo:'TY2025005', name:'Vikram Rao', phone:'+91 54321 09876', course:'Mobile App Development', batch:'Batch 1 (45 days)', joinDate:'2025-02-15', expectedEndDate:'2025-04-01', totalFee:30000, paidFee:0, status:'Pending' },
+          { id:6, regNo:'TY2025006', name:'Ananya Desai', phone:'+91 43210 98765', course:'Cloud Computing', batch:'Batch 2 (45 days)', joinDate:'2025-03-01', expectedEndDate:'2025-04-15', totalFee:28000, paidFee:28000, status:'Paid' },
+          { id:7, regNo:'TY2025007', name:'Karan Mehta', phone:'+91 32109 87654', course:'Web Development', batch:'Batch 1 (45 days)', joinDate:'2025-03-05', expectedEndDate:'2025-04-19', totalFee:25000, paidFee:5000, status:'Partial' },
+          { id:8, regNo:'TY2025008', name:'Divya Iyer', phone:'+91 21098 76543', course:'Cybersecurity', batch:'Batch 1 (45 days)', joinDate:'2025-03-10', expectedEndDate:'2025-04-24', totalFee:32000, paidFee:0, status:'Pending' },
+          { id:9, regNo:'TY2025009', name:'Arjun Nair', phone:'+91 10987 65432', course:'AI & Machine Learning', batch:'Batch 3 (45 days)', joinDate:'2025-03-15', expectedEndDate:'2025-04-29', totalFee:40000, paidFee:20000, status:'Partial' },
+          { id:10, regNo:'TY2025010', name:'Meera Joshi', phone:'+91 09876 54321', course:'Digital Marketing', batch:'Batch 1 (45 days)', joinDate:'2025-03-20', expectedEndDate:'2025-05-04', totalFee:18000, paidFee:18000, status:'Paid' },
+          { id:11, regNo:'TY2025011', name:'Raj Malhotra', phone:'+91 98760 12345', course:'Data Science', batch:'Batch 2 (45 days)', joinDate:'2025-04-01', expectedEndDate:'2025-05-16', totalFee:35000, paidFee:0, status:'Pending' },
+          { id:12, regNo:'TY2025012', name:'Kavita Reddy', phone:'+91 87651 23456', course:'Web Development', batch:'Batch 3 (45 days)', joinDate:'2025-04-05', expectedEndDate:'2025-05-20', totalFee:25000, paidFee:25000, status:'Paid' }
         ];
         saveData();
         showToast('Demo data loaded for preview', 'success');
       }
+      if (expenses.length === 0) {
+        expenses = [
+          { id:1, name:'Electricity Bill', amount:4500, date:'2025-06-01' },
+          { id:2, name:'Stationery', amount:1200, date:'2025-06-05' },
+          { id:3, name:'Internet Recharge', amount:2000, date:'2025-06-10' },
+          { id:4, name:'Projector Repair', amount:3500, date:'2025-06-15' },
+          { id:5, name:'Cleaning Supplies', amount:800, date:'2025-06-18' }
+        ];
+        saveExpenses();
+      }
     }
     function saveData() { localStorage.setItem('techyuva_students', JSON.stringify(students)); }
+    function saveExpenses() { localStorage.setItem('techyuva_expenses', JSON.stringify(expenses)); }
 
     // ==================== SHARED UTILITIES (from style.css) ====================
     const $ = (s, c=document) => c.querySelector(s);
@@ -1322,6 +1517,7 @@
         if (panelId === 'students') { updateStudentsTable(); updateCourseFilters(); }
         if (panelId === 'fees') updateFeesTable();
         if (panelId === 'courses') updateCourses();
+        if (panelId === 'expenses') renderExpenses();
         if (panelId === 'analytics') updateAnalytics();
       });
     });
@@ -1362,17 +1558,20 @@
         }
       });
 
-      const courseCounts = {};
-      students.forEach(s => { courseCounts[s.course] = (courseCounts[s.course] || 0) + 1; });
+      const courseBatchCounts = {};
+      students.forEach(s => {
+        const key = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : '');
+        courseBatchCounts[key] = (courseBatchCounts[key] || 0) + 1;
+      });
 
       if (charts.courseDist) charts.courseDist.destroy();
       charts.courseDist = new Chart($('#courseDistributionChart'), {
         type: 'bar',
         data: {
-          labels: Object.keys(courseCounts),
+          labels: Object.keys(courseBatchCounts),
           datasets: [{
             label: 'Students',
-            data: Object.values(courseCounts),
+            data: Object.values(courseBatchCounts),
             backgroundColor: '#b85c38',
             borderRadius: 5, barThickness: 22
           }]
@@ -1388,28 +1587,53 @@
       });
     }
 
+    // ==================== BATCH / END DATE HELPERS ====================
+    function updateBatchesForCourse() {
+      const course = $('#studentCourse').value;
+      const batchSelect = $('#studentBatch');
+      batchSelect.innerHTML = '<option value="">Select Batch</option>' +
+        BATCHES.map(b => `<option value="${b}">${b}</option>`).join('');
+      updateExpectedEndDate();
+    }
+
+    function updateExpectedEndDate() {
+      const joinDate = $('#studentJoinDate').value;
+      const batch = $('#studentBatch').value;
+      $('#studentExpectedEndDate').value = calcExpectedEndDate(joinDate, batch);
+    }
+
     // ==================== STUDENTS ====================
     function updateStudentsTable() {
       const search = $('#studentSearch').value.toLowerCase();
       const courseFilter = $('#studentCourseFilter').value;
+      const batchFilter = $('#studentBatchFilter').value;
       const statusFilter = $('#studentStatusFilter').value;
+      const dateFrom = $('#studentDateFrom').value;
+      const dateTo = $('#studentDateTo').value;
+
       let filtered = students.filter(s => {
-        const matchSearch = s.name.toLowerCase().includes(search) || s.email.toLowerCase().includes(search) || s.course.toLowerCase().includes(search);
+        const matchSearch = s.name.toLowerCase().includes(search) || (s.regNo || '').toLowerCase().includes(search) || s.course.toLowerCase().includes(search);
         const matchCourse = !courseFilter || s.course === courseFilter;
+        const matchBatch = !batchFilter || s.batch === batchFilter;
         const matchStatus = !statusFilter || s.status === statusFilter;
-        return matchSearch && matchCourse && matchStatus;
+        const matchDate = (!dateFrom || s.joinDate >= dateFrom) && (!dateTo || s.joinDate <= dateTo);
+        return matchSearch && matchCourse && matchBatch && matchStatus && matchDate;
       });
       const tbody = $('#studentsTable');
       tbody.innerHTML = filtered.map(s => {
         const balance = (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0);
+        const courseBatch = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : '');
+        const endLabel = s.expectedEndDate ? formatDate(s.expectedEndDate) : '-';
         return `
           <tr>
+            <td><span class="owner-table__name">${s.regNo || '-'}</span></td>
             <td>
               <div class="owner-table__name">${s.name}</div>
-              <div class="owner-table__meta">${s.email} · ${s.phone}</div>
+              <div class="owner-table__meta">${s.phone}</div>
             </td>
-            <td>${s.course}</td>
+            <td>${courseBatch}</td>
             <td>${formatDate(s.joinDate)}</td>
+            <td>${endLabel}</td>
             <td>₹${(parseFloat(s.totalFee) || 0).toLocaleString('en-IN')}</td>
             <td>₹${(parseFloat(s.paidFee) || 0).toLocaleString('en-IN')}</td>
             <td style="color:${balance>0?'var(--bad)':'var(--good)'}; font-weight:600;">₹${balance.toLocaleString('en-IN')}</td>
@@ -1423,7 +1647,7 @@
             </td>
           </tr>
         `;
-      }).join('') || emptyRow(8, 'No students found', 'Add a student or adjust filters');
+      }).join('') || emptyRow(10, 'No students found', 'Add a student or adjust filters');
     }
 
     function updateCourseFilters() {
@@ -1431,26 +1655,31 @@
       const currentVal = select.value;
       select.innerHTML = '<option value="">All Courses</option>' + COURSES.map(c => `<option value="${c}">${c}</option>`).join('');
       select.value = currentVal;
+
+      const batchSelect = $('#studentBatchFilter');
+      const currentBatch = batchSelect.value;
+      batchSelect.innerHTML = '<option value="">All Batches</option>' + BATCHES.map(b => `<option value="${b}">${b.replace(/ \(\d+ days\)/, '')}</option>`).join('');
+      batchSelect.value = currentBatch;
     }
     function filterStudents() { updateStudentsTable(); }
 
     function addStudent() {
       const name = $('#studentName').value.trim();
-      const email = $('#studentEmail').value.trim();
+      const regNo = $('#studentRegNo').value.trim();
       const phone = $('#studentPhone').value.trim();
       const course = $('#studentCourse').value;
+      const batch = $('#studentBatch').value;
       const joinDate = $('#studentJoinDate').value;
+      const expectedEndDate = $('#studentExpectedEndDate').value;
       const totalFee = parseFloat($('#studentTotalFee').value) || 0;
       const paidFee = parseFloat($('#studentPaidFee').value) || 0;
-      const status = $('#studentStatus').value;
-      if (!name || !course || !joinDate) { showToast('Please fill name, course, and join date', 'error'); return; }
+      if (!name || !course || !batch || !joinDate) { showToast('Please fill name, course, batch, and join date', 'error'); return; }
+      const status = paidFee >= totalFee && totalFee > 0 ? 'Paid' : paidFee > 0 ? 'Partial' : 'Pending';
       const newStudent = {
-        id: Date.now(), name, email, phone, course, joinDate, totalFee, paidFee,
-        status: paidFee >= totalFee && totalFee > 0 ? 'Paid' : paidFee > 0 ? 'Partial' : status
+        id: Date.now(), regNo, name, phone, course, batch, joinDate, expectedEndDate, totalFee, paidFee, status
       };
       students.push(newStudent); saveData(); clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
       showToast('Student registered successfully!', 'success');
-      // Switch to students tab
       $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
       $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
       $(`[data-tab="students"]`).classList.add('is-active');
@@ -1458,24 +1687,26 @@
     }
 
     function clearStudentForm() {
-      $('#studentName').value = ''; $('#studentEmail').value = ''; $('#studentPhone').value = '';
-      $('#studentCourse').value = ''; $('#studentJoinDate').value = '';
-      $('#studentTotalFee').value = ''; $('#studentPaidFee').value = '0'; $('#studentStatus').value = 'Pending';
+      $('#studentName').value = ''; $('#studentRegNo').value = ''; $('#studentPhone').value = '';
+      $('#studentCourse').value = ''; $('#studentBatch').value = ''; $('#studentJoinDate').value = '';
+      $('#studentExpectedEndDate').value = ''; $('#studentTotalFee').value = ''; $('#studentPaidFee').value = '0';
     }
     function deleteStudent(id) { if (!confirm('Delete this student?')) return; students = students.filter(s => s.id !== id); saveData(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses(); showToast('Student deleted', 'success'); }
     function editStudent(id) {
       const s = students.find(x => x.id === id); if (!s) return;
-      $('#editStudentId').value = s.id; $('#editName').value = s.name; $('#editEmail').value = s.email;
-      $('#editPhone').value = s.phone; $('#editCourse').value = s.course; $('#editTotalFee').value = s.totalFee;
-      $('#editPaidFee').value = s.paidFee; $('#editStatus').value = s.status;
+      $('#editStudentId').value = s.id; $('#editName').value = s.name; $('#editRegNo').value = s.regNo || '';
+      $('#editPhone').value = s.phone; $('#editCourse').value = s.course; $('#editBatch').value = s.batch || 'Batch 1 (45 days)';
+      $('#editTotalFee').value = s.totalFee; $('#editPaidFee').value = s.paidFee; $('#editStatus').value = s.status;
       $('#editModal').classList.add('is-active');
     }
     function saveEditStudent() {
       const id = parseInt($('#editStudentId').value);
       const s = students.find(x => x.id === id); if (!s) return;
-      s.name = $('#editName').value.trim(); s.email = $('#editEmail').value.trim(); s.phone = $('#editPhone').value.trim();
-      s.course = $('#editCourse').value; s.totalFee = parseFloat($('#editTotalFee').value) || 0;
-      s.paidFee = parseFloat($('#editPaidFee').value) || 0; s.status = $('#editStatus').value;
+      s.regNo = $('#editRegNo').value.trim(); s.name = $('#editName').value.trim(); s.phone = $('#editPhone').value.trim();
+      s.course = $('#editCourse').value; s.batch = $('#editBatch').value;
+      s.totalFee = parseFloat($('#editTotalFee').value) || 0; s.paidFee = parseFloat($('#editPaidFee').value) || 0;
+      s.status = $('#editStatus').value;
+      s.expectedEndDate = calcExpectedEndDate(s.joinDate, s.batch);
       if (s.paidFee >= s.totalFee && s.totalFee > 0) s.status = 'Paid';
       else if (s.paidFee > 0) s.status = 'Partial';
       else s.status = 'Pending';
@@ -1497,23 +1728,27 @@
 
       const search = $('#feeSearch').value.toLowerCase();
       const statusFilter = $('#feeStatusFilter').value;
+      const dateFrom = $('#feeDateFrom').value;
+      const dateTo = $('#feeDateTo').value;
       let filtered = students.filter(s => {
         const matchSearch = s.name.toLowerCase().includes(search) || s.course.toLowerCase().includes(search);
         const matchStatus = !statusFilter || s.status === statusFilter;
-        return matchSearch && matchStatus;
+        const matchDate = (!dateFrom || s.joinDate >= dateFrom) && (!dateTo || s.joinDate <= dateTo);
+        return matchSearch && matchStatus && matchDate;
       });
       const tbody = $('#feesTable');
       tbody.innerHTML = filtered.map(s => {
         const total = parseFloat(s.totalFee) || 0; const paid = parseFloat(s.paidFee) || 0;
         const balance = total - paid; const pct = total > 0 ? Math.round((paid / total) * 100) : 0;
         let pcls = pct >= 100 ? 'progress-fill--green' : pct >= 50 ? 'progress-fill--orange' : 'progress-fill--red';
+        const courseBatch = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : '');
         return `
           <tr>
             <td>
               <div class="owner-table__name">${s.name}</div>
-              <div class="owner-table__meta">${s.email}</div>
+              <div class="owner-table__meta">${s.phone}</div>
             </td>
-            <td>${s.course}</td>
+            <td>${courseBatch}</td>
             <td>₹${total.toLocaleString('en-IN')}</td>
             <td>₹${paid.toLocaleString('en-IN')}</td>
             <td style="color:var(--bad); font-weight:600;">₹${balance.toLocaleString('en-IN')}</td>
@@ -1621,6 +1856,77 @@
       `).join('');
     }
 
+    // ==================== EXPENSES ====================
+    function renderExpenses() {
+      const totalAmount = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const now = new Date();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+      const monthExpenses = expenses.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+      });
+      const monthTotal = monthExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      $('#expTotalAmount').textContent = '₹' + totalAmount.toLocaleString('en-IN');
+      $('#expMonthAmount').textContent = '₹' + monthTotal.toLocaleString('en-IN');
+      $('#expTotalEntries').textContent = expenses.length;
+      $('#expAvgAmount').textContent = expenses.length > 0 ? '₹' + Math.round(totalAmount / expenses.length).toLocaleString('en-IN') : '₹0';
+
+      const search = ($('#expSearch').value || '').toLowerCase();
+      const dateFrom = $('#expDateFrom').value;
+      const dateTo = $('#expDateTo').value;
+      let filtered = expenses.filter(e => {
+        const matchSearch = e.name.toLowerCase().includes(search);
+        const matchDate = (!dateFrom || e.date >= dateFrom) && (!dateTo || e.date <= dateTo);
+        return matchSearch && matchDate;
+      });
+      const tbody = $('#expensesTable');
+      tbody.innerHTML = filtered.map((e, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><div class="owner-table__name">${e.name}</div></td>
+          <td style="color:var(--bad); font-weight:600;">₹${(parseFloat(e.amount) || 0).toLocaleString('en-IN')}</td>
+          <td>${formatDate(e.date)}</td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn action-btn--danger" onclick="deleteExpense(${e.id})" title="Delete">✕</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || emptyRow(5, 'No expenses found', 'Add an expense or adjust filters');
+    }
+
+    function addExpense() {
+      const name = $('#expName').value.trim();
+      const amount = parseFloat($('#expAmount').value) || 0;
+      const date = $('#expDate').value;
+      if (!name || amount <= 0 || !date) { showToast('Please fill name, amount, and date', 'error'); return; }
+      expenses.push({ id: Date.now(), name, amount, date });
+      saveExpenses(); clearExpenseForm(); renderExpenses();
+      showToast('Expense added!', 'success');
+    }
+
+    function clearExpenseForm() {
+      $('#expName').value = ''; $('#expAmount').value = ''; $('#expDate').value = new Date().toISOString().split('T')[0];
+    }
+
+    function deleteExpense(id) {
+      if (!confirm('Delete this expense?')) return;
+      expenses = expenses.filter(e => e.id !== id);
+      saveExpenses(); renderExpenses();
+      showToast('Expense deleted', 'success');
+    }
+
+    function exportExpensesCSV() {
+      if (expenses.length === 0) { showToast('No expenses to export', 'error'); return; }
+      const headers = ['#', 'Expense Name', 'Amount', 'Date'];
+      const data = expenses.map((e, i) => ({ '#': i + 1, 'Expense Name': e.name, Amount: e.amount, Date: e.date }));
+      const csv = [headers.join(','), ...data.map(row => headers.map(h => `"${row[h]}"`).join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'expenses.csv'; link.click();
+      showToast('Exported expenses.csv', 'success');
+    }
+
     // ==================== ANALYTICS ====================
     function updateAnalytics() {
       const monthlyData = {};
@@ -1660,11 +1966,11 @@
     function exportToCSV(type) {
       let data = [], headers = [], filename = '';
       if (type === 'students') {
-        filename = 'students.csv'; headers = ['ID','Name','Email','Phone','Course','Join Date','Total Fee','Paid Fee','Balance','Status'];
-        data = students.map(s => ({ ID:s.id, Name:s.name, Email:s.email, Phone:s.phone, Course:s.course, 'Join Date':s.joinDate, 'Total Fee':s.totalFee, 'Paid Fee':s.paidFee, Balance:(parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0), Status:s.status }));
+        filename = 'students.csv'; headers = ['ID','Reg No','Name','Phone','Course','Batch','Join Date','Expected End','Total Fee','Paid Fee','Balance','Status'];
+        data = students.map(s => ({ ID:s.id, 'Reg No':s.regNo || '-', Name:s.name, Phone:s.phone, Course:s.course, Batch:s.batch ? s.batch.replace(/ \(\d+ days\)/, '') : '-', 'Join Date':s.joinDate, 'Expected End':s.expectedEndDate || '-', 'Total Fee':s.totalFee, 'Paid Fee':s.paidFee, Balance:(parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0), Status:s.status }));
       } else if (type === 'fees') {
-        filename = 'fee_payments.csv'; headers = ['Name','Course','Total Fee','Paid Fee','Balance','Status'];
-        data = students.map(s => ({ Name:s.name, Course:s.course, 'Total Fee':s.totalFee, 'Paid Fee':s.paidFee, Balance:(parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0), Status:s.status }));
+        filename = 'fee_payments.csv'; headers = ['Name','Course','Batch','Total Fee','Paid Fee','Balance','Status'];
+        data = students.map(s => ({ Name:s.name, Course:s.course, Batch:s.batch ? s.batch.replace(/ \(\d+ days\)/, '') : '-', 'Total Fee':s.totalFee, 'Paid Fee':s.paidFee, Balance:(parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0), Status:s.status }));
       } else if (type === 'courses') {
         filename = 'course_reports.csv'; headers = ['Course','Students','Total Revenue','Collected','Pending','Collection Rate %'];
         const cd = {}; COURSES.forEach(c => { cd[c] = { students:0, total:0, collected:0, pending:0 }; });
@@ -1698,18 +2004,13 @@
     // Modal overlay click
     $$('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('is-active'); }); });
 
-    // Auto-calculate status
-    $('#studentPaidFee')?.addEventListener('input', function() {
-      const total = parseFloat($('#studentTotalFee').value) || 0; const paid = parseFloat(this.value) || 0;
-      const status = $('#studentStatus'); if (paid >= total && total > 0) status.value = 'Paid'; else if (paid > 0) status.value = 'Partial'; else status.value = 'Pending';
-    });
-    $('#studentTotalFee')?.addEventListener('input', function() {
-      const total = parseFloat(this.value) || 0; const paid = parseFloat($('#studentPaidFee').value) || 0;
-      const status = $('#studentStatus'); if (paid >= total && total > 0) status.value = 'Paid'; else if (paid > 0) status.value = 'Partial'; else status.value = 'Pending';
-    });
+    // Auto-calculate expected end date on form changes
+    $('#studentJoinDate')?.addEventListener('change', updateExpectedEndDate);
+    $('#studentBatch')?.addEventListener('change', updateExpectedEndDate);
 
-    // Set default join date
+    // Set default dates
     $('#studentJoinDate').value = new Date().toISOString().split('T')[0];
+    $('#expDate').value = new Date().toISOString().split('T')[0];
 
     // Init
     loadDemoData();
