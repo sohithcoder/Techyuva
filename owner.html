@@ -1630,17 +1630,25 @@
 
   <script>
     // ==================== DATA ====================
-    let students = JSON.parse(localStorage.getItem('techyuva_students')) || [];
-    let expenses = JSON.parse(localStorage.getItem('techyuva_expenses')) || [];
+    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3001/api'
+      : window.location.origin + '/api';
+
+    let students = [];
+    let expenses = [];
+    let courses = [];
     let currentPaymentId = null;
     let charts = {};
-    const COURSES = [
-      'Web Development','Data Science','Mobile App Development','UI/UX Design',
-      'Cloud Computing','Cybersecurity','AI & Machine Learning','Digital Marketing'
-    ];
     const BATCHES = [
       'Batch 1 (45 days)', 'Batch 2 (45 days)', 'Batch 3 (45 days)', 'Batch 4 (45 days)'
     ];
+
+    async function api(path, options = {}) {
+      const config = { headers: { 'Content-Type': 'application/json' }, ...options };
+      const res = await fetch(`${API_BASE}${path}`, config);
+      if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || `API error ${res.status}`); }
+      return res.json();
+    }
 
     function getBatchDuration(batch) {
       const match = batch && batch.match(/(\d+)\s*days/);
@@ -1653,38 +1661,8 @@
       return d.toISOString().split('T')[0];
     }
 
-    function loadDemoData() {
-      if (students.length === 0) {
-        students = [
-          { id:1, regNo:'TY2025001', name:'Rahul Sharma', phone:'+91 98765 43210', phone2:'', address:'123, MG Road, Mumbai', reference:'Friend', paymentMode:'online', course:'Web Development', batch:'Batch 1 (45 days)', joinDate:'2025-01-15', expectedEndDate:'2025-03-01', totalFee:25000, paidFee:25000, status:'Paid', certificateIssued:'yes', courseStatus:'completed', payments:[{id:1,amount:25000,date:'2025-01-15',mode:'online'}] },
-          { id:2, regNo:'TY2025002', name:'Priya Patel', phone:'+91 87654 32109', phone2:'', address:'456, Lake Road, Pune', reference:'Instagram', paymentMode:'offline', course:'Data Science', batch:'Batch 1 (45 days)', joinDate:'2025-01-20', expectedEndDate:'2025-03-06', totalFee:35000, paidFee:17500, status:'Partial', certificateIssued:'no', courseStatus:'ongoing', payments:[{id:1,amount:10000,date:'2025-01-20',mode:'offline'},{id:2,amount:7500,date:'2025-02-15',mode:'offline'}] },
-          { id:3, regNo:'TY2025003', name:'Amit Kumar', phone:'+91 76543 21098', phone2:'+91 99887 76655', address:'789, Park Street, Delhi', reference:'Google', paymentMode:'online', course:'Web Development', batch:'Batch 2 (45 days)', joinDate:'2025-02-01', expectedEndDate:'2025-03-18', totalFee:25000, paidFee:10000, status:'Partial', certificateIssued:'no', courseStatus:'ongoing', payments:[{id:1,amount:10000,date:'2025-02-01',mode:'online'}] },
-          { id:4, regNo:'TY2025004', name:'Sneha Gupta', phone:'+91 65432 10987', phone2:'', address:'321, Green Avenue, Bangalore', reference:'Friend', paymentMode:'offline', course:'UI/UX Design', batch:'Batch 1 (45 days)', joinDate:'2025-02-10', expectedEndDate:'2025-03-27', totalFee:20000, paidFee:20000, status:'Paid', certificateIssued:'yes', courseStatus:'completed', payments:[{id:1,amount:20000,date:'2025-02-10',mode:'offline'}] },
-          { id:5, regNo:'TY2025005', name:'Vikram Rao', phone:'+91 54321 09876', phone2:'', address:'654, Hill View, Hyderabad', reference:'YouTube', paymentMode:'internship', course:'Mobile App Development', batch:'Batch 1 (45 days)', joinDate:'2025-02-15', expectedEndDate:'2025-04-01', totalFee:30000, paidFee:0, status:'Pending', certificateIssued:'no', courseStatus:'ongoing', payments:[] },
-          { id:6, regNo:'TY2025006', name:'Ananya Desai', phone:'+91 43210 98765', phone2:'+91 88776 65544', address:'987, Royal Road, Chennai', reference:'Newspaper', paymentMode:'online', course:'Cloud Computing', batch:'Batch 2 (45 days)', joinDate:'2025-03-01', expectedEndDate:'2025-04-15', totalFee:28000, paidFee:28000, status:'Paid', certificateIssued:'yes', courseStatus:'completed', payments:[{id:1,amount:28000,date:'2025-03-01',mode:'online'}] },
-          { id:7, regNo:'TY2025007', name:'Karan Mehta', phone:'+91 32109 87654', phone2:'', address:'111, Sunshine Colony, Ahmedabad', reference:'Friend', paymentMode:'offline', course:'Web Development', batch:'Batch 1 (45 days)', joinDate:'2025-03-05', expectedEndDate:'2025-04-19', totalFee:25000, paidFee:5000, status:'Partial', certificateIssued:'no', courseStatus:'ongoing', payments:[{id:1,amount:5000,date:'2025-03-05',mode:'offline'}] },
-          { id:8, regNo:'TY2025008', name:'Divya Iyer', phone:'+91 21098 76543', phone2:'', address:'222, Temple Road, Coimbatore', reference:'Instagram', paymentMode:'online', course:'Cybersecurity', batch:'Batch 1 (45 days)', joinDate:'2025-03-10', expectedEndDate:'2025-04-24', totalFee:32000, paidFee:0, status:'Pending', certificateIssued:'no', courseStatus:'ongoing', payments:[] },
-          { id:9, regNo:'TY2025009', name:'Arjun Nair', phone:'+91 10987 65432', phone2:'', address:'333, Lake View, Kochi', reference:'Google', paymentMode:'online', course:'AI & Machine Learning', batch:'Batch 3 (45 days)', joinDate:'2025-03-15', expectedEndDate:'2025-04-29', totalFee:40000, paidFee:20000, status:'Partial', certificateIssued:'no', courseStatus:'ongoing', payments:[{id:1,amount:20000,date:'2025-03-15',mode:'online'}] },
-          { id:10, regNo:'TY2025010', name:'Meera Joshi', phone:'+91 09876 54321', phone2:'', address:'444, River Side, Jaipur', reference:'Friend', paymentMode:'offline', course:'Digital Marketing', batch:'Batch 1 (45 days)', joinDate:'2025-03-20', expectedEndDate:'2025-05-04', totalFee:18000, paidFee:18000, status:'Paid', certificateIssued:'yes', courseStatus:'completed', payments:[{id:1,amount:18000,date:'2025-03-20',mode:'offline'}] },
-          { id:11, regNo:'TY2025011', name:'Raj Malhotra', phone:'+91 98760 12345', phone2:'+91 77665 54433', address:'555, Mall Road, Chandigarh', reference:'YouTube', paymentMode:'online', course:'Data Science', batch:'Batch 2 (45 days)', joinDate:'2025-04-01', expectedEndDate:'2025-05-16', totalFee:35000, paidFee:0, status:'Pending', certificateIssued:'no', courseStatus:'ongoing', payments:[] },
-          { id:12, regNo:'TY2025012', name:'Kavita Reddy', phone:'+91 87651 23456', phone2:'', address:'666, Tech Park, Bangalore', reference:'Friend', paymentMode:'offline', course:'Web Development', batch:'Batch 3 (45 days)', joinDate:'2025-04-05', expectedEndDate:'2025-05-20', totalFee:25000, paidFee:25000, status:'Paid', certificateIssued:'yes', courseStatus:'completed', payments:[{id:1,amount:25000,date:'2025-04-05',mode:'offline'}] }
-        ];
-        saveData();
-        showToast('Demo data loaded for preview', 'success');
-      }
-      if (expenses.length === 0) {
-        expenses = [
-          { id:1, name:'Electricity Bill', amount:4500, date:'2025-06-01', mode:'online' },
-          { id:2, name:'Stationery', amount:1200, date:'2025-06-05', mode:'cash' },
-          { id:3, name:'Internet Recharge', amount:2000, date:'2025-06-10', mode:'online' },
-          { id:4, name:'Projector Repair', amount:3500, date:'2025-06-15', mode:'cash' },
-          { id:5, name:'Cleaning Supplies', amount:800, date:'2025-06-18', mode:'cash' }
-        ];
-        saveExpenses();
-      }
-    }
-    function saveData() { localStorage.setItem('techyuva_students', JSON.stringify(students)); }
-    function saveExpenses() { localStorage.setItem('techyuva_expenses', JSON.stringify(expenses)); }
+    function saveData() {} // API handles persistence
+    function saveExpenses() {} // API handles persistence
 
     // ==================== SHARED UTILITIES ====================
     const $ = (s, c=document) => c.querySelector(s);
@@ -1862,7 +1840,7 @@
     }
     function filterStudents() { updateStudentsTable(); }
 
-    function addStudent() {
+    async function addStudent() {
       const name = $('#studentName').value.trim();
       const regNo = $('#studentRegNo').value.trim();
       const phone = $('#studentPhone').value.trim();
@@ -1881,7 +1859,11 @@
       const status = paidFee >= totalFee && totalFee > 0 ? 'Paid' : paidFee > 0 ? 'Partial' : 'Pending';
       const payments = paidFee > 0 ? [{ id:Date.now()+1, amount:paidFee, date:joinDate, mode:paymentMode === 'internship' ? 'offline' : paymentMode }] : [];
       const newStudent = { id:Date.now(), regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus, certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee, status, payments };
-      students.push(newStudent); saveData(); clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
+      try {
+        const saved = await api('/students', { method: 'POST', body: JSON.stringify({ regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus, certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee, status, payments }) });
+        students.unshift(saved);
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); return; }
+      clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
       showToast('Student registered successfully!', 'success');
       $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
       $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
@@ -1897,7 +1879,11 @@
       $('#studentPaymentMode').value = 'offline'; $('#studentCourseStatus').value = 'ongoing';
     }
 
-    function deleteStudent(id) { if (!confirm('Delete this student?')) return; students = students.filter(s => s.id !== id); saveData(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses(); showToast('Student deleted', 'success'); }
+    async function deleteStudent(id) {
+      if (!confirm('Delete this student?')) return;
+      try { await api(`/students/${id}`, { method: 'DELETE' }); students = students.filter(s => s.id !== id); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses(); showToast('Student deleted', 'success'); }
+      catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
+    }
 
     function editStudent(id) {
       const s = students.find(x => x.id === id); if (!s) return;
@@ -1912,23 +1898,30 @@
       $('#editModal').classList.add('is-active');
     }
 
-    function saveEditStudent() {
-      const id = parseInt($('#editStudentId').value);
+    async function saveEditStudent() {
+      const id = $('#editStudentId').value;
       const s = students.find(x => x.id === id); if (!s) return;
-      s.regNo = $('#editRegNo').value.trim(); s.name = $('#editName').value.trim();
-      s.phone = $('#editPhone').value.trim(); s.phone2 = $('#editPhone2').value.trim();
-      s.address = $('#editAddress').value.trim(); s.reference = $('#editReference').value.trim();
-      s.course = $('#editCourse').value; s.batch = $('#editBatch').value;
-      s.paymentMode = $('#editPaymentMode').value; s.courseStatus = $('#editCourseStatus').value;
-      s.certificateIssued = $('#editCertificate').value;
-      s.totalFee = parseFloat($('#editTotalFee').value) || 0; s.paidFee = parseFloat($('#editPaidFee').value) || 0;
-      s.status = $('#editStatus').value;
-      s.expectedEndDate = calcExpectedEndDate(s.joinDate, s.batch);
-      if (s.paidFee >= s.totalFee && s.totalFee > 0) s.status = 'Paid';
-      else if (s.paidFee > 0) s.status = 'Partial';
-      else s.status = 'Pending';
-      saveData(); closeEditModal(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
-      showToast('Student updated successfully!', 'success');
+      const updates = {
+        regNo: $('#editRegNo').value.trim(), name: $('#editName').value.trim(),
+        phone: $('#editPhone').value.trim(), phone2: $('#editPhone2').value.trim(),
+        address: $('#editAddress').value.trim(), reference: $('#editReference').value.trim(),
+        course: $('#editCourse').value, batch: $('#editBatch').value,
+        paymentMode: $('#editPaymentMode').value, courseStatus: $('#editCourseStatus').value,
+        certificateIssued: $('#editCertificate').value,
+        totalFee: parseFloat($('#editTotalFee').value) || 0, paidFee: parseFloat($('#editPaidFee').value) || 0,
+        status: $('#editStatus').value,
+        expectedEndDate: calcExpectedEndDate(s.joinDate, $('#editBatch').value),
+      };
+      if (updates.paidFee >= updates.totalFee && updates.totalFee > 0) updates.status = 'Paid';
+      else if (updates.paidFee > 0) updates.status = 'Partial';
+      else updates.status = 'Pending';
+      try {
+        const updated = await api(`/students/${id}`, { method: 'PUT', body: JSON.stringify(updates) });
+        const idx = students.findIndex(x => x.id === id);
+        if (idx !== -1) students[idx] = updated;
+        closeEditModal(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
+        showToast('Student updated successfully!', 'success');
+      } catch (err) { showToast('Update failed: ' + err.message, 'error'); }
     }
     function closeEditModal() { $('#editModal').classList.remove('is-active'); }
 
@@ -1954,7 +1947,7 @@
       $('#paymentModal').classList.add('is-active');
     }
     function closePaymentModal() { $('#paymentModal').classList.remove('is-active'); currentPaymentId = null; }
-    function recordPayment() {
+    async function recordPayment() {
       if (!currentPaymentId) return;
       const amount = parseFloat($('#paymentAmount').value) || 0;
       const mode = $('#paymentModeSelect') ? $('#paymentModeSelect').value : 'offline';
@@ -1962,13 +1955,13 @@
       const s = students.find(x => x.id === currentPaymentId);
       const balance = (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0);
       if (amount > balance) { showToast('Amount exceeds balance', 'error'); return; }
-      s.paidFee = (parseFloat(s.paidFee) || 0) + amount;
-      if (!s.payments) s.payments = [];
-      s.payments.push({ id:Date.now(), amount, date:new Date().toISOString().split('T')[0], mode });
-      if (s.paidFee >= s.totalFee && s.totalFee > 0) s.status = 'Paid';
-      else if (s.paidFee > 0) s.status = 'Partial';
-      saveData(); closePaymentModal(); updateFeesTable(); updateStudentsTable(); updateDashboard(); updateCourses();
-      showToast('Payment of ₹' + amount.toLocaleString('en-IN') + ' recorded', 'success');
+      try {
+        const updated = await api(`/students/${currentPaymentId}/payments`, { method: 'POST', body: JSON.stringify({ amount, mode, date: new Date().toISOString().split('T')[0] }) });
+        const idx = students.findIndex(x => x.id === currentPaymentId);
+        if (idx !== -1) students[idx] = updated;
+        closePaymentModal(); updateFeesTable(); updateStudentsTable(); updateDashboard(); updateCourses();
+        showToast('Payment of ₹' + amount.toLocaleString('en-IN') + ' recorded', 'success');
+      } catch (err) { showToast('Payment failed: ' + err.message, 'error'); }
     }
 
     // ==================== FEES ====================
@@ -2061,43 +2054,41 @@
 
     // ==================== COURSE CRUD ====================
     function getCourseList() {
-      let stored = JSON.parse(localStorage.getItem('techyuva_courses'));
-      if (!stored || stored.length === 0) {
-        stored = [
-          { id:1, name:'Web Development', duration:'12 weeks', fee:25000, badge:'Frontend · Backend' },
-          { id:2, name:'Data Science', duration:'14 weeks', fee:35000, badge:'Python · ML · Stats' },
-          { id:3, name:'Mobile App Development', duration:'10 weeks', fee:30000, badge:'Android · iOS' },
-          { id:4, name:'UI/UX Design', duration:'8 weeks', fee:20000, badge:'Design · Research' },
-          { id:5, name:'Cloud Computing', duration:'10 weeks', fee:28000, badge:'AWS · Azure · GCP' },
-          { id:6, name:'Cybersecurity', duration:'12 weeks', fee:32000, badge:'Network · Security' },
-          { id:7, name:'AI & Machine Learning', duration:'16 weeks', fee:40000, badge:'ML · Deep Learning' },
-          { id:8, name:'Digital Marketing', duration:'8 weeks', fee:18000, badge:'SEO · Social Media' }
-        ];
-        localStorage.setItem('techyuva_courses', JSON.stringify(stored));
-      }
-      return stored;
+      if (courses && courses.length > 0) return courses;
+      return [
+        { id:'default-1', name:'Web Development', duration:'12 weeks', fee:25000, badge:'Frontend · Backend' },
+        { id:'default-2', name:'Data Science', duration:'14 weeks', fee:35000, badge:'Python · ML · Stats' },
+        { id:'default-3', name:'Mobile App Development', duration:'10 weeks', fee:30000, badge:'Android · iOS' },
+        { id:'default-4', name:'UI/UX Design', duration:'8 weeks', fee:20000, badge:'Design · Research' },
+        { id:'default-5', name:'Cloud Computing', duration:'10 weeks', fee:28000, badge:'AWS · Azure · GCP' },
+        { id:'default-6', name:'Cybersecurity', duration:'12 weeks', fee:32000, badge:'Network · Security' },
+        { id:'default-7', name:'AI & Machine Learning', duration:'16 weeks', fee:40000, badge:'ML · Deep Learning' },
+        { id:'default-8', name:'Digital Marketing', duration:'8 weeks', fee:18000, badge:'SEO · Social Media' },
+      ];
     }
-    function saveCourseData(list) { localStorage.setItem('techyuva_courses', JSON.stringify(list)); }
+    function saveCourseData() {} // no-op — API handles persistence
 
-    function saveCourse() {
+    async function saveCourse() {
       const name = $('#courseName').value.trim();
       const duration = $('#courseDuration').value.trim();
       const fee = parseFloat($('#courseFee').value) || 0;
       const badge = $('#courseBadge').value.trim();
       const editId = $('#editCourseId').value;
       if (!name) { showToast('Please enter a course name', 'error'); return; }
-      let list = getCourseList();
-      if (editId) {
-        const c = list.find(x => x.id == editId);
-        if (c) { c.name = name; c.duration = duration; c.fee = fee; c.badge = badge; }
-        showToast('Course updated!', 'success');
-      } else {
-        if (list.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Course already exists', 'error'); return; }
-        list.push({ id: Date.now(), name, duration, fee, badge });
-        showToast('Course added!', 'success');
-      }
-      saveCourseData(list); clearCourseForm(); updateCourses(); updateCourseFilters();
-      if (typeof populateCourseSelects === 'function') populateCourseSelects();
+      try {
+        if (editId) {
+          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, duration, fee, badge }) });
+          const idx = courses.findIndex(c => c.id === editId);
+          if (idx !== -1) courses[idx] = updated;
+        } else {
+          if (courses.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Course already exists', 'error'); return; }
+          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, duration, fee, badge }) });
+          courses.push(saved);
+        }
+        clearCourseForm(); updateCourses(); updateCourseFilters();
+        if (typeof populateCourseSelects === 'function') populateCourseSelects();
+        showToast(editId ? 'Course updated!' : 'Course added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
     }
 
     function editCourse(name) {
@@ -2110,13 +2101,17 @@
       $('#courseName').focus();
     }
 
-    function deleteCourse(name) {
+    async function deleteCourse(name) {
       if (!confirm('Delete "' + name + '" course? Students enrolled will not be affected.')) return;
-      let list = getCourseList();
-      list = list.filter(c => c.name !== name);
-      saveCourseData(list); updateCourses(); updateCourseFilters();
-      if (typeof populateCourseSelects === 'function') populateCourseSelects();
-      showToast('Course deleted', 'success');
+      const c = courses.find(x => x.name === name);
+      if (!c) return;
+      try {
+        await api(`/courses/${c.id}`, { method: 'DELETE' });
+        courses = courses.filter(x => x.name !== name);
+        updateCourses(); updateCourseFilters();
+        if (typeof populateCourseSelects === 'function') populateCourseSelects();
+        showToast('Course deleted', 'success');
+      } catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
     }
 
     function clearCourseForm() {
@@ -2191,20 +2186,27 @@
       $('#expFootMode').innerHTML = modeParts.join('<br>');
     }
 
-    function addExpense() {
+    async function addExpense() {
       const name = $('#expName').value.trim();
       const amount = parseFloat($('#expAmount').value) || 0;
       const mode = $('#expMode').value;
       const date = $('#expDate').value;
       if (!name || amount <= 0 || !date) { showToast('Please fill name, amount, and date', 'error'); return; }
-      expenses.push({ id: Date.now(), name, amount, date, mode });
-      saveExpenses(); clearExpenseForm(); renderExpenses();
-      showToast('Expense added!', 'success');
+      try {
+        const saved = await api('/expenses', { method: 'POST', body: JSON.stringify({ name, amount, date, mode }) });
+        expenses.unshift(saved);
+        clearExpenseForm(); renderExpenses();
+        showToast('Expense added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
     }
     function clearExpenseForm() {
       $('#expName').value = ''; $('#expAmount').value = ''; $('#expDate').value = new Date().toISOString().split('T')[0]; $('#expMode').value = 'cash';
     }
-    function deleteExpense(id) { if (!confirm('Delete this expense?')) return; expenses = expenses.filter(e => e.id !== id); saveExpenses(); renderExpenses(); showToast('Expense deleted', 'success'); }
+    async function deleteExpense(id) {
+      if (!confirm('Delete this expense?')) return;
+      try { await api(`/expenses/${id}`, { method: 'DELETE' }); expenses = expenses.filter(e => e.id !== id); renderExpenses(); showToast('Expense deleted', 'success'); }
+      catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
+    }
     function exportExpensesCSV() {
       if (expenses.length === 0) { showToast('No expenses to export', 'error'); return; }
       const headers = ['#', 'Expense Name', 'Amount', 'Mode', 'Date'];
@@ -2292,12 +2294,25 @@
     $('#studentJoinDate').value = new Date().toISOString().split('T')[0];
     $('#expDate').value = new Date().toISOString().split('T')[0];
 
-    // Init
-    loadDemoData();
-    updateDashboard();
-    updateStudentsTable();
-    updateCourseFilters();
-    populateCourseSelects();
+    // Init — load from Firestore first
+    (async function init() {
+      try {
+        const [s, e, c] = await Promise.all([
+          api('/students'),
+          api('/expenses'),
+          api('/courses'),
+        ]);
+        students = s;
+        expenses = e;
+        courses = c;
+      } catch (err) {
+        console.warn('Firestore unavailable:', err.message);
+      }
+      updateDashboard();
+      updateStudentsTable();
+      updateCourseFilters();
+      populateCourseSelects();
+    })();
   </script>
 </body>
 </html>

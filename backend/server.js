@@ -1,0 +1,239 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
+
+// ─── Firebase Admin Initialization ───
+let admin, db;
+
+function initFirebase() {
+  try {
+    admin = require('firebase-admin');
+
+    // Strategy 1: Service account file path
+    if (process.env.FIREBASE_SERVICE_ACCOUNT_PATH) {
+      const saPath = path.resolve(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
+      if (fs.existsSync(saPath)) {
+        const serviceAccount = JSON.parse(fs.readFileSync(saPath, 'utf8'));
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+        console.log('✓ Firebase initialized via service account file');
+      } else {
+        console.warn('⚠ Service account file not found at:', saPath);
+        admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || 'techyuya' });
+      }
+    }
+    // Strategy 2: Service account JSON as env string (for Vercel)
+    else if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+      const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+      admin.initializeApp({ credential: admin.credential.cert(sa) });
+      console.log('✓ Firebase initialized via FIREBASE_SERVICE_ACCOUNT_JSON');
+    }
+    // Strategy 3: Default
+    else {
+      admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || 'techyuya' });
+      console.log('✓ Firebase initialized (ADC fallback)');
+    }
+
+    db = admin.firestore();
+    return true;
+  } catch (err) {
+    console.error('✗ Firebase init error:', err.message);
+    return false;
+  }
+}
+
+const firebaseReady = initFirebase();
+
+// ─── Express Setup ───
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+function getDB() {
+  if (!db) throw new Error('Firestore not initialized');
+  return db;
+}
+
+function formatDoc(doc) {
+  return { id: doc.id, ...doc.data() };
+}
+
+// ─── Health ───
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', firebase: firebaseReady ? 'connected' : 'not_initialized' });
+});
+
+// ─── STUDENTS ───
+app.get('/api/students', async (req, res) => {
+  try {
+    const snap = await getDB().collection('students').orderBy('joinDate', 'desc').get();
+    res.json(snap.docs.map(formatDoc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/students', async (req, res) => {
+  try {
+    const d = req.body;
+    const student = {
+      regNo: d.regNo || '', name: d.name || '', phone: d.phone || '', phone2: d.phone2 || '',
+      address: d.address || '', reference: d.reference || '', paymentMode: d.paymentMode || 'offline',
+      course: d.course || '', batch: d.batch || '', courseStatus: d.courseStatus || 'ongoing',
+      certificateIssued: d.certificateIssued || 'no', joinDate: d.joinDate || '',
+      expectedEndDate: d.expectedEndDate || '', totalFee: parseFloat(d.totalFee) || 0,
+      paidFee: parseFloat(d.paidFee) || 0, status: d.status || 'Pending',
+      payments: d.payments || [], createdAt: new Date().toISOString(),
+    };
+    const ref = await getDB().collection('students').add(student);
+    res.json({ id: ref.id, ...student });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/students/:id', async (req, res) => {
+  try {
+    const data = req.body;
+    const update = {};
+    ['regNo','name','phone','phone2','address','reference','paymentMode','course','batch','courseStatus','certificateIssued','joinDate','expectedEndDate','status'].forEach(f => {
+      if (data[f] !== undefined) update[f] = data[f];
+    });
+    if (data.totalFee !== undefined) update.totalFee = parseFloat(data.totalFee);
+    if (data.paidFee !== undefined) update.paidFee = parseFloat(data.paidFee);
+    if (data.payments !== undefined) update.payments = data.payments;
+    await getDB().collection('students').doc(req.params.id).update(update);
+    const doc = await getDB().collection('students').doc(req.params.id).get();
+    res.json(formatDoc(doc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/students/:id', async (req, res) => {
+  try {
+    await getDB().collection('students').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/students/:id/payments', async (req, res) => {
+  try {
+    const { amount, mode, date } = req.body;
+    if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    const docRef = getDB().collection('students').doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Student not found' });
+    const s = doc.data();
+    const newPaid = (parseFloat(s.paidFee) || 0) + parseFloat(amount);
+    const total = parseFloat(s.totalFee) || 0;
+    const payments = s.payments || [];
+    payments.push({ id: Date.now(), amount: parseFloat(amount), date: date || new Date().toISOString().split('T')[0], mode: mode || 'offline' });
+    const status = newPaid >= total && total > 0 ? 'Paid' : newPaid > 0 ? 'Partial' : 'Pending';
+    await docRef.update({ paidFee: newPaid, payments, status });
+    res.json(formatDoc(await docRef.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── COURSES ───
+app.get('/api/courses', async (req, res) => {
+  try {
+    const snap = await getDB().collection('courses').orderBy('name', 'asc').get();
+    const courses = snap.docs.map(formatDoc);
+    if (courses.length === 0) {
+      res.json([
+        { id:'default-1', name:'Web Development', duration:'12 weeks', fee:25000, badge:'Frontend · Backend' },
+        { id:'default-2', name:'Data Science', duration:'14 weeks', fee:35000, badge:'Python · ML · Stats' },
+        { id:'default-3', name:'Mobile App Development', duration:'10 weeks', fee:30000, badge:'Android · iOS' },
+        { id:'default-4', name:'UI/UX Design', duration:'8 weeks', fee:20000, badge:'Design · Research' },
+        { id:'default-5', name:'Cloud Computing', duration:'10 weeks', fee:28000, badge:'AWS · Azure · GCP' },
+        { id:'default-6', name:'Cybersecurity', duration:'12 weeks', fee:32000, badge:'Network · Security' },
+        { id:'default-7', name:'AI & Machine Learning', duration:'16 weeks', fee:40000, badge:'ML · Deep Learning' },
+        { id:'default-8', name:'Digital Marketing', duration:'8 weeks', fee:18000, badge:'SEO · Social Media' },
+      ]);
+    } else res.json(courses);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/courses', async (req, res) => {
+  try {
+    const d = req.body;
+    const ref = await getDB().collection('courses').add({ name: d.name, duration: d.duration || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', createdAt: new Date().toISOString() });
+    const doc = await ref.get();
+    res.json(formatDoc(doc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/courses/:id', async (req, res) => {
+  try {
+    const d = req.body;
+    const update = {};
+    ['name','duration','badge'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
+    if (d.fee !== undefined) update.fee = parseFloat(d.fee);
+    await getDB().collection('courses').doc(req.params.id).update(update);
+    res.json(formatDoc(await getDB().collection('courses').doc(req.params.id).get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/courses/:id', async (req, res) => {
+  try {
+    await getDB().collection('courses').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── EXPENSES ───
+app.get('/api/expenses', async (req, res) => {
+  try {
+    const snap = await getDB().collection('expenses').orderBy('date', 'desc').get();
+    res.json(snap.docs.map(formatDoc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/expenses', async (req, res) => {
+  try {
+    const d = req.body;
+    const ref = await getDB().collection('expenses').add({ name: d.name, amount: parseFloat(d.amount) || 0, date: d.date || new Date().toISOString().split('T')[0], mode: d.mode || 'cash', createdAt: new Date().toISOString() });
+    const doc = await ref.get();
+    res.json(formatDoc(doc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/expenses/:id', async (req, res) => {
+  try {
+    await getDB().collection('expenses').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── DASHBOARD ───
+app.get('/api/dashboard', async (req, res) => {
+  try {
+    const sSnap = await getDB().collection('students').get();
+    const eSnap = await getDB().collection('expenses').get();
+    const students = sSnap.docs.map(formatDoc);
+    const expenses = eSnap.docs.map(formatDoc);
+    const totalCollected = students.reduce((s, x) => s + (parseFloat(x.paidFee) || 0), 0);
+    const totalPending = students.reduce((s, x) => s + ((parseFloat(x.totalFee) || 0) - (parseFloat(x.paidFee) || 0)), 0);
+    const now = new Date();
+    const thisMonth = now.toISOString().slice(0, 7);
+    const monthFees = students.filter(s => s.joinDate && s.joinDate.startsWith(thisMonth)).reduce((s, x) => s + (parseFloat(x.paidFee) || 0), 0);
+    const monthExp = expenses.filter(e => e.date && e.date.startsWith(thisMonth)).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    const courseDist = {};
+    students.forEach(s => { const k = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : ''); courseDist[k] = (courseDist[k] || 0) + 1; });
+    res.json({
+      totalStudents: students.length, totalCollected, totalPending,
+      activeCourses: [...new Set(students.map(s => s.course))].filter(c => c).length,
+      monthNewStudents: students.filter(s => s.joinDate && s.joinDate.startsWith(thisMonth)).length,
+      monthFeesCollected: monthFees, monthExpenses: monthExp, monthNet: monthFees - monthExp,
+      paymentStatus: { paid: students.filter(s => s.status === 'Paid').length, partial: students.filter(s => s.status === 'Partial').length, pending: students.filter(s => s.status === 'Pending').length },
+      courseDistribution: courseDist,
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── Export for Vercel ───
+module.exports = app;
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`\n  🚀 TechYuva Backend running at http://localhost:${PORT}`);
+    console.log(`  📡 API: http://localhost:${PORT}/api/health\n`);
+  });
+}
