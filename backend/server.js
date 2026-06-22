@@ -15,11 +15,13 @@ function initFirebase() {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_PATH) {
       const saPath = path.resolve(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
       if (fs.existsSync(saPath)) {
-        admin.initializeApp({ credential: admin.credential.applicationDefault() });
-        console.log('✓ Firebase initialized via GOOGLE_APPLICATION_CREDENTIALS');
+        const serviceAccount = JSON.parse(fs.readFileSync(saPath, 'utf8'));
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+        console.log('✓ Firebase initialized via service account file');
       } else {
+        console.warn('⚠ Service account file not found at:', saPath);
         admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || 'techyuya' });
-        console.log('✓ Firebase initialized (no service account - may fail on auth)');
+        console.log('✓ Firebase initialized (ADC fallback)');
       }
     }
     // Strategy 2: Service account JSON as env string
