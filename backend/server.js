@@ -81,9 +81,15 @@ function formatDoc(doc) {
   return { id: doc.id, ...doc.data() };
 }
 
-// ─── Health ───
+// ─── Health / Diagnostics ───
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', firebase: firebaseReady ? 'connected' : 'not_initialized' });
+  res.json({
+    status: 'ok',
+    firebase: firebaseReady ? 'connected' : 'not_initialized',
+    env_json_set: !!process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
+    env_json_len: process.env.FIREBASE_SERVICE_ACCOUNT_JSON ? process.env.FIREBASE_SERVICE_ACCOUNT_JSON.length : 0,
+    env_email_set: !!process.env.FIREBASE_CLIENT_EMAIL,
+  });
 });
 
 // ─── STUDENTS ───
