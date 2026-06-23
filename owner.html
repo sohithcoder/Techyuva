@@ -735,19 +735,39 @@
       .search-box { max-width: none; min-width: 0; }
       .owner-section__header { flex-direction: column; align-items: flex-start; }
     }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--paper);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      transition: opacity .4s, visibility .4s;
+    }
+    .loading-overlay.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 2px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      color: var(--ink-soft);
+    }
   </style>
 </head>
 <body data-theme="paper">
 
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
-
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
-
-  <!-- Grain -->
-  <div class="grain" aria-hidden="true"></div>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading data...</div>
+  </div>
 
   <!-- File Explorer Nav -->
   <header class="nav" id="nav">
@@ -795,11 +815,11 @@
       </div>
     </div>
     <div class="nav__bar">
-      <a href="index.html#top" class="nav__logo" data-magnetic>
+      <a href="index.html#top" class="nav__logo">
         <span class="nav__logo-mark">>_</span>TechYuva
       </a>
       <div class="nav__actions">
-        <a href="index.html" class="link-arrow" style="font-size:.78rem;" data-magnetic>← Back home</a>
+        <a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a>
       </div>
     </div>
   </header>
@@ -970,11 +990,11 @@
             </div>
           </div>
           <div class="form-actions">
-            <button class="btn btn--primary" onclick="addStudent()" data-magnetic>
+            <button class="btn btn--primary" onclick="addStudent()">
               <span>$ register student</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button class="btn" onclick="clearStudentForm()" data-magnetic>
+            <button class="btn" onclick="clearStudentForm()">
               <span>$ clear</span>
             </button>
           </div>
@@ -1191,11 +1211,11 @@
           </div>
           <input type="hidden" id="editCourseId" value="" />
           <div class="form-actions">
-            <button class="btn btn--primary" onclick="saveCourse()" data-magnetic>
+            <button class="btn btn--primary" onclick="saveCourse()">
               <span>$ save course</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button class="btn" onclick="clearCourseForm()" data-magnetic>
+            <button class="btn" onclick="clearCourseForm()">
               <span>$ clear</span>
             </button>
           </div>
@@ -1225,7 +1245,7 @@
             </div>
             <div class="field" style="align-self:end;">
               <input type="hidden" id="editBatchId" value="" />
-              <button class="btn btn--primary" onclick="saveBatch()" data-magnetic style="white-space:nowrap;">
+              <button class="btn btn--primary" onclick="saveBatch()" style="white-space:nowrap;">
                 <span>$ save batch</span>
               </button>
             </div>
@@ -1334,11 +1354,11 @@
             </div>
           </div>
           <div class="form-actions">
-            <button class="btn btn--primary" onclick="addExpense()" data-magnetic>
+            <button class="btn btn--primary" onclick="addExpense()">
               <span>$ add expense</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button class="btn" onclick="clearExpenseForm()" data-magnetic>
+            <button class="btn" onclick="clearExpenseForm()">
               <span>$ clear</span>
             </button>
           </div>
@@ -1512,8 +1532,8 @@
         <div class="fee-breakdown" id="paymentBreakdown"></div>
       </div>
       <div class="modal__footer">
-        <button class="btn" onclick="closePaymentModal()" data-magnetic><span>$ cancel</span></button>
-        <button class="btn btn--primary" onclick="recordPayment()" data-magnetic>
+        <button class="btn" onclick="closePaymentModal()"><span>$ cancel</span></button>
+        <button class="btn btn--primary" onclick="recordPayment()">
           <span>$ record payment</span>
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -1611,8 +1631,8 @@
         </div>
       </div>
       <div class="modal__footer">
-        <button class="btn" onclick="closeEditModal()" data-magnetic><span>$ cancel</span></button>
-        <button class="btn btn--primary" onclick="saveEditStudent()" data-magnetic>
+        <button class="btn" onclick="closeEditModal()"><span>$ cancel</span></button>
+        <button class="btn btn--primary" onclick="saveEditStudent()">
           <span>$ save changes</span>
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -1674,9 +1694,6 @@
     // ==================== SHARED UTILITIES ====================
     const $ = (s, c=document) => c.querySelector(s);
     const $$ = (s, c=document) => [...c.querySelectorAll(s)];
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
-
     // Nav
     const nav = $('#nav');
     $('#explorerToggle')?.addEventListener('click', () => nav.classList.add('is-collapsed'));
@@ -1688,30 +1705,6 @@
         if (children) { children.classList.toggle('is-collapsed'); folder.classList.toggle('is-open'); }
       });
     });
-    const bar = $('#scrollProgress')?.querySelector('span');
-    if (bar) {
-      const update = () => { const max = document.documentElement.scrollHeight - innerHeight; bar.style.width = max > 0 ? (scrollY / max) * 100 + '%' : '0%'; };
-      addEventListener('scroll', update, { passive: true }); addEventListener('resize', update); update();
-    }
-    if (!isTouch) {
-      const ring = $('#cursor'), dot = $('#cursorDot');
-      let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
-      addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`; });
-      addEventListener('mousedown', () => ring.classList.add('is-down'));
-      addEventListener('mouseup', () => ring.classList.remove('is-down'));
-      const loop = () => { rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14; ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`; requestAnimationFrame(loop); }; loop();
-      document.addEventListener('mouseover', e => { if (e.target.closest('a, button, [data-magnetic], input, select, .owner-tab, .action-btn')) ring.classList.add('is-hover'); });
-      document.addEventListener('mouseout', e => { if (e.target.closest('a, button, [data-magnetic], input, select, .owner-tab, .action-btn')) ring.classList.remove('is-hover'); });
-    }
-    if (!isTouch && !reducedMotion) {
-      $$('[data-magnetic]').forEach(el => {
-        const strength = 0.3;
-        el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(); el.style.transform = `translate(${(e.clientX - r.left - r.width/2)*strength}px, ${(e.clientY - r.top - r.height/2)*strength}px)`; el.style.transition = 'transform .12s ease-out'; });
-        el.addEventListener('mouseleave', () => { el.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)'; el.style.transform = ''; });
-      });
-    }
-    const revealObserver = new IntersectionObserver(entries => { entries.forEach(en => { if (!en.isIntersecting) return; en.target.classList.add('is-visible'); revealObserver.unobserve(en.target); }); }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-    $$('.reveal').forEach(el => revealObserver.observe(el));
 
     // ==================== TABS ====================
     $$('.owner-tab').forEach(tab => {
@@ -2377,6 +2370,9 @@
       updateStudentsTable();
       updateCourseFilters();
       populateCourseSelects();
+      // Hide loading overlay
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.classList.add('is-hidden');
     })();
   </script>
 </body>
