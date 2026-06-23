@@ -58,7 +58,7 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  cursor: none;
+  cursor: auto;
 }
 
 body.quiz-open { overflow: hidden; }
@@ -67,7 +67,7 @@ body.quiz-open { overflow: hidden; }
 
 img, svg { display: block; }
 a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 em { font-style: italic; }
 kbd {
   font-family: var(--font-mono);
@@ -134,6 +134,7 @@ kbd {
   pointer-events: none; z-index: 9999;
   border-radius: 50%;
   transform: translate(-50%, -50%);
+  display: none !important;
 }
 .cursor {
   width: 32px; height: 32px;
@@ -156,7 +157,6 @@ kbd {
 
 @media (hover: none), (pointer: coarse) {
   .cursor, .cursor-dot { display: none; }
-  body, button { cursor: auto; }
 }
 
 /* ============================================================
@@ -650,7 +650,7 @@ kbd {
   color: var(--ink-faint);
   border: 1px solid transparent;
   transition: color .25s, background-color .25s, border-color .25s;
-  cursor: none;
+  cursor: pointer;
 }
 .term-tab:hover { color: var(--ink); background: rgba(28,25,21,.04); }
 .term-tab.is-active {
@@ -1542,7 +1542,7 @@ kbd {
 .mascot__body {
   position: relative;
   pointer-events: auto;
-  cursor: none;
+  cursor: pointer;
   transition: transform .3s var(--ease-spring);
 }
 .mascot__body:hover { transform: scale(1.1); }

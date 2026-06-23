@@ -7,52 +7,57 @@ require('dotenv').config();
 // ─── Firebase Admin Initialization ───
 let admin, db;
 
+function normalizePrivateKey(key) {
+  if (!key) return key;
+  // Handle keys pasted with literal \n, double-escaped \\n, or actual newlines
+  return key.replace(/\\n/g, '\n').replace(/\n/g, '\n').trim();
+}
+
 function initFirebase() {
   try {
     admin = require('firebase-admin');
+    const projectId = process.env.FIREBASE_PROJECT_ID || 'techyuya';
 
-    // Strategy 1: Try to find the key file (local dev, no env var needed)
-    const keyPaths = [
-      process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
-      './firebase-key.json',
-      path.join(__dirname, 'firebase-key.json'),
-    ].filter(Boolean);
-    const foundKeyPath = keyPaths.find(p => fs.existsSync(path.resolve(p)));
-    if (foundKeyPath) {
-      const sa = JSON.parse(fs.readFileSync(path.resolve(foundKeyPath), 'utf8'));
-      admin.initializeApp({ credential: admin.credential.cert(sa) });
-      console.log('✓ Firebase: loaded key file at', foundKeyPath);
-    }
-    // Strategy 2: Service account JSON as env var (for Vercel - DEPRECATED, use Strategy 3)
-    else if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-      try {
-        const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
-        admin.initializeApp({ credential: admin.credential.cert(sa) });
-        console.log('✓ Firebase: initialized via FIREBASE_SERVICE_ACCOUNT_JSON');
-      } catch (e) {
-        console.error('✗ Bad FIREBASE_SERVICE_ACCOUNT_JSON:', e.message);
-        fallbackInit();
-      }
-    }
-    // Strategy 3: Individual env vars
-    else if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+    // Strategy 1: Individual env vars (recommended for Vercel)
+    if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
       admin.initializeApp({
         credential: admin.credential.cert({
-          projectId: 'techyuya',
+          projectId,
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          privateKey: normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY),
         }),
       });
       console.log('✓ Firebase: initialized via individual env vars');
     }
-    // Strategy 4: Fallback
-    else {
-      fallbackInit();
+    // Strategy 2: Service account JSON as env var
+    else if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+      try {
+        const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+        if (!sa.private_key) throw new Error('Missing private_key in service account JSON');
+        sa.private_key = normalizePrivateKey(sa.private_key);
+        admin.initializeApp({ credential: admin.credential.cert(sa) });
+        console.log('✓ Firebase: initialized via FIREBASE_SERVICE_ACCOUNT_JSON');
+      } catch (e) {
+        console.error('✗ Bad FIREBASE_SERVICE_ACCOUNT_JSON:', e.message);
+        throw e;
+      }
     }
-
-    function fallbackInit() {
-      admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID || 'techyuya' });
-      console.log('⚠ Firebase: no credentials found, using fallback (will fail at runtime)');
+    // Strategy 3: Service account key file (local dev only — file is gitignored)
+    else {
+      const keyPaths = [
+        process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
+        path.join(__dirname, 'firebase-key.json'),
+        './firebase-key.json',
+      ].filter(Boolean);
+      const foundKeyPath = keyPaths.find(p => fs.existsSync(path.resolve(p)));
+      if (foundKeyPath) {
+        const sa = JSON.parse(fs.readFileSync(path.resolve(foundKeyPath), 'utf8'));
+        admin.initializeApp({ credential: admin.credential.cert(sa) });
+        console.log('✓ Firebase: loaded key file at', foundKeyPath);
+      } else {
+        admin.initializeApp({ projectId });
+        console.log('⚠ Firebase: no credentials found, using fallback (will fail at runtime)');
+      }
     }
 
     db = admin.firestore();
@@ -81,12 +86,20 @@ function formatDoc(doc) {
 
 // ─── Health / Diagnostics ───
 app.get('/api/health', (req, res) => {
+  const strategy = process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY
+    ? 'env_vars'
+    : process.env.FIREBASE_SERVICE_ACCOUNT_JSON
+    ? 'service_account_json'
+    : firebaseReady
+    ? 'key_file_or_fallback'
+    : 'none';
   res.json({
     status: 'ok',
     firebase: firebaseReady ? 'connected' : 'not_initialized',
-    env_json_set: !!process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
-    env_json_len: process.env.FIREBASE_SERVICE_ACCOUNT_JSON ? process.env.FIREBASE_SERVICE_ACCOUNT_JSON.length : 0,
+    strategy,
     env_email_set: !!process.env.FIREBASE_CLIENT_EMAIL,
+    env_private_key_set: !!process.env.FIREBASE_PRIVATE_KEY,
+    env_project_id: process.env.FIREBASE_PROJECT_ID || 'techyuya',
   });
 });
 
