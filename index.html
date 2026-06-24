@@ -151,109 +151,37 @@
       </div>
     </section>
 
-    <!-- ===== Courses ===== -->
-    <section class="section section--dark" id="courses">
+    <!-- ===== Course Schedule ===== -->
+    <section class="section section--dark" id="schedule">
       <div class="section__head">
         <span class="section__index reveal">02</span>
-        <h2 class="section__title reveal" data-ascii-title>Pick a course.<br/><em>Begin.</em></h2>
-        <p class="section__sub reveal">Live tracks. Each ends with projects, a certificate, and access to the student zone.</p>
+        <h2 class="section__title reveal" data-ascii-title>Current <em>Batches</em></h2>
+        <p class="section__sub reveal">All active courses and their running batches. Pick one and enroll today.</p>
       </div>
-
-      <div class="courses" id="courseList">
-        <!-- Courses loaded dynamically from backend -->
+      <div class="owner-table-wrap" style="margin:0 auto;max-width:900px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;" id="scheduleWrap">
+        <table class="owner-table" style="min-width:0;">
+          <thead><tr><th>Course</th><th>Batch</th><th>Duration</th><th>Status</th></tr></thead>
+          <tbody id="scheduleTable"><tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">Loading schedule...</div></div></td></tr></tbody>
+        </table>
       </div>
-
-      <p class="courses__note reveal">
-        Not sure where to start?
-        <button class="link-arrow" id="takePlacement">Take a placement test</button>
-      </p>
     </section>
 
-    <!-- ===== Student Zone ===== -->
+    <!-- ===== Student Zone Glimpse ===== -->
     <section class="section" id="zone">
       <div class="section__head">
         <span class="section__index reveal">03</span>
-        <h2 class="section__title reveal" data-ascii-title>Student <em>Zone</em></h2>
-        <p class="section__sub reveal">Everything you need after enrollment — track progress, download notes, join cohorts, and message mentors.</p>
+        <h2 class="section__title reveal" data-ascii-title>Latest from <em>Study Zone</em></h2>
+        <p class="section__sub reveal">Recent updates — roadmaps, jobs, materials, and mock tests.</p>
       </div>
-
-      <div class="zone">
-
-        <!-- Login card -->
-        <div class="zone__login reveal">
-          <div class="zone__login-inner">
-            <span class="zone__tag">Access</span>
-            <h3>Welcome back, coder</h3>
-            <form class="zone__form" id="zoneLogin" novalidate>
-              <label class="field">
-                <span>Student ID / Email</span>
-                <input type="text" name="email" placeholder="you@techyuva.in" autocomplete="username" />
-              </label>
-              <label class="field">
-                <span>Password</span>
-                <input type="password" name="pass" placeholder="••••••••" autocomplete="current-password" />
-              </label>
-              <button type="submit" class="btn btn--primary btn--full"><span>Enter zone</span></button>
-              <p class="zone__hint">New here? <a href="#courses">Pick a course</a> to get your ID.</p>
-            </form>
-          </div>
-          <div class="zone__login-art" aria-hidden="true">
-            <div class="floating-dots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          </div>
-        </div>
-
-        <!-- Dashboard preview -->
-        <div class="zone__dash reveal">
-          <div class="dash__top">
-            <span class="dash__label">Dashboard preview</span>
-            <span class="dash__status"><i></i> Live cohort</span>
-          </div>
-
-          <div class="dash__progress">
-            <div class="dash__course">
-              <div class="dash__course-head"><strong>Java Mastery</strong><span>64%</span></div>
-              <div class="progress"><span style="--p:64%"></span></div>
-            </div>
-            <div class="dash__course">
-              <div class="dash__course-head"><strong>DSA Practice</strong><span>38%</span></div>
-              <div class="progress"><span style="--p:38%"></span></div>
-            </div>
-            <div class="dash__course">
-              <div class="dash__course-head"><strong>Capstone Project</strong><span>12%</span></div>
-              <div class="progress"><span style="--p:12%"></span></div>
-            </div>
-          </div>
-
-          <div class="dash__stats">
-            <div class="dash__stat"><b>27</b><small>classes attended</small></div>
-            <div class="dash__stat"><b>9</b><small>projects shipped</small></div>
-            <div class="dash__stat"><b>1,240</b><small>XP earned</small></div>
-          </div>
-
-          <div class="dash__next">
-            <span class="dash__next-label">Up next</span>
-            <div class="dash__next-item">
-              <span class="dash__next-time">Today · 7:00 PM</span>
-              <strong>Live: Generics &amp; Collections deep-dive</strong>
-              <button class="btn btn--small"><span>Join class</span></button>
-            </div>
-          </div>
-
-          <div class="dash__resources">
-            <span class="dash__resources-label">Quick links</span>
-            <div class="dash__resources-grid">
-              <a href="#" class="resource"><span>📄</span> Notes &amp; PDFs</a>
-              <a href="#" class="resource"><span>💻</span> Code playground</a>
-              <a href="#" class="resource"><span>🏆</span> Leaderboard</a>
-              <a href="#" class="resource"><span>💬</span> Mentor chat</a>
-            </div>
-          </div>
-        </div>
+      <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:.6rem;" id="zoneUpdates">
+        <p style="text-align:center;color:var(--ink-soft);padding:2rem;">Loading recent updates...</p>
       </div>
+      <p style="text-align:center;margin-top:1.5rem;">
+        <a href="studyzone.html" class="link-arrow" style="font-size:.85rem;">View full Study Zone →</a>
+      </p>
     </section>
-
-    <!-- ===== Quiz ===== -->
-    <section class="quiz" id="quiz" hidden>
+    <!-- Quiz overlay -->
+    <div class="quiz" id="quiz" hidden>
       <div class="quiz__top">
         <button class="quiz__quit" id="quizQuit">✕ <span>Quit</span></button>
         <span class="quiz__subject" id="quizSubject">Java</span>
@@ -272,7 +200,7 @@
         <div class="quiz__options" id="quizOptions"></div>
       </div>
       <p class="quiz__hint">Press <kbd>1</kbd>–<kbd>4</kbd> to answer</p>
-    </section>
+    </div>
 
     <!-- ===== Results / Analysis ===== -->
     <section class="results section" id="analysis" hidden>
@@ -366,57 +294,27 @@
       return String(text).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     }
 
-    async function loadIndexCourses() {
-      const container = document.getElementById('courseList');
-      if (!container) return;
+    async function loadSchedule() {
+      const tbody = document.getElementById('scheduleTable');
+      if (!tbody) return;
       try {
-        const courses = await getCourses();
-        if (!courses.length) {
-          container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">No courses available yet. Check back soon.</p>';
-          return;
-        }
-        const batchesByCourse = {};
-        const batchRes = await Promise.all(courses.map(c => getBatches(c.id).catch(() => [])));
-        courses.forEach((c, i) => { batchesByCourse[c.id] = batchRes[i]; });
-
-        container.innerHTML = courses.map((c, idx) => {
-          const batches = batchesByCourse[c.id] || [];
-          const batchTags = batches.map(b => `<span class="course__batch-tag">${b.name}</span>`).join('');
-          const modules = Array.isArray(c.modules) && c.modules.length
-            ? c.modules.map(m => `<li>${m}</li>`).join('')
-            : '<li>Industry-relevant curriculum</li><li>Live instructor-led sessions</li><li>Hands-on projects &amp; assignments</li><li>Certificate on completion</li>';
-          return `
-            <article class="course reveal" data-course="${slugify(c.name)}">
-              <div class="course__content">
-                <div class="course__head">
-                  <span class="course__index">${String(idx + 1).padStart(2, '0')}</span>
-                  <span class="course__lang">${c.name.split(' ')[0]}</span>
-                  <span class="course__badge">${c.badge || c.name}</span>
-                </div>
-                <h3 class="course__name">${c.name}</h3>
-                <p class="course__desc">${c.description || 'Comprehensive course with hands-on projects and live mentoring.'}</p>
-                <ul class="course__modules">${modules}</ul>
-                ${batchTags ? `<div class="course__batches">${batchTags}</div>` : ''}
-                <div class="course__foot">
-                  <span class="course__duration">${c.duration || 'Self-paced'}${c.endDate ? ' · ends ' + formatDate(c.endDate) : ''}</span>
-                  <a class="course__cta" href="https://wa.me/919876543210?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener">
-                    <span class="cta__text">$ techyuva enroll --course=${slugify(c.name)}</span>
-                    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </a>
-                </div>
-              </div>
-            </article>`;
-        }).join('');
-
-        // Re-run lightweight reveal observer
-        if (window.revealObserver) {
-          document.querySelectorAll('#courseList .reveal').forEach(el => window.revealObserver.observe(el));
-        }
-      } catch (err) {
-        console.warn('Could not load courses:', err.message);
-        container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">Courses loading unavailable. Please try again later.</p>';
-      }
+        const [courses, allBatches] = await Promise.all([getCourses(), getBatches()]);
+        if (!courses.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No courses yet</div></div></td></tr>'; return; }
+        let rows = '';
+        courses.forEach(c => {
+          const batches = allBatches.filter(b => b.courseId === c.id);
+          if (!batches.length) {
+            rows += '<tr><td><span class="owner-table__name">' + c.name + '</span></td><td colspan="3" style="color:var(--ink-faint);">No batches yet</td></tr>';
+          } else {
+            batches.forEach((b, i) => {
+              rows += '<tr><td>' + (i === 0 ? '<span class="owner-table__name">' + c.name + '</span>' : '') + '</td><td>' + b.name + '</td><td>' + b.duration + ' days</td><td><span class="badge badge--partial">Active</span></td></tr>';
+            });
+          }
+        });
+        tbody.innerHTML = rows || '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No batches scheduled</div></div></td></tr>';
+      } catch (err) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">Unable to load</div></div></td></tr>'; }
     }
+
     async function loadTrendingCourses() {
       const container = document.getElementById('trendingList');
       if (!container) return;
@@ -429,39 +327,32 @@
         const batchesByCourse = {};
         const batchRes = await Promise.all(courses.map(c => getBatches(c.id).catch(() => [])));
         courses.forEach((c, i) => { batchesByCourse[c.id] = batchRes[i]; });
-
         container.innerHTML = courses.map((c, idx) => {
           const batches = batchesByCourse[c.id] || [];
-          const batchTags = batches.map(b => `<span class="course__batch-tag">${b.name}</span>`).join('');
-          return `
-            <article class="course reveal" data-course="${slugify(c.name)}">
-              <div class="course__content">
-                <div class="course__head">
-                  <span class="course__index">${String(idx + 1).padStart(2, '0')}</span>
-                  <span class="course__lang">${c.name.split(' ')[0]}</span>
-                  <span class="course__badge">${c.badge || c.name}</span>
-                </div>
-                <h3 class="course__name">${c.name}</h3>
-                <p class="course__desc">${c.description || 'Comprehensive course with hands-on projects and live mentoring.'}</p>
-                ${batchTags ? '<div class="course__batches">' + batchTags + '</div>' : ''}
-                <div class="course__foot">
-                  <span class="course__duration">${c.duration || 'Self-paced'}${c.endDate ? ' · ends ' + formatDate(c.endDate) : ''}</span>
-                  <a class="course__cta" href="menu.html">
-                    <span class="cta__text">$ view course details</span>
-                    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </a>
-                </div>
-              </div>
-            </article>`;
+          const batchTags = batches.map(b => '<span class="course__batch-tag">' + b.name + '</span>').join('');
+          return '<article class="course reveal"><div class="course__content"><div class="course__head"><span class="course__index">' + String(idx + 1).padStart(2, '0') + '</span><span class="course__lang">' + c.name.split(' ')[0] + '</span><span class="course__badge">' + (c.badge || c.name) + '</span></div><h3 class="course__name">' + c.name + '</h3><p class="course__desc">' + (c.description || 'Comprehensive course with hands-on projects and live mentoring.') + '</p>' + (batchTags ? '<div class="course__batches">' + batchTags + '</div>' : '') + '<div class="course__foot"><span class="course__duration">' + (c.duration || 'Self-paced') + (c.endDate ? ' · ends ' + formatDate(c.endDate) : '') + '</span><a class="course__cta" href="menu.html"><span class="cta__text">$ view details</span><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div></article>';
         }).join('');
-      } catch (err) {
-        console.warn('Trending courses:', err.message);
-        container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">Unable to load trending courses.</p>';
-      }
+      } catch (err) { container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">Unable to load trending.</p>'; }
     }
-
-    loadIndexCourses();
+    async function loadZoneUpdates() {
+      const ctr = document.getElementById('zoneUpdates');
+      if (!ctr) return;
+      try {
+        const items = await api('/studyzone');
+        const recent = (items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+        if (!recent.length) { ctr.innerHTML = '<p style="text-align:center;color:var(--ink-soft);padding:1rem;">No updates yet.</p>'; return; }
+        const labels = { 'career-roadmap':'Career','placement-guideline':'Placement','job-opening':'Job','study-material':'Material','mock-test':'Mock Test' };
+        ctr.innerHTML = recent.map(item => {
+          const m = item.meta || {}; let tag = '';
+          if (item.type === 'job-opening' && m.company) tag = '<span style="font-size:.65rem;color:var(--ink-soft);">' + m.company + '</span>';
+          else if (item.type === 'mock-test' && m.difficulty) tag = '<span style="font-size:.65rem;color:var(--ink-soft);">' + m.difficulty + '</span>';
+          return '<a href="studyzone.html" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:10px;background:var(--paper);text-decoration:none;color:inherit;transition:border-color .2s;"><div style="display:flex;align-items:center;gap:.6rem;min-width:0;"><span style="font-size:.6rem;font-family:var(--font-mono);text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2);padding:.15em .5em;border-radius:100px;white-space:nowrap;">' + (labels[item.type] || item.type) + '</span><span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.title + '</span></div><div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0;">' + tag + '<span style="font-size:.65rem;color:var(--ink-faint);white-space:nowrap;">' + formatDate(item.createdAt) + '</span></div></a>';
+        }).join('');
+      } catch (err) { ctr.innerHTML = '<p style="text-align:center;color:var(--ink-soft);">Unable to load updates.</p>'; }
+    }
     loadTrendingCourses();
+    loadSchedule();
+    loadZoneUpdates();
   </script>
 </body>
 </html>
