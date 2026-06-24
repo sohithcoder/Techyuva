@@ -290,10 +290,10 @@ kbd {
 
 @media (max-width: 900px) {
   /* Mobile: explorer is a slide-in drawer, hidden by default.
-     Ignore the collapsed/expanded desktop state entirely. */
-  .nav { position: fixed; transform: translateX(calc(-1 * var(--nav-w))); width: var(--nav-w); height: 100%; z-index: 1000; }
-  .nav.is-open { transform: translateX(0); }
-  .nav__bar { left: 0 !important; position: fixed; top: 0; width: 100%; z-index: 999; }
+     Use `left` (not transform) so fixed children (nav__bar) stay viewport-relative. */
+  .nav { position: fixed; left: calc(-1 * var(--nav-w)); width: var(--nav-w); height: 100%; z-index: 1000; transition: left .35s var(--ease-out); }
+  .nav.is-open { left: 0; }
+  .nav__bar { left: 0 !important; position: fixed; top: 0; width: 100vw; z-index: 999; }
   /* Prevent nav from affecting document scroll width */
   html { overflow-x: hidden; }
 }
@@ -1673,4 +1673,47 @@ kbd {
   body { font-size: 15px; }
   .link-arrow { font-size: .72rem; }
   .footer { font-size: .72rem; text-align: center; padding: 2rem 1rem; }
+  /* Hero — prevent orb/ring overflow */
+  .hero { overflow: hidden; }
+  .hero__terminal { overflow: hidden; }
+  .hero__orb { width: 280px !important; height: 280px !important; }
+  .hero__ring { display: none; }
+  .cta { overflow: hidden; }
+  .cta__orb { width: 220px !important; height: 220px !important; }
+  /* Section spacing */
+  .section { padding: 3rem 0; }
+  .section__head { margin-bottom: 2rem; }
+  .section__title { font-size: 1.6rem; }
+  /* Features */
+  .features { gap: 1.2rem; }
+  .feature { padding: 1.2rem; }
+  /* Courses on index */
+  .courses { gap: 1rem; }
+  .course { min-width: 0; }
+  .course__content { padding: 1.2rem; }
+  .course__name { font-size: 1.2rem; }
+  /* Terminal */
+  .terminal__body { padding: .8rem; min-height: 180px; }
+  .terminal__code, .terminal__out { font-size: .68rem; }
+  /* Zone */
+  .zone { gap: 1rem; }
+  .zone__login, .zone__dash { padding: 1.2rem; }
+  /* Stats */
+  .hero__stats { gap: 1rem; flex-wrap: wrap; }
+  .stat__num { font-size: 1.8rem; }
+  /* CTA */
+  .cta__title { font-size: 1.8rem; }
+  /* Results */
+  .results__grid { grid-template-columns: 1fr; }
+  .card--chart { grid-column: span 1; }
+}
+
+@media (max-width: 380px) {
+  .hero__title { font-size: 1.8rem !important; }
+  .hero__copy { font-size: .82rem; }
+  .hero__actions { flex-direction: column; gap: .6rem; }
+  .hero__actions .btn { width: 100%; justify-content: center; }
+  .section__title { font-size: 1.4rem; }
+  .course__name { font-size: 1.1rem; }
+  .terminal { border-radius: 10px; }
 }

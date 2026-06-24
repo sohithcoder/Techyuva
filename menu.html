@@ -291,6 +291,18 @@
     }
     @media (max-width: 640px) {
       .course-grid { grid-template-columns: 1fr; }
+      .course-card__header { padding: 1.2rem 1.2rem 0; }
+      .course-card__body { padding: 1rem 1.2rem 0.8rem; }
+      .course-card__footer { padding: .8rem 1.2rem 1rem; flex-direction: column; gap: .6rem; align-items: stretch; }
+      .course-card__cta { text-align: center; justify-content: center; }
+      .course-page__head h1 { font-size: 2rem; }
+      .course-filter { gap: .3rem; }
+      .course-filter button { font-size: .7rem; padding: .35rem .8rem; }
+    }
+    @media (max-width: 420px) {
+      .course-card__title { font-size: 1.3rem; }
+      .course-card__desc { font-size: .82rem; }
+      .course-card__price { font-size: 1.3rem; }
     }
   </style>
 </head>
