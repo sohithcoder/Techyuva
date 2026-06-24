@@ -135,9 +135,6 @@
       border-radius: 50%;
       background: var(--accent);
     }
-    .course-card__lang--java::before { background: var(--java); }
-    .course-card__lang--cpp::before { background: var(--cpp); }
-    .course-card__lang--python::before { background: var(--python); }
 
     .course-card__badge {
       font-size: .62rem;
@@ -174,7 +171,7 @@
     .course-card__meta {
       display: flex;
       gap: 1.2rem;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
       flex-wrap: wrap;
     }
     .course-card__meta-item {
@@ -190,6 +187,22 @@
     .course-card__meta-item svg {
       width: 14px; height: 14px;
       opacity: .5;
+    }
+
+    .course-card__batches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 1rem;
+    }
+    .course-card__batch-tag {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      color: var(--accent);
+      border: 1px solid var(--accent-soft);
+      border-radius: 100px;
+      padding: .2em .7em;
+      background: var(--accent-soft);
     }
 
     .course-card__modules {
@@ -265,7 +278,13 @@
       transform: translateX(3px);
     }
 
-    /* Comparison strip */
+    .course-grid__empty {
+      grid-column: 1 / -1;
+      color: var(--ink-soft);
+      font-size: .95rem;
+      padding: 2rem 0;
+    }
+
     @media (max-width: 900px) {
       .course-page { padding-left: var(--pad); }
     }
@@ -278,13 +297,6 @@
 
   <!-- Scroll Progress -->
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
-
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
-
-  <!-- Grain -->
-  <div class="grain" aria-hidden="true"></div>
 
   <!-- File Explorer Nav -->
   <header class="nav" id="nav">
@@ -332,11 +344,11 @@
       </div>
     </div>
     <div class="nav__bar">
-      <a href="index.html#top" class="nav__logo" data-magnetic>
+      <a href="index.html#top" class="nav__logo">
         <span class="nav__logo-mark">>_</span>TechYuva
       </a>
       <div class="nav__actions">
-        <a href="index.html" class="link-arrow" style="font-size:.78rem;" data-magnetic>← Back home</a>
+        <a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a>
       </div>
     </div>
   </header>
@@ -346,22 +358,18 @@
     <!-- Header -->
     <div class="course-page__head reveal">
       <h1>All <em>courses</em></h1>
-      <p>Three core tracks built for real progress. Live cohorts, recorded sessions, and a student zone that keeps you accountable.</p>
+      <p>Live tracks built for real progress. Cohorts, recorded sessions, and a student zone that keeps you accountable.</p>
     </div>
 
     <!-- Filters -->
-    <div class="course-filter reveal">
+    <div class="course-filter reveal" id="courseFilter">
       <button class="is-active" data-filter="all">All</button>
     </div>
 
     <!-- Course Grid -->
     <div class="course-grid" id="courseGrid">
-
-
-
+      <!-- Courses loaded dynamically from backend -->
     </div>
-
-
 
   </main>
 
@@ -372,28 +380,17 @@
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
 
-  <script>
-    /* ===== Shared utilities ===== */
+  <script type="module">
+    import { getCourses, getBatches, formatCurrency, formatDate } from './api.js';
+
     const $  = (s, c = document) => c.querySelector(s);
     const $$ = (s, c = document) => [...c.querySelectorAll(s)];
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
     /* ===== File Explorer Nav ===== */
     const nav = $("#nav");
     $("#explorerToggle")?.addEventListener("click", () => nav.classList.add("is-collapsed"));
     $("#navExpand")?.addEventListener("click", () => nav.classList.remove("is-collapsed"));
-
-    $$('[data-folder]').forEach(folder => {
-      folder.addEventListener("click", () => {
-        const id = folder.dataset.folder;
-        const children = $(`#folder-${id}`);
-        if (children) {
-          children.classList.toggle("is-collapsed");
-          folder.classList.toggle("is-open");
-        }
-      });
-    });
 
     /* ===== Scroll Progress ===== */
     const bar = $("#scrollProgress")?.querySelector("span");
@@ -407,48 +404,6 @@
       update();
     }
 
-    /* ===== Custom Cursor ===== */
-    if (!isTouch) {
-      const ring = $("#cursor");
-      const dot  = $("#cursorDot");
-      let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
-      addEventListener("mousemove", e => {
-        mx = e.clientX; my = e.clientY;
-        dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
-      });
-      addEventListener("mousedown", () => ring.classList.add("is-down"));
-      addEventListener("mouseup",   () => ring.classList.remove("is-down"));
-      const loop = () => {
-        rx += (mx - rx) * 0.14;
-        ry += (my - ry) * 0.14;
-        ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
-        requestAnimationFrame(loop);
-      };
-      loop();
-      document.addEventListener("mouseover", e => {
-        if (e.target.closest("a, button, [data-magnetic]")) ring.classList.add("is-hover");
-      });
-      document.addEventListener("mouseout", e => {
-        if (e.target.closest("a, button, [data-magnetic]")) ring.classList.remove("is-hover");
-      });
-    }
-
-    /* ===== Magnetic Elements ===== */
-    if (!isTouch && !reducedMotion) {
-      $$("[data-magnetic]").forEach(el => {
-        const strength = 0.3;
-        el.addEventListener("mousemove", e => {
-          const r = el.getBoundingClientRect();
-          el.style.transform = `translate(${(e.clientX - r.left - r.width/2)*strength}px, ${(e.clientY - r.top - r.height/2)*strength}px)`;
-          el.style.transition = "transform .12s ease-out";
-        });
-        el.addEventListener("mouseleave", () => {
-          el.style.transition = "transform .5s cubic-bezier(.16,1,.3,1)";
-          el.style.transform = "";
-        });
-      });
-    }
-
     /* ===== Scroll Reveals ===== */
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(en => {
@@ -458,30 +413,6 @@
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
     $$(".reveal").forEach(el => revealObserver.observe(el));
-
-    /* ===== Course Filter ===== */
-    const filterBtns = $$('.course-filter button');
-    const cards = $$('.course-card');
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter;
-        filterBtns.forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-        cards.forEach(card => {
-          const show = filter === 'all' || card.dataset.course === filter;
-          card.style.display = show ? '' : 'none';
-          if (show) {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(16px)';
-            requestAnimationFrame(() => {
-              card.style.transition = 'opacity .5s var(--ease-out), transform .5s var(--ease-out)';
-              card.style.opacity = '1';
-              card.style.transform = '';
-            });
-          }
-        });
-      });
-    });
 
     /* ===== Smooth Anchor Scroll ===== */
     $$('a[href^="#"]').forEach(link => {
@@ -493,74 +424,109 @@
       });
     });
 
-    /* ===== Fetch courses from Firestore (added in owner dashboard) ===== */
-    (async function loadCourses() {
-      const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3001/api' : window.location.origin + '/api';
+    /* ===== Course Filter ===== */
+    const filterContainer = $('#courseFilter');
+    const grid = $('#courseGrid');
+    let courses = [];
+
+    function applyFilter(filter) {
+      const cards = $$('.course-card', grid);
+      cards.forEach(card => {
+        const show = filter === 'all' || card.dataset.course === filter;
+        card.style.display = show ? '' : 'none';
+        if (show) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(16px)';
+          requestAnimationFrame(() => {
+            card.style.transition = 'opacity .5s var(--ease-out), transform .5s var(--ease-out)';
+            card.style.opacity = '1';
+            card.style.transform = '';
+          });
+        }
+      });
+    }
+
+    filterContainer.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      $$('button', filterContainer).forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      applyFilter(btn.dataset.filter);
+    });
+
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    async function loadCourses() {
       try {
-        const res = await fetch(API_BASE + '/courses');
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) return;
-        const grid = $('#courseGrid');
-        data.forEach(c => {
-          const card = document.createElement('article');
-          card.className = 'course-card reveal';
-          card.setAttribute('data-course', c.name.toLowerCase().replace(/\s+/g, '-'));
-          const desc = c.name === 'Web Development' ? 'From HTML to full-stack. Build real web applications with modern frameworks.'
-            : c.name === 'Data Science' ? 'Python, statistics, ML. Turn data into decisions.'
-            : c.name === 'Mobile App Development' ? 'Build iOS and Android apps from scratch.'
-            : c.name === 'UI/UX Design' ? 'Design thinking, wireframing, prototyping. Create products people love.'
-            : c.name === 'Cloud Computing' ? 'AWS, Azure, GCP. Deploy, scale, and manage cloud infrastructure.'
-            : c.name === 'Cybersecurity' ? 'Network security, ethical hacking, cryptography. Protect digital assets.'
-            : c.name === 'AI & Machine Learning' ? 'ML algorithms, neural networks, deep learning. Build intelligent systems.'
-            : c.name === 'Digital Marketing' ? 'SEO, social media, analytics. Master the digital marketing landscape.'
-            : 'Comprehensive course with hands-on projects and live mentoring.';
-          const badgeText = c.badge || c.name.split(' ').slice(0,2).join(' · ');
-          card.innerHTML = `
-            <div class="course-card__header">
-              <span class="course-card__lang">${c.name.split(' ')[0]}</span>
-              <span class="course-card__badge">${badgeText}</span>
-            </div>
-            <div class="course-card__body">
-              <h3 class="course-card__title">${c.name}</h3>
-              <p class="course-card__desc">${desc}</p>
-              <div class="course-card__meta">
-                <span class="course-card__meta-item">
-                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="currentColor" stroke-width="1.2"/><path d="M8 4.5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-                  ${c.endDate ? 'Ends ' + new Date(c.endDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : 'Self-paced'}
-                </span>
-                <span class="course-card__meta-item">
-                  <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-                  Live sessions
-                </span>
-                <span class="course-card__meta-item">
-                  <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4h4l-3 2.5L11.5 13 8 10.5 4.5 13l1-4.5-3-2.5h4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-                  Projects
-                </span>
+        courses = await getCourses();
+        const batchesByCourse = {};
+        const batchRes = await Promise.all(courses.map(c => getBatches(c.id).catch(() => [])));
+        courses.forEach((c, i) => { batchesByCourse[c.id] = batchRes[i]; });
+
+        // Build filter buttons
+        filterContainer.innerHTML = '<button class="is-active" data-filter="all">All</button>' +
+          courses.map(c => `<button data-filter="${slugify(c.name)}">${c.name.split(' ')[0]}</button>`).join('');
+
+        if (!courses.length) {
+          grid.innerHTML = '<p class="course-grid__empty">No courses available yet. Check back soon.</p>';
+          return;
+        }
+
+        grid.innerHTML = courses.map(c => {
+          const batches = batchesByCourse[c.id] || [];
+          const batchTags = batches.map(b => `<span class="course-card__batch-tag">${b.name}</span>`).join('');
+          const modules = Array.isArray(c.modules) && c.modules.length
+            ? c.modules.slice(0, 5).map(m => `<li>${m}</li>`).join('')
+            : '<li>Industry-relevant curriculum</li><li>Live instructor-led sessions</li><li>Hands-on projects & assignments</li><li>Certificate on completion</li>';
+          return `
+            <article class="course-card reveal" data-course="${slugify(c.name)}">
+              <div class="course-card__header">
+                <span class="course-card__lang">${c.name.split(' ')[0]}</span>
+                <span class="course-card__badge">${c.badge || c.name}</span>
               </div>
-              <ul class="course-card__modules">
-                <li>Industry-relevant curriculum</li>
-                <li>Live instructor-led sessions</li>
-                <li>Hands-on projects & assignments</li>
-                <li>Certificate on completion</li>
-              </ul>
-            </div>
-            <div class="course-card__footer">
-              <div class="course-card__price">
-                ₹${(c.fee || 0).toLocaleString('en-IN')}
-                <small>one-time fee</small>
+              <div class="course-card__body">
+                <h3 class="course-card__title">${c.name}</h3>
+                <p class="course-card__desc">${c.description || 'Comprehensive course with hands-on projects and live mentoring.'}</p>
+                <div class="course-card__meta">
+                  <span class="course-card__meta-item">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="currentColor" stroke-width="1.2"/><path d="M8 4.5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    ${c.duration ? c.duration + (c.endDate ? ' · ends ' + formatDate(c.endDate) : '') : 'Self-paced'}
+                  </span>
+                  <span class="course-card__meta-item">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Live sessions
+                  </span>
+                  <span class="course-card__meta-item">
+                    <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4h4l-3 2.5L11.5 13 8 10.5 4.5 13l1-4.5-3-2.5h4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                    Projects
+                  </span>
+                </div>
+                ${batchTags ? `<div class="course-card__batches">${batchTags}</div>` : ''}
+                <ul class="course-card__modules">${modules}</ul>
               </div>
-              <a class="course-card__cta" href="https://wa.me/919876543210?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener" data-magnetic>
-                <span>Register</span>
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </a>
-            </div>`;
-          grid.appendChild(card);
-        });
+              <div class="course-card__footer">
+                <div class="course-card__price">
+                  ${formatCurrency(c.fee)}
+                  <small>one-time fee</small>
+                </div>
+                <a class="course-card__cta" href="https://wa.me/919876543210?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener">
+                  <span>Register</span>
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+              </div>
+            </article>`;
+        }).join('');
+
+        $$('.reveal', grid).forEach(el => revealObserver.observe(el));
       } catch (err) {
         console.warn('Could not load courses:', err.message);
+        grid.innerHTML = '<p class="course-grid__empty">Courses loading unavailable. Please try again later.</p>';
       }
-    })();
+    }
+
+    loadCourses();
   </script>
 </body>
 </html>

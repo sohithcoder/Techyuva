@@ -405,13 +405,29 @@
 
     @media (max-width: 900px) {
       .sz-page { padding-left: var(--pad); }
-      .sz-split { grid-template-columns: 1fr; gap: 1.2rem; }
-      .sz-sidebar { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; }
-      .sz-sidebar__item { flex: 1 1 140px; }
+      .sz-split { grid-template-columns: 1fr; gap: 1rem; }
+      .sz-sidebar { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; gap: .3rem; }
+      .sz-sidebar__item { flex: 1 1 120px; font-size: .7rem; padding: .6rem .7rem; }
     }
     @media (max-width: 640px) {
-      .problem-row { grid-template-columns: auto 1fr; gap: .6rem; }
-      .problem-row__diff, .problem-row__topic, .problem-row__solve { display: none; }
+      .sz-head h1 { font-size: 1.8rem; }
+      .sz-head p { font-size: .85rem; }
+      .sz-section__header { flex-direction: column; align-items: flex-start; gap: .5rem; padding: 1rem 1.2rem; }
+      .sz-section__title h2 { font-size: 1.15rem; }
+      .sz-section__body { padding: 1rem; }
+      .sz-card { padding: 1rem 1.1rem; }
+      .sz-card__title { font-size: 1.05rem; }
+      .sz-card__desc { font-size: .82rem; }
+      .sz-sidebar { flex-direction: column; gap: .25rem; }
+      .sz-sidebar__item { flex: none; font-size: .74rem; }
+      .sz-section__count { font-size: .68rem; }
+    }
+    @media (max-width: 420px) {
+      .sz-head h1 { font-size: 1.5rem; }
+      .sz-section__header { padding: .8rem 1rem; }
+      .sz-card { padding: .85rem 1rem; border-radius: 10px; }
+      .sz-card__title { font-size: .95rem; }
+      .section-header .link-arrow { font-size: .68rem; }
     }
   </style>
 </head>

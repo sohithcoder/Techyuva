@@ -25,3 +25,4 @@ backend/firebase-key.json
 # Environment files (secrets)
 .env
 backend/.env
+.vercel

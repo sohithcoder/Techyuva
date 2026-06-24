@@ -291,9 +291,11 @@ kbd {
 @media (max-width: 900px) {
   /* Mobile: explorer is a slide-in drawer, hidden by default.
      Ignore the collapsed/expanded desktop state entirely. */
-  .nav { transform: translateX(calc(-1 * var(--nav-w))); width: var(--nav-w); }
+  .nav { position: fixed; transform: translateX(calc(-1 * var(--nav-w))); width: var(--nav-w); height: 100%; z-index: 1000; }
   .nav.is-open { transform: translateX(0); }
-  .nav__bar { left: 0 !important; }
+  .nav__bar { left: 0 !important; position: fixed; top: 0; width: 100%; z-index: 999; }
+  /* Prevent nav from affecting document scroll width */
+  html { overflow-x: hidden; }
 }
 
 /* ============================================================
@@ -1645,11 +1647,30 @@ kbd {
 }
 
 /* ============================================================
-   MOBILE ADJUSTMENTS
-   ============================================================ */
 @media (max-width: 900px) {
   .section, .hero, .cta, .footer, .quiz {
     padding-left: var(--pad);
   }
-  .nav__bar { left: 0; }
+}
+
+/* ============================================================
+   TOUCH TARGETS — minimum 44×44px for all interactive elements
+   ============================================================ */
+@media (pointer: coarse) {
+  button, .btn, a.btn, [role="button"],
+  .nav__tree-item, .owner-tab, .sz-sidebar__item,
+  input[type="submit"], input[type="button"],
+  select, .action-btn, .owner-tab {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  input, textarea, select {
+    font-size: 16px !important; /* prevent iOS zoom on focus */
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .link-arrow { font-size: .72rem; }
+  .footer { font-size: .72rem; text-align: center; padding: 2rem 1rem; }
 }

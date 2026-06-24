@@ -661,7 +661,43 @@
       .toolbar { flex-direction: column; align-items: stretch; }
       .toolbar input[type="date"] { width: 100% !important; }
       .search-box { max-width: none; min-width: 0; }
-      .owner-section__header { flex-direction: column; align-items: flex-start; }
+      .owner-section__header { flex-direction: column; align-items: flex-start; gap: .5rem; }
+      /* Tabs — horizontal scroll */
+      .owner-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; gap: .25rem; padding-bottom: .3rem; scrollbar-width: none; }
+      .owner-tabs::-webkit-scrollbar { display: none; }
+      .owner-tabs .owner-tab { white-space: nowrap; flex-shrink: 0; font-size: .72rem; padding: .55rem .85rem; }
+      /* Form grids — always single column */
+      .form-grid { grid-template-columns: 1fr !important; gap: .6rem; }
+      .form-actions { flex-direction: column; }
+      .form-actions .btn { width: 100%; justify-content: center; }
+      /* Modals — full width */
+      .modal { width: calc(100vw - 2rem) !important; max-width: none !important; margin: 1rem; border-radius: 12px; }
+      .modal__body { padding: 1rem; }
+      .modal .form-grid { gap: .5rem; }
+      /* Chart cards */
+      .chart-card { padding: 1rem; }
+      .chart-card .chart-title { font-size: .78rem; }
+      /* Course cards */
+      .course-cards-grid { gap: .6rem; }
+      /* Owner sections */
+      .owner-section__body { padding: 1rem; }
+      .owner-section__header { padding: .8rem 1rem; }
+      /* Stat cards */
+      .stat-card { padding: 1rem; }
+      .stat-card__value { font-size: 1.4rem; }
+      /* Batch form area */
+      #batchesTable { font-size: .72rem; }
+      /* Study Zone form */
+      #szMetaFields > div { grid-template-columns: 1fr !important; }
+    }
+    @media (max-width: 420px) {
+      .owner-tabs .owner-tab { font-size: .68rem; padding: .45rem .7rem; }
+      .stat-card__value { font-size: 1.2rem; }
+      .stat-card__label { font-size: .68rem; }
+      .owner-table { min-width: 560px; }
+      .owner-table th, .owner-table td { font-size: .65rem; padding: .55rem .45rem; }
+      .owner-section__title h2 { font-size: 1.1rem; }
+      .owner-section__icon { width: 30px; height: 30px; font-size: .9rem; }
     }
 
     /* Override reveal animation — always visible */
@@ -1118,7 +1154,7 @@
           <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;">
             <div class="field">
               <span>Course</span>
-              <select id="batchCourse" style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;width:100%;box-sizing:border-box;">
+              <select id="batchCourse" onchange="renderBatchesTable()" style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;width:100%;box-sizing:border-box;">
                 <option value="">Select Course</option>
               </select>
             </div>
@@ -1441,7 +1477,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="footer" style="padding-left: calc(var(--nav-edge) + var(--pad)); border-top:1px solid var(--line);">
+  <footer class="footer footer--page" style="border-top:1px solid var(--line);">
     <span class="footer__logo">>_TechYuva</span>
     <p>Owner dashboard. Built for analysis, not distraction.</p>
     <span class="footer__year">© 2026 TechYuva</span>
@@ -2002,7 +2038,13 @@
 
     // ==================== BATCHES ====================
     function renderBatchesTable() {
-      const list = getBatches();
+      const courseFilter = $('#batchCourse').value;
+      let list = getBatches();
+      if (courseFilter) {
+        const course = (courses || []).find(c => c.name === courseFilter);
+        if (course) list = list.filter(b => b.courseId === course.id);
+        else list = [];
+      }
       $('#batchesTable').innerHTML = list.map(b => `<tr>
         <td><span class="owner-table__name">${b.name}</span></td>
         <td>${getCourseNameById(b.courseId)}</td>
@@ -2012,7 +2054,7 @@
           <button class="action-btn" onclick="editBatch('${b.id}')" title="Edit">✏</button>
           <button class="action-btn action-btn--danger" onclick="deleteBatch('${b.id}')" title="Delete">✕</button>
         </div></td>
-      </tr>`).join('') || '<tr><td colspan="5"><div class="empty-state"><div class="empty-state__title">No batches</div><div class="empty-state__desc">Add a batch above</div></div></td></tr>';
+      </tr>`).join('') || '<tr><td colspan="5"><div class="empty-state"><div class="empty-state__title">No batches</div><div class="empty-state__desc">Select a course and add batches</div></div></td></tr>';
     }
 
     function editBatch(id) {
