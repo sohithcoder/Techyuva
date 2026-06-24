@@ -13,7 +13,20 @@
       padding: clamp(5rem, 10vh, 8rem) var(--pad) clamp(2rem, 4vh, 4rem);
       padding-left: calc(var(--nav-edge) + var(--pad));
     }
-    /* All sections — big, same level */
+    /* --- Color Palette —— warm, distinct per section --- */
+    :root {
+      --sz-career:   #d4784a;
+      --sz-career-bg:rgba(212,120,74,.07);
+      --sz-place:    #3d8b63;
+      --sz-place-bg: rgba(61,139,99,.07);
+      --sz-jobs:     #4075a8;
+      --sz-jobs-bg:  rgba(64,117,168,.07);
+      --sz-mats:     #7b5ea7;
+      --sz-mats-bg:  rgba(123,94,167,.07);
+      --sz-test:     #c74552;
+      --sz-test-bg:  rgba(199,69,82,.07);
+    }
+
     .sz-sec { margin-bottom: 3rem; }
     .sz-sec__head {
       display: flex; align-items: baseline; justify-content: space-between;
@@ -21,12 +34,56 @@
       font-family: 'Instrument Serif', Georgia, serif; font-weight: 400;
       font-size: clamp(2.4rem, 5.5vw, 3.6rem); letter-spacing: -.02em; line-height: 1.05;
     }
-    #career .sz-sec__head { font-style: italic; }
+    /* Per-section heading colors */
+    #career .sz-sec__head     { color: var(--sz-career); font-style: italic; }
+    #placement .sz-sec__head  { color: var(--sz-place); }
+    #jobs .sz-sec__head       { color: var(--sz-jobs); }
+    #materials .sz-sec__head  { color: var(--sz-mats); }
+    #mocktest .sz-sec__head   { color: var(--sz-test); }
+
     .sz-sec__count {
       font-family: var(--font-mono); font-size: .68rem; color: var(--ink-soft);
       font-weight: 400; white-space: nowrap; margin-left: .6rem; font-style: normal;
     }
-    .sz-card:hover { border-color: var(--accent); }
+
+    /* Cards — left accent border matching section */
+    .sz-card {
+      border-left: 3px solid var(--line);
+      transition: border-color .25s, border-left-color .25s, background .25s, transform .2s;
+    }
+    /* Full-width — one card per row */
+    .sz-grid { display: flex; flex-direction: column; gap: .5rem; padding: 0; }
+    #career .sz-card:hover    { border-left-color: var(--sz-career); border-color: var(--sz-career); background: var(--sz-career-bg); }
+    #placement .sz-card:hover { border-left-color: var(--sz-place);  border-color: var(--sz-place);  background: var(--sz-place-bg); }
+    #jobs .sz-card:hover      { border-left-color: var(--sz-jobs);   border-color: var(--sz-jobs);   background: var(--sz-jobs-bg); }
+    #materials .sz-card:hover { border-left-color: var(--sz-mats);   border-color: var(--sz-mats);   background: var(--sz-mats-bg); }
+
+    /* Card with image — horizontal layout */
+    .sz-card:has(.sz-card__img) {
+      flex-direction: row; align-items: center; gap: .8rem;
+    }
+    .sz-card__img {
+      width: 40px; height: 40px; border-radius: 8px; object-fit: contain;
+      flex-shrink: 0;
+    }
+    .sz-card__body { flex: 1; min-width: 0; }
+    #mocktest .sz-card:hover  { border-left-color: var(--sz-test);   border-color: var(--sz-test);   background: var(--sz-test-bg); }
+
+    /* Tag colors per section */
+    #career .sz-card__tag--a    { background: var(--sz-career-bg); color: var(--sz-career); border-color: rgba(212,120,74,.25); }
+    #placement .sz-card__tag--a { background: var(--sz-place-bg);  color: var(--sz-place);  border-color: rgba(61,139,99,.25); }
+    #jobs .sz-card__tag--a      { background: var(--sz-jobs-bg);   color: var(--sz-jobs);   border-color: rgba(64,117,168,.25); }
+    #materials .sz-card__tag--a { background: var(--sz-mats-bg);   color: var(--sz-mats);   border-color: rgba(123,94,167,.25); }
+    #mocktest .sz-card__tag--a  { background: var(--sz-test-bg);   color: var(--sz-test);   border-color: rgba(199,69,82,.25); }
+
+    /* Arrow color per section */
+    #career .sz-card__arrow    { color: var(--sz-career); }
+    #placement .sz-card__arrow { color: var(--sz-place); }
+    #jobs .sz-card__arrow      { color: var(--sz-jobs); }
+    #materials .sz-card__arrow { color: var(--sz-mats); }
+    #mocktest .sz-card__arrow  { color: var(--sz-test); }
+
+    /* Card base styles */
     .sz-card__top {
       display: flex; align-items: flex-start; justify-content: space-between;
       gap: .4rem; margin-bottom: .2rem;
@@ -35,8 +92,6 @@
       font-family: var(--font-display); font-weight: 400;
       font-size: 1rem; line-height: 1.25;
     }
-    .sz-card__arrow { color: var(--accent); flex-shrink: 0; margin-top: 1px; transition: .2s; }
-    .sz-card:hover .sz-card__arrow { transform: translateX(3px); }
     .sz-card__desc {
       font-size: .76rem; color: var(--ink-soft); line-height: 1.45;
       margin-bottom: .4rem; flex: 1;
@@ -48,13 +103,12 @@
       letter-spacing: .05em; padding: .15em .5em; border-radius: 100px;
       background: var(--paper-2); color: var(--ink-soft); border: 1px solid var(--line);
     }
-    .sz-card__tag--a { background: var(--accent-soft); color: var(--accent); border-color: rgba(184,92,56,.2); }
     .sz-empty { grid-column: 1/-1; color: var(--ink-faint); font-size: .78rem; }
 
     @media (max-width: 900px) { .sz-page { padding-left: var(--pad); } }
     @media (max-width: 640px) {
       .sz-sec__head { font-size: 1.8rem; }
-      .sz-grid { grid-template-columns: 1fr; gap: .4rem; }
+      .sz-grid { gap: .35rem; }
       .sz-card { padding: .75rem .9rem; }
     }
   </style>
@@ -66,6 +120,7 @@
   <header class="nav" id="nav">
     <button class="nav__expand" id="navExpand" aria-label="Show explorer">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
     <div class="nav__explorer" id="navExplorer">
       <div class="nav__explorer-head">
         <span class="nav__explorer-title">EXPLORER</span>
@@ -178,12 +233,16 @@
         else if (type === 'mock-test') { if (m.difficulty) t.push(m.difficulty); if (m.topic) t.push(m.topic); if (m.platform) t.push(m.platform); }
         const lk = it.link || '#', ex = /^https?:\/\//i.test(lk) ? ' target="_blank" rel="noopener"' : '';
         const num = type === 'mock-test' ? `<span class="sz-card__tag sz-card__tag--a">#${i + 1}</span>` : '';
+        const img = it.icon && /^https?:\/\//i.test(it.icon) ? `<img src="${it.icon}" alt="${it.title}" class="sz-card__img" />` : '';
         return `<a class="sz-card" href="${lk}"${ex}>
-          <div class="sz-card__top"><h3 class="sz-card__title">${it.title}</h3>
-            <svg class="sz-card__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ${img}
+          <div class="sz-card__body">
+            <div class="sz-card__top"><h3 class="sz-card__title">${it.title}</h3>
+              <svg class="sz-card__arrow" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="sz-card__desc">${it.description || ''}</p>
+            <div class="sz-card__tags">${num}${tags(t.slice(0, 4), type === 'mock-test' || type === 'career-roadmap')}</div>
           </div>
-          <p class="sz-card__desc">${it.description || ''}</p>
-          <div class="sz-card__tags">${num}${tags(t.slice(0, 4), type === 'mock-test' || type === 'career-roadmap')}</div>
         </a>`;
       }).join('');
     }
