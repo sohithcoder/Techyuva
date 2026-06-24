@@ -803,6 +803,7 @@
       <button class="owner-tab" data-tab="courses">Courses</button>
       <button class="owner-tab" data-tab="expenses">Expenses</button>
       <button class="owner-tab" data-tab="analytics">Analytics</button>
+      <button class="owner-tab" data-tab="studyzone">Study Zone</button>
     </div>
 
     <!-- TAB: Register -->
@@ -847,24 +848,12 @@
               <span>Course</span>
               <select id="studentCourse" onchange="updateBatchesForCourse()">
                 <option value="">Select Course</option>
-                <option value="Web Development">Web Development</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Mobile App Development">Mobile App Development</option>
-                <option value="UI/UX Design">UI/UX Design</option>
-                <option value="Cloud Computing">Cloud Computing</option>
-                <option value="Cybersecurity">Cybersecurity</option>
-                <option value="AI & Machine Learning">AI & Machine Learning</option>
-                <option value="Digital Marketing">Digital Marketing</option>
               </select>
             </div>
             <div class="field">
               <span>Batch</span>
-              <select id="studentBatch">
+              <select id="studentBatch" onchange="updateExpectedEndDate()">
                 <option value="">Select Batch</option>
-                <option value="Batch 1 (45 days)">Batch 1 (45 days)</option>
-                <option value="Batch 2 (45 days)">Batch 2 (45 days)</option>
-                <option value="Batch 3 (45 days)">Batch 3 (45 days)</option>
-                <option value="Batch 4 (45 days)">Batch 4 (45 days)</option>
               </select>
             </div>
             <div class="field">
@@ -1126,7 +1115,13 @@
           </div>
         </div>
         <div class="owner-section__body">
-          <div class="form-grid" style="grid-template-columns:1fr 1fr auto;">
+          <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;">
+            <div class="field">
+              <span>Course</span>
+              <select id="batchCourse" style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;width:100%;box-sizing:border-box;">
+                <option value="">Select Course</option>
+              </select>
+            </div>
             <div class="field">
               <span>Batch Name</span>
               <input type="text" id="batchName" placeholder="e.g. Batch 5" />
@@ -1145,7 +1140,7 @@
           <div class="owner-table-wrap" style="margin-top:1rem;">
             <table class="owner-table">
               <thead>
-                <tr><th>Batch</th><th>Duration</th><th>Label</th><th>Actions</th></tr>
+                <tr><th>Batch</th><th>Course</th><th>Duration</th><th>Label</th><th>Actions</th></tr>
               </thead>
               <tbody id="batchesTable"></tbody>
             </table>
@@ -1376,6 +1371,70 @@
           <div class="chart-title">Course Revenue</div>
           <div class="chart-container" style="height:280px;"><canvas id="revenueComparisonChart"></canvas></div>
         </div>
+    </div>
+
+    <!-- TAB: Study Zone -->
+    <div class="owner-tab-panel" id="panel-studyzone">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--blue">📖</div>
+            <div>
+              <h2>Manage Study Zone Items</h2>
+              <span>Add, edit or remove items for the student zone</span>
+            </div>
+          </div>
+          <select id="szTypeFilter" onchange="renderStudyZoneTable()" style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;font-family:var(--font-mono);font-size:.78rem;">
+            <option value="career-roadmap">Career Roadmap</option>
+            <option value="placement-guideline">Placement Guidelines</option>
+            <option value="job-opening">Job Openings</option>
+            <option value="study-material">Study Materials</option>
+            <option value="mock-test">Mock Tests</option>
+          </select>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+            <div class="field">
+              <span>Title</span>
+              <input type="text" id="szTitle" placeholder="e.g. Frontend Roadmap 2026" />
+            </div>
+            <div class="field">
+              <span>Link URL</span>
+              <input type="url" id="szLink" placeholder="https://example.com/resource" />
+            </div>
+            <div class="field field--full">
+              <span>Description</span>
+              <textarea id="szDescription" rows="2" placeholder="Brief description..." style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;width:100%;resize:vertical;box-sizing:border-box;"></textarea>
+            </div>
+            <div class="field">
+              <span>Icon (emoji)</span>
+              <input type="text" id="szIcon" placeholder="🗺" />
+            </div>
+            <div class="field">
+              <span>Order</span>
+              <input type="number" id="szOrder" placeholder="0" />
+            </div>
+            <div class="field field--full" id="szMetaFields"></div>
+          </div>
+          <input type="hidden" id="editStudyZoneId" value="" />
+          <div class="form-actions">
+            <button class="btn btn--primary" onclick="saveStudyZoneItem()">
+              <span>$ save item</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="btn" onclick="clearStudyZoneForm()">
+              <span>$ clear</span>
+            </button>
+          </div>
+          <div class="owner-table-wrap" style="margin-top:1rem;">
+            <table class="owner-table">
+              <thead>
+                <tr><th>Title</th><th>Link</th><th>Order</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="studyZoneTable"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1473,24 +1532,14 @@
           </div>
           <div class="field">
             <span>Course</span>
-            <select id="editCourse">
-              <option value="Web Development">Web Development</option>
-              <option value="Data Science">Data Science</option>
-              <option value="Mobile App Development">Mobile App Development</option>
-              <option value="UI/UX Design">UI/UX Design</option>
-              <option value="Cloud Computing">Cloud Computing</option>
-              <option value="Cybersecurity">Cybersecurity</option>
-              <option value="AI & Machine Learning">AI & Machine Learning</option>
-              <option value="Digital Marketing">Digital Marketing</option>
+            <select id="editCourse" onchange="updateEditBatchForCourse()">
+              <option value="">Select Course</option>
             </select>
           </div>
           <div class="field">
             <span>Batch</span>
             <select id="editBatch">
-              <option value="Batch 1 (45 days)">Batch 1 (45 days)</option>
-              <option value="Batch 2 (45 days)">Batch 2 (45 days)</option>
-              <option value="Batch 3 (45 days)">Batch 3 (45 days)</option>
-              <option value="Batch 4 (45 days)">Batch 4 (45 days)</option>
+              <option value="">Select Batch</option>
             </select>
           </div>
           <div class="field">
@@ -1564,7 +1613,16 @@
     let charts = {};
 
     function batchLabel(b) { return `${b.name} (${b.duration} days)`; }
-    function getBatches() { return batches.length ? batches : [{id:'batch-1',name:'Batch 1',duration:45},{id:'batch-2',name:'Batch 2',duration:45},{id:'batch-3',name:'Batch 3',duration:45},{id:'batch-4',name:'Batch 4',duration:45}]; }
+    function getBatches() { return batches || []; }
+    function getBatchesForCourse(courseName) {
+      const course = (courses || []).find(c => c.name === courseName);
+      if (!course) return [];
+      return (batches || []).filter(b => b.courseId === course.id);
+    }
+    function getCourseNameById(id) {
+      const c = (courses || []).find(x => x.id === id);
+      return c ? c.name : '—';
+    }
 
     async function api(path, options = {}) {
       const config = { headers: { 'Content-Type': 'application/json' }, ...options };
@@ -1615,6 +1673,7 @@
         if (panelId === 'courses') { updateCourses(); renderBatchesTable(); }
         if (panelId === 'expenses') renderExpenses();
         if (panelId === 'analytics') updateAnalytics();
+        if (panelId === 'studyzone') { updateStudyZoneMetaFields(); renderStudyZoneTable(); }
       });
     });
 
@@ -1654,9 +1713,19 @@
 
     // ==================== BATCH HELPERS ====================
     function updateBatchesForCourse() {
+      const courseName = $('#studentCourse').value;
+      const courseBatches = courseName ? getBatchesForCourse(courseName) : getBatches();
       const batchSelect = $('#studentBatch');
-      batchSelect.innerHTML = '<option value="">Select Batch</option>' + getBatches().map(b => `<option value="${batchLabel(b)}">${batchLabel(b)}</option>`).join('');
+      batchSelect.innerHTML = '<option value="">Select Batch</option>' + courseBatches.map(b => `<option value="${batchLabel(b)}">${batchLabel(b)}</option>`).join('');
       updateExpectedEndDate();
+    }
+    function updateEditBatchForCourse() {
+      const courseName = $('#editCourse').value;
+      const courseBatches = courseName ? getBatchesForCourse(courseName) : getBatches();
+      const batchSelect = $('#editBatch');
+      const v = batchSelect.value;
+      batchSelect.innerHTML = '<option value="">Select Batch</option>' + courseBatches.map(b => `<option value="${batchLabel(b)}">${batchLabel(b)}</option>`).join('');
+      if (v) batchSelect.value = v;
     }
     function updateExpectedEndDate() {
       $('#studentExpectedEndDate').value = calcExpectedEndDate($('#studentJoinDate').value, $('#studentBatch').value);
@@ -1720,11 +1789,12 @@
     function updateCourseFilters() {
       const list = getCourseList();
       const s1 = $('#studentCourseFilter'); const v1 = s1.value; s1.innerHTML = '<option value="">All Courses</option>' + list.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); s1.value = v1;
-      const s2 = $('#studentBatchFilter'); const v2 = s2.value; s2.innerHTML = '<option value="">All Batches</option>' + getBatches().map(b => `<option value="${batchLabel(b)}">${b.name}</option>`).join(''); s2.value = v2;
+      const allBatches = getBatches();
+      const s2 = $('#studentBatchFilter'); const v2 = s2.value; s2.innerHTML = '<option value="">All Batches</option>' + allBatches.map(b => `<option value="${batchLabel(b)}">${b.name}</option>`).join(''); s2.value = v2;
     }
     function populateCourseSelects() {
       const list = getCourseList();
-      const selects = ['studentCourse', 'editCourse'];
+      const selects = ['studentCourse', 'editCourse', 'batchCourse'];
       selects.forEach(id => {
         const sel = $(`#${id}`);
         if (!sel) return;
@@ -1784,7 +1854,11 @@
       $('#editStudentId').value = s.id; $('#editName').value = s.name; $('#editRegNo').value = s.regNo || '';
       $('#editPhone').value = s.phone; $('#editPhone2').value = s.phone2 || '';
       $('#editAddress').value = s.address || ''; $('#editReference').value = s.reference || '';
-      $('#editCourse').value = s.course; $('#editBatch').value = s.batch || 'Batch 1 (45 days)';
+      // ensure course select is populated, then set value and update batch options
+      populateCourseSelects();
+      $('#editCourse').value = s.course;
+      updateEditBatchForCourse();
+      $('#editBatch').value = s.batch || '';
       $('#editPaymentMode').value = s.paymentMode || 'offline';
       $('#editCertificate').value = s.certificateIssued || 'no';
       $('#editTotalFee').value = s.totalFee; $('#editPaidFee').value = s.paidFee; $('#editStatus').value = s.status;
@@ -1931,38 +2005,45 @@
       const list = getBatches();
       $('#batchesTable').innerHTML = list.map(b => `<tr>
         <td><span class="owner-table__name">${b.name}</span></td>
+        <td>${getCourseNameById(b.courseId)}</td>
         <td>${b.duration} days</td>
         <td><span class="badge badge--partial">${batchLabel(b)}</span></td>
         <td><div class="action-btns">
           <button class="action-btn" onclick="editBatch('${b.id}')" title="Edit">✏</button>
           <button class="action-btn action-btn--danger" onclick="deleteBatch('${b.id}')" title="Delete">✕</button>
         </div></td>
-      </tr>`).join('') || '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No batches</div><div class="empty-state__desc">Add a batch above</div></div></td></tr>';
+      </tr>`).join('') || '<tr><td colspan="5"><div class="empty-state"><div class="empty-state__title">No batches</div><div class="empty-state__desc">Add a batch above</div></div></td></tr>';
     }
 
     function editBatch(id) {
       const b = getBatches().find(x => x.id === id);
       if (!b) return;
       $('#editBatchId').value = b.id;
+      $('#batchCourse').value = getCourseNameById(b.courseId);
       $('#batchName').value = b.name;
       $('#batchDuration').value = b.duration;
     }
 
     async function saveBatch() {
+      const courseName = $('#batchCourse').value;
       const name = $('#batchName').value.trim();
       const duration = parseInt($('#batchDuration').value);
       const editId = $('#editBatchId').value;
-      if (!name || !duration) { showToast('Enter name and duration', 'error'); return; }
+      if (!courseName || !name || !duration) { showToast('Select course, enter name and duration', 'error'); return; }
+      const course = (courses || []).find(c => c.name === courseName);
+      if (!course) { showToast('Course not found', 'error'); return; }
+      const courseId = course.id;
       try {
         if (editId) {
-          await api(`/batches/${editId}`, { method: 'PUT', body: JSON.stringify({ name, duration }) });
+          await api(`/batches/${editId}`, { method: 'PUT', body: JSON.stringify({ courseId, name, duration }) });
           const b = batches.find(x => x.id === editId);
-          if (b) { b.name = name; b.duration = duration; }
+          if (b) { b.courseId = courseId; b.name = name; b.duration = duration; }
         } else {
-          const saved = await api('/batches', { method: 'POST', body: JSON.stringify({ name, duration }) });
+          const saved = await api('/batches', { method: 'POST', body: JSON.stringify({ courseId, name, duration }) });
           batches.push(saved);
         }
         $('#editBatchId').value = '';
+        $('#batchCourse').value = '';
         $('#batchName').value = '';
         $('#batchDuration').value = '';
         renderBatchesTable();
@@ -2005,17 +2086,7 @@
 
     // ==================== COURSE CRUD ====================
     function getCourseList() {
-      if (courses && courses.length > 0) return courses;
-      return [
-        { id:'default-1', name:'Web Development', endDate:'', fee:25000, badge:'Frontend · Backend' },
-        { id:'default-2', name:'Data Science', endDate:'', fee:35000, badge:'Python · ML · Stats' },
-        { id:'default-3', name:'Mobile App Development', endDate:'', fee:30000, badge:'Android · iOS' },
-        { id:'default-4', name:'UI/UX Design', endDate:'', fee:20000, badge:'Design · Research' },
-        { id:'default-5', name:'Cloud Computing', endDate:'', fee:28000, badge:'AWS · Azure · GCP' },
-        { id:'default-6', name:'Cybersecurity', endDate:'', fee:32000, badge:'Network · Security' },
-        { id:'default-7', name:'AI & Machine Learning', endDate:'', fee:40000, badge:'ML · Deep Learning' },
-        { id:'default-8', name:'Digital Marketing', endDate:'', fee:18000, badge:'SEO · Social Media' },
-      ];
+      return courses || [];
     }
     function saveCourseData() {} // no-op — API handles persistence
 
@@ -2099,6 +2170,144 @@
     }
     function closeCourseDetail() { $('#courseDetailModal').classList.remove('is-active'); }
 
+    // ==================== STUDY ZONE CRUD ====================
+    let studyZoneItems = [];
+    const SZ_TYPE_LABELS = { 'career-roadmap':'Career Roadmap','placement-guideline':'Placement Guidelines','job-opening':'Job Openings','study-material':'Study Materials','mock-test':'Mock Tests' };
+
+    function updateStudyZoneMetaFields() {
+      const type = $('#szTypeFilter').value;
+      let html = '';
+      if (type === 'career-roadmap') {
+        html = '<span>Skills (comma-separated)</span><input type="text" id="szMetaSkills" placeholder="HTML, CSS, JavaScript, React" />';
+      } else if (type === 'job-opening') {
+        html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;"><div class="field"><span>Company</span><input type="text" id="szMetaCompany" placeholder="Google" /></div><div class="field"><span>Location</span><input type="text" id="szMetaLocation" placeholder="Remote" /></div></div><span>Tags (comma-separated)</span><input type="text" id="szMetaTags" placeholder="Internship, Full-time" />';
+      } else if (type === 'study-material') {
+        html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;"><div class="field"><span>File Type</span><input type="text" id="szMetaFileType" placeholder="PDF" /></div><div class="field"><span>Size</span><input type="text" id="szMetaSize" placeholder="2.4 MB" /></div></div>';
+      } else if (type === 'mock-test') {
+        html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;"><div class="field"><span>Difficulty</span><input type="text" id="szMetaDifficulty" placeholder="Easy / Medium / Hard" /></div><div class="field"><span>Topic</span><input type="text" id="szMetaTopic" placeholder="Array, DP, Graph" /></div><div class="field"><span>Platform</span><input type="text" id="szMetaPlatform" placeholder="LeetCode / HackerRank" /></div></div>';
+      }
+      $('#szMetaFields').innerHTML = html;
+    }
+
+    function getStudyZoneMetaFromForm() {
+      const type = $('#szTypeFilter').value;
+      const meta = {};
+      if (type === 'career-roadmap') {
+        const skills = ($('#szMetaSkills')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (skills.length) meta.skills = skills;
+      } else if (type === 'job-opening') {
+        const company = ($('#szMetaCompany')?.value || '').trim();
+        const location = ($('#szMetaLocation')?.value || '').trim();
+        if (company) meta.company = company;
+        if (location) meta.location = location;
+        const tags = ($('#szMetaTags')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (tags.length) meta.tags = tags;
+      } else if (type === 'study-material') {
+        const fileType = ($('#szMetaFileType')?.value || '').trim();
+        const size = ($('#szMetaSize')?.value || '').trim();
+        if (fileType) meta.fileType = fileType;
+        if (size) meta.size = size;
+      } else if (type === 'mock-test') {
+        const difficulty = ($('#szMetaDifficulty')?.value || '').trim();
+        const topic = ($('#szMetaTopic')?.value || '').trim();
+        const platform = ($('#szMetaPlatform')?.value || '').trim();
+        if (difficulty) meta.difficulty = difficulty;
+        if (topic) meta.topic = topic;
+        if (platform) meta.platform = platform;
+      }
+      return meta;
+    }
+
+    function setStudyZoneMetaForm(meta) {
+      const type = $('#szTypeFilter').value;
+      if (!meta) return;
+      if (type === 'career-roadmap' && Array.isArray(meta.skills)) {
+        const el = $('#szMetaSkills'); if (el) el.value = meta.skills.join(', ');
+      } else if (type === 'job-opening') {
+        const elC = $('#szMetaCompany'); if (elC) elC.value = meta.company || '';
+        const elL = $('#szMetaLocation'); if (elL) elL.value = meta.location || '';
+        const elT = $('#szMetaTags'); if (elT && Array.isArray(meta.tags)) elT.value = meta.tags.join(', ');
+      } else if (type === 'study-material') {
+        const elF = $('#szMetaFileType'); if (elF) elF.value = meta.fileType || '';
+        const elS = $('#szMetaSize'); if (elS) elS.value = meta.size || '';
+      } else if (type === 'mock-test') {
+        const elD = $('#szMetaDifficulty'); if (elD) elD.value = meta.difficulty || '';
+        const elT = $('#szMetaTopic'); if (elT) elT.value = meta.topic || '';
+        const elP = $('#szMetaPlatform'); if (elP) elP.value = meta.platform || '';
+      }
+    }
+
+    async function renderStudyZoneTable() {
+      const type = $('#szTypeFilter').value;
+      updateStudyZoneMetaFields();
+      try {
+        studyZoneItems = await api(`/studyzone?type=${encodeURIComponent(type)}`);
+      } catch (err) { studyZoneItems = []; }
+      const tbody = $('#studyZoneTable');
+      tbody.innerHTML = studyZoneItems.map(item => `<tr>
+        <td><span class="owner-table__name">${item.title}</span><div class="owner-table__meta">${item.description || ''}</div></td>
+        <td><a href="${item.link || '#'}" target="_blank" rel="noopener" style="color:var(--accent);font-size:.75rem;">${(item.link || '').substring(0,50)}...</a></td>
+        <td>${item.order || 0}</td>
+        <td><div class="action-btns">
+          <button class="action-btn" onclick="editStudyZoneItem('${item.id}')" title="Edit">✏</button>
+          <button class="action-btn action-btn--danger" onclick="deleteStudyZoneItem('${item.id}')" title="Delete">✕</button>
+        </div></td>
+      </tr>`).join('') || '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No items</div><div class="empty-state__desc">Add items for ' + (SZ_TYPE_LABELS[type] || type) + '</div></div></td></tr>';
+    }
+
+    function editStudyZoneItem(id) {
+      const item = studyZoneItems.find(x => x.id === id);
+      if (!item) return;
+      $('#editStudyZoneId').value = item.id;
+      $('#szTypeFilter').value = item.type;
+      updateStudyZoneMetaFields();
+      $('#szTitle').value = item.title;
+      $('#szLink').value = item.link || '';
+      $('#szDescription').value = item.description || '';
+      $('#szIcon').value = item.icon || '';
+      $('#szOrder').value = item.order || 0;
+      setStudyZoneMetaForm(item.meta);
+    }
+
+    async function saveStudyZoneItem() {
+      const editId = $('#editStudyZoneId').value;
+      const type = $('#szTypeFilter').value;
+      const title = $('#szTitle').value.trim();
+      const link = $('#szLink').value.trim();
+      const description = $('#szDescription').value.trim();
+      const icon = $('#szIcon').value.trim();
+      const order = parseInt($('#szOrder').value) || 0;
+      const meta = getStudyZoneMetaFromForm();
+      if (!title || !link) { showToast('Title and Link are required', 'error'); return; }
+      const body = { type, title, link, description, icon, order, meta };
+      try {
+        if (editId) {
+          await api(`/studyzone/${editId}`, { method: 'PUT', body: JSON.stringify(body) });
+        } else {
+          await api('/studyzone', { method: 'POST', body: JSON.stringify(body) });
+        }
+        clearStudyZoneForm();
+        renderStudyZoneTable();
+        showToast(editId ? 'Item updated!' : 'Item added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    async function deleteStudyZoneItem(id) {
+      if (!confirm('Delete this item?')) return;
+      try {
+        await api(`/studyzone/${id}`, { method: 'DELETE' });
+        studyZoneItems = studyZoneItems.filter(x => x.id !== id);
+        renderStudyZoneTable();
+        showToast('Item deleted', 'success');
+      } catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
+    }
+
+    function clearStudyZoneForm() {
+      $('#editStudyZoneId').value = '';
+      $('#szTitle').value = ''; $('#szLink').value = ''; $('#szDescription').value = '';
+      $('#szIcon').value = ''; $('#szOrder').value = '';
+      updateStudyZoneMetaFields();
+    }
     // ==================== EXPENSES ====================
     function renderExpenses() {
       const totalAmount = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);

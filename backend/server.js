@@ -172,27 +172,25 @@ app.post('/api/students/:id/payments', async (req, res) => {
 // ─── COURSES ───
 app.get('/api/courses', async (req, res) => {
   try {
-    const snap = await getDB().collection('courses').orderBy('name', 'asc').get();
-    const courses = snap.docs.map(formatDoc);
-    if (courses.length === 0) {
-      res.json([
-        { id:'default-1', name:'Web Development', duration:'', endDate:'', fee:25000, badge:'Frontend · Backend' },
-        { id:'default-2', name:'Data Science', duration:'', endDate:'', fee:35000, badge:'Python · ML · Stats' },
-        { id:'default-3', name:'Mobile App Development', duration:'', endDate:'', fee:30000, badge:'Android · iOS' },
-        { id:'default-4', name:'UI/UX Design', duration:'', endDate:'', fee:20000, badge:'Design · Research' },
-        { id:'default-5', name:'Cloud Computing', duration:'', endDate:'', fee:28000, badge:'AWS · Azure · GCP' },
-        { id:'default-6', name:'Cybersecurity', duration:'', endDate:'', fee:32000, badge:'Network · Security' },
-        { id:'default-7', name:'AI & Machine Learning', duration:'', endDate:'', fee:40000, badge:'ML · Deep Learning' },
-        { id:'default-8', name:'Digital Marketing', duration:'', endDate:'', fee:18000, badge:'SEO · Social Media' },
-      ]);
-    } else res.json(courses);
+    const snap = await getDB().collection('courses').orderBy('order', 'asc').get();
+    res.json(snap.docs.map(formatDoc));
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/courses', async (req, res) => {
   try {
     const d = req.body;
-    const ref = await getDB().collection('courses').add({ name: d.name, duration: d.duration || '', endDate: d.endDate || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', createdAt: new Date().toISOString() });
+    const ref = await getDB().collection('courses').add({
+      name: d.name,
+      description: d.description || '',
+      duration: d.duration || '',
+      endDate: d.endDate || '',
+      fee: parseFloat(d.fee) || 0,
+      badge: d.badge || '',
+      modules: Array.isArray(d.modules) ? d.modules : [],
+      order: parseInt(d.order) || 0,
+      createdAt: new Date().toISOString(),
+    });
     const doc = await ref.get();
     res.json(formatDoc(doc));
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -203,19 +201,11 @@ app.put('/api/courses/:id', async (req, res) => {
     const d = req.body;
     const docRef = getDB().collection('courses').doc(req.params.id);
     const doc = await docRef.get();
-    if (!doc.exists) {
-      // Default ID → create document instead
-      const ref = await getDB().collection('courses').add({
-        name: d.name, duration: d.duration || '', endDate: d.endDate || '',
-        fee: parseFloat(d.fee) || 0, badge: d.badge || '',
-        createdAt: new Date().toISOString(),
-      });
-      const newDoc = await ref.get();
-      return res.json(formatDoc(newDoc));
-    }
+    if (!doc.exists) return res.status(404).json({ error: 'Course not found' });
     const update = {};
-    ['name','duration','endDate','badge'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
+    ['name','description','duration','endDate','badge','modules'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
     if (d.fee !== undefined) update.fee = parseFloat(d.fee);
+    if (d.order !== undefined) update.order = parseInt(d.order);
     await docRef.update(update);
     res.json(formatDoc(await docRef.get()));
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -224,6 +214,106 @@ app.put('/api/courses/:id', async (req, res) => {
 app.delete('/api/courses/:id', async (req, res) => {
   try {
     await getDB().collection('courses').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── BATCHES (per-course) ───
+app.get('/api/batches', async (req, res) => {
+  try {
+    let query = getDB().collection('batches').orderBy('order', 'asc');
+    if (req.query.courseId) query = query.where('courseId', '==', req.query.courseId);
+    const snap = await query.get();
+    res.json(snap.docs.map(formatDoc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/batches', async (req, res) => {
+  try {
+    const d = req.body;
+    if (!d.courseId || !d.name || !d.duration) return res.status(400).json({ error: 'courseId, name, and duration required' });
+    const ref = await getDB().collection('batches').add({
+      courseId: d.courseId,
+      name: d.name,
+      duration: parseInt(d.duration),
+      order: parseInt(d.order) || 0,
+      createdAt: new Date().toISOString(),
+    });
+    res.json(formatDoc(await ref.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/batches/:id', async (req, res) => {
+  try {
+    const d = req.body;
+    const docRef = getDB().collection('batches').doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Batch not found' });
+    const update = {};
+    if (d.courseId !== undefined) update.courseId = d.courseId;
+    if (d.name !== undefined) update.name = d.name;
+    if (d.duration !== undefined) update.duration = parseInt(d.duration);
+    if (d.order !== undefined) update.order = parseInt(d.order);
+    await docRef.update(update);
+    res.json(formatDoc(await docRef.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/batches/:id', async (req, res) => {
+  try {
+    await getDB().collection('batches').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── STUDY ZONE ITEMS ───
+const STUDY_ZONE_TYPES = ['career-roadmap', 'placement-guideline', 'job-opening', 'study-material', 'mock-test'];
+
+app.get('/api/studyzone', async (req, res) => {
+  try {
+    const snap = await getDB().collection('studyZoneItems').orderBy('order', 'asc').get();
+    let items = snap.docs.map(formatDoc);
+    if (req.query.type) items = items.filter(item => item.type === req.query.type);
+    res.json(items);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/studyzone', async (req, res) => {
+  try {
+    const d = req.body;
+    if (!STUDY_ZONE_TYPES.includes(d.type)) return res.status(400).json({ error: 'Invalid type' });
+    if (!d.title || !d.link) return res.status(400).json({ error: 'title and link required' });
+    const ref = await getDB().collection('studyZoneItems').add({
+      type: d.type,
+      title: d.title,
+      description: d.description || '',
+      link: d.link,
+      icon: d.icon || '',
+      order: parseInt(d.order) || 0,
+      meta: d.meta || {},
+      createdAt: new Date().toISOString(),
+    });
+    res.json(formatDoc(await ref.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/studyzone/:id', async (req, res) => {
+  try {
+    const d = req.body;
+    const docRef = getDB().collection('studyZoneItems').doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Item not found' });
+    const update = {};
+    ['type','title','description','link','icon','meta'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
+    if (d.order !== undefined) update.order = parseInt(d.order);
+    await docRef.update(update);
+    res.json(formatDoc(await docRef.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/studyzone/:id', async (req, res) => {
+  try {
+    await getDB().collection('studyZoneItems').doc(req.params.id).delete();
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -252,75 +342,15 @@ app.delete('/api/expenses/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─── BATCHES (stored as a single settings document) ───
-const DEFAULT_BATCHES = [
-  { id: 'batch-1', name: 'Batch 1', duration: 45 },
-  { id: 'batch-2', name: 'Batch 2', duration: 45 },
-  { id: 'batch-3', name: 'Batch 3', duration: 45 },
-  { id: 'batch-4', name: 'Batch 4', duration: 45 },
-];
-
-async function getBatches() {
-  try {
-    const doc = await getDB().collection('settings').doc('batches').get();
-    if (doc.exists) return doc.data().list || DEFAULT_BATCHES;
-  } catch (_) {}
-  return DEFAULT_BATCHES;
-}
-
-app.get('/api/batches', async (req, res) => {
-  try {
-    res.json(await getBatches());
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/batches', async (req, res) => {
-  try {
-    const { name, duration } = req.body;
-    if (!name || !duration) return res.status(400).json({ error: 'Name and duration required' });
-    const list = await getBatches();
-    const id = 'batch-' + Date.now();
-    list.push({ id, name, duration: parseInt(duration) });
-    await getDB().collection('settings').doc('batches').set({ list });
-    res.json({ id, name, duration: parseInt(duration) });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.put('/api/batches/:id', async (req, res) => {
-  try {
-    const { name, duration } = req.body;
-    let list = await getBatches();
-    const idx = list.findIndex(b => b.id === req.params.id);
-    if (idx === -1) {
-      // Default ID or not found — add as new
-      const newBatch = { id: 'batch-' + Date.now(), name: name || 'Batch', duration: parseInt(duration) || 45 };
-      list.push(newBatch);
-      await getDB().collection('settings').doc('batches').set({ list });
-      return res.json(newBatch);
-    }
-    if (name) list[idx].name = name;
-    if (duration) list[idx].duration = parseInt(duration);
-    await getDB().collection('settings').doc('batches').set({ list });
-    res.json(list[idx]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.delete('/api/batches/:id', async (req, res) => {
-  try {
-    let list = await getBatches();
-    list = list.filter(b => b.id !== req.params.id);
-    await getDB().collection('settings').doc('batches').set({ list });
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
 // ─── DASHBOARD ───
 app.get('/api/dashboard', async (req, res) => {
   try {
     const sSnap = await getDB().collection('students').get();
     const eSnap = await getDB().collection('expenses').get();
+    const cSnap = await getDB().collection('courses').get();
     const students = sSnap.docs.map(formatDoc);
     const expenses = eSnap.docs.map(formatDoc);
+    const courses = cSnap.docs.map(formatDoc);
     const totalCollected = students.reduce((s, x) => s + (parseFloat(x.paidFee) || 0), 0);
     const totalPending = students.reduce((s, x) => s + ((parseFloat(x.totalFee) || 0) - (parseFloat(x.paidFee) || 0)), 0);
     const now = new Date();
@@ -331,7 +361,7 @@ app.get('/api/dashboard', async (req, res) => {
     students.forEach(s => { const k = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : ''); courseDist[k] = (courseDist[k] || 0) + 1; });
     res.json({
       totalStudents: students.length, totalCollected, totalPending,
-      activeCourses: [...new Set(students.map(s => s.course))].filter(c => c).length,
+      activeCourses: courses.length,
       monthNewStudents: students.filter(s => s.joinDate && s.joinDate.startsWith(thisMonth)).length,
       monthFeesCollected: monthFees, monthExpenses: monthExp, monthNet: monthFees - monthExp,
       paymentStatus: { paid: students.filter(s => s.status === 'Paid').length, partial: students.filter(s => s.status === 'Partial').length, pending: students.filter(s => s.status === 'Pending').length },
