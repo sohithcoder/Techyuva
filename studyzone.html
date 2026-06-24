@@ -41,6 +41,29 @@
     }
 
     /* --- Section headers — cleaner, with colored dots --- */
+
+    .sz-latest {
+      display: flex; align-items: center; gap: .8rem;
+      margin-bottom: 1.5rem; padding: .6rem 1rem;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: var(--paper-2); font-size: .75rem;
+    }
+    .sz-latest__label {
+      font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--ink-soft); white-space: nowrap;
+    }
+    .sz-latest__items {
+      display: flex; gap: .5rem; overflow-x: auto; flex: 1;
+      font-size: .74rem; color: var(--ink-soft);
+    }
+    .sz-latest__item {
+      white-space: nowrap; color: var(--ink);
+      text-decoration: none; transition: .15s;
+    }
+    .sz-latest__item:hover { color: var(--accent); }
+    .sz-latest__item span {
+      font-size: .6rem; color: var(--ink-faint); margin-left: .35rem;
+    }
     .sz-sec { margin-bottom: 3rem; }
     .sz-sec__head {
       display: flex; align-items: center; gap: .65rem;
@@ -176,6 +199,7 @@
         </div>
       </div>
     </div>
+
     <div class="nav__bar">
       <a href="index.html#top" class="nav__logo"><span class="nav__logo-mark">>_</span>TechYuva</a>
       <div class="nav__actions"><a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a></div>
@@ -192,6 +216,11 @@
       <button class="sz-nav__btn" data-target="materials">Materials</button>
       <button class="sz-nav__btn" data-target="mocktest">Mock Tests</button>
     </nav>
+
+    <div class="sz-latest" id="szLatest">
+      <span class="sz-latest__label">Recent</span>
+      <span class="sz-latest__items" id="szLatestItems">Loading...</span>
+    </div>
     <div class="sz-sec" id="career">
       <div class="sz-sec__head">
         <span class="sz-sec__dot"></span>
@@ -281,15 +310,27 @@
       ticking = true;
       requestAnimationFrame(() => {
         let current = '';
-        secs.forEach(sec => {
-          if (sec.getBoundingClientRect().top <= 150) current = sec.id;
-        });
-        if (current) {
-          navBtns.forEach(b => b.classList.toggle('is-active', b.dataset.target === current));
-        }
+        secs.forEach(sec => { if (sec.getBoundingClientRect().top <= 150) current = sec.id; });
+        if (current) navBtns.forEach(b => b.classList.toggle('is-active', b.dataset.target === current));
         ticking = false;
       });
     }, { passive: true });
+
+    /* Load latest 5 changes */
+    (async function loadLatest() {
+      const el = document.getElementById('szLatestItems');
+      if (!el) return;
+      try {
+        const items = await api('/studyzone');
+        const recent = (items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+        if (!recent.length) { el.textContent = 'No changes yet'; return; }
+        const labels = { 'career-roadmap':'Career','placement-guideline':'Place','job-opening':'Job','study-material':'Mat','mock-test':'Test' };
+        el.innerHTML = recent.map(it => {
+          const d = new Date(it.createdAt);
+          return '<a href="#' + (it.type==='career-roadmap'?'career':it.type==='placement-guideline'?'placement':it.type==='job-opening'?'jobs':it.type==='study-material'?'materials':'mocktest') + '" class="sz-latest__item">[' + (labels[it.type]||'') + '] ' + it.title + '<span>' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span></a>';
+        }).join(' · ');
+      } catch (e) { el.textContent = 'Unable to load'; }
+    })();
     const sb = $("#scrollProgress")?.querySelector("span");
     if (sb) { const u = () => { const m = document.documentElement.scrollHeight - innerHeight; sb.style.width = m > 0 ? (scrollY / m) * 100 + "%" : "0%"; }; addEventListener("scroll", u, { passive: true }); addEventListener("resize", u); u(); }
 
