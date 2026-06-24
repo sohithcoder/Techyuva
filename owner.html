@@ -2125,6 +2125,7 @@
         const data = courseData[c.name] || { students:0, totalRevenue:0, collected:0, pending:0 };
         const trendingBadge = c.trending ? '<span class="badge" style="background:var(--accent-soft);color:var(--accent);font-size:.55rem;margin-left:.4rem;">Trending</span>' : '';
         return '<div class="course-mini-card"><div class="course-mini-card__head"><div class="course-mini-card__name">' + c.name + trendingBadge + '</div><div style="display:flex;gap:.35rem;align-items:center;"><button class="action-btn" onclick="editCourse(\'' + c.name.replace(/'/g, "\\'") + '\')" title="Edit" style="min-width:28px;min-height:28px;">✏</button><button class="action-btn action-btn--danger" onclick="deleteCourse(\'' + c.name.replace(/'/g, "\\'") + '\')" title="Delete" style="min-width:28px;min-height:28px;">✕</button></div></div><div class="course-mini-card__stats"><div><div class="course-mini-card__stat-label">Fee</div><div class="course-mini-card__stat-value">₹' + ((parseFloat(c.fee) || 0).toLocaleString('en-IN')) + '</div></div><div><div class="course-mini-card__stat-label">End Date</div><div class="course-mini-card__stat-value">' + (c.endDate ? formatDate(c.endDate) : '-') + '</div></div></div></div>';
+      }).join('');
     }
 
     // ==================== COURSE CRUD ====================

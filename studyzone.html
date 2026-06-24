@@ -59,10 +59,14 @@
     .sz-latest__item {
       white-space: nowrap; color: var(--ink);
       text-decoration: none; transition: .15s;
+      display: inline-flex; align-items: center; gap: .3rem;
     }
     .sz-latest__item:hover { color: var(--accent); }
-    .sz-latest__item span {
-      font-size: .6rem; color: var(--ink-faint); margin-left: .35rem;
+    .sz-latest__dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sz-latest__item small {
+      font-size: .62rem; color: var(--ink-faint);
     }
     .sz-sec { margin-bottom: 3rem; }
     .sz-sec__head {
@@ -324,11 +328,13 @@
         const items = await api('/studyzone');
         const recent = (items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
         if (!recent.length) { el.textContent = 'No changes yet'; return; }
+        const colors = { 'career-roadmap':'var(--sz-career)','placement-guideline':'var(--sz-place)','job-opening':'var(--sz-jobs)','study-material':'var(--sz-mats)','mock-test':'var(--sz-test)' };
         const labels = { 'career-roadmap':'Career','placement-guideline':'Place','job-opening':'Job','study-material':'Mat','mock-test':'Test' };
         el.innerHTML = recent.map(it => {
           const d = new Date(it.createdAt);
-          return '<a href="#' + (it.type==='career-roadmap'?'career':it.type==='placement-guideline'?'placement':it.type==='job-opening'?'jobs':it.type==='study-material'?'materials':'mocktest') + '" class="sz-latest__item">[' + (labels[it.type]||'') + '] ' + it.title + '<span>' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span></a>';
-        }).join(' · ');
+          const c = colors[it.type] || 'var(--ink-soft)';
+          return '<a href="#' + (it.type==='career-roadmap'?'career':it.type==='placement-guideline'?'placement':it.type==='job-opening'?'jobs':it.type==='study-material'?'materials':'mocktest') + '" class="sz-latest__item"><span class="sz-latest__dot" style="background:' + c + '"></span>' + it.title + '<small>' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</small></a>';
+        }).join('');
       } catch (e) { el.textContent = 'Unable to load'; }
     })();
     const sb = $("#scrollProgress")?.querySelector("span");
