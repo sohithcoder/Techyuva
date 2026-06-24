@@ -282,8 +282,9 @@
     async function api(path, options = {}) {
       const config = { headers: { 'Content-Type': 'application/json' }, ...options };
       const res = await fetch(`${API_BASE}${path}`, config);
-      if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || `API error ${res.status}`); }
-      return res.json();
+      if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || 'API error'); }
+      const text = await res.text();
+      return text ? JSON.parse(text) : [];
     }
 
     async function getCourses() { return api('/courses'); }
@@ -334,7 +335,8 @@
       const container = document.getElementById('trendingList');
       if (!container) return;
       try {
-        const courses = await api('/courses?trending=true');
+        const raw = await api('/courses?trending=true');
+        const courses = Array.isArray(raw) ? raw : [];
         if (!courses.length) {
           container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">No trending courses right now. Check the full <a href="menu.html" style="color:var(--accent);">course list</a>.</p>';
           return;
