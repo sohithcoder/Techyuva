@@ -217,6 +217,7 @@ app.delete('/api/courses/:id', async (req, res) => {
 // ─── BATCHES (per-course) ───
 app.get('/api/batches', async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-store');
     const snap = await getDB().collection('batches').orderBy('order', 'asc').get();
     let batches = snap.docs.map(formatDoc);
     if (req.query.courseId) batches = batches.filter(b => b.courseId === req.query.courseId);
