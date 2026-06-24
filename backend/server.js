@@ -173,7 +173,9 @@ app.post('/api/students/:id/payments', async (req, res) => {
 app.get('/api/courses', async (req, res) => {
   try {
     const snap = await getDB().collection('courses').orderBy('order', 'asc').get();
-    res.json(snap.docs.map(formatDoc));
+    let courses = snap.docs.map(formatDoc);
+    if (req.query.trending === 'true') courses = courses.filter(c => c.trending);
+    res.json(courses);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -181,15 +183,7 @@ app.post('/api/courses', async (req, res) => {
   try {
     const d = req.body;
     const ref = await getDB().collection('courses').add({
-      name: d.name,
-      description: d.description || '',
-      duration: d.duration || '',
-      endDate: d.endDate || '',
-      fee: parseFloat(d.fee) || 0,
-      badge: d.badge || '',
-      modules: Array.isArray(d.modules) ? d.modules : [],
-      order: parseInt(d.order) || 0,
-      createdAt: new Date().toISOString(),
+      name: d.name, description: d.description || '', duration: d.duration || '', endDate: d.endDate || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', modules: Array.isArray(d.modules) ? d.modules : [], order: parseInt(d.order) || 0, trending: !!d.trending, createdAt: new Date().toISOString()
     });
     const doc = await ref.get();
     res.json(formatDoc(doc));
@@ -206,8 +200,10 @@ app.put('/api/courses/:id', async (req, res) => {
     ['name','description','duration','endDate','badge','modules'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
     if (d.fee !== undefined) update.fee = parseFloat(d.fee);
     if (d.order !== undefined) update.order = parseInt(d.order);
+    if (d.hasOwnProperty('trending')) update.trending = !!d.trending;
+    update.updatedAt = new Date().toISOString();
     await docRef.update(update);
-    res.json(formatDoc(await docRef.get()));
+    res.json({ id: req.params.id, ...update });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -334,11 +330,15 @@ app.post('/api/expenses', async (req, res) => {
     res.json(formatDoc(doc));
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
-
-app.delete('/api/expenses/:id', async (req, res) => {
+app.put('/api/expenses/:id', async (req, res) => {
   try {
-    await getDB().collection('expenses').doc(req.params.id).delete();
-    res.json({ success: true });
+    const d = req.body;
+    const docRef = getDB().collection('expenses').doc(req.params.id);
+    const snap = await docRef.get();
+    if (!snap.exists) return res.status(404).json({ error: 'Not found' });
+    const update = { name: d.name || snap.data().name, amount: parseFloat(d.amount) || snap.data().amount, date: d.date || snap.data().date, mode: d.mode || snap.data().mode, updatedAt: new Date().toISOString() };
+    await docRef.update(update);
+    res.json({ id: req.params.id, ...update });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

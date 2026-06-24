@@ -140,32 +140,14 @@
     </section>
 
     <!-- ===== Why / Features ===== -->
-    <section class="section" id="about">
+    <section class="section" id="trending">
       <div class="section__head">
         <span class="section__index reveal">01</span>
-        <h2 class="section__title reveal" data-ascii-title>Built for the way<br/>you actually <em>learn</em> to code</h2>
+        <h2 class="section__title reveal" data-ascii-title>Trending <em>Courses</em></h2>
+        <p class="section__sub reveal">What's hot right now. Pick one and start learning today.</p>
       </div>
-      <div class="features">
-        <article class="feature reveal">
-          <span class="feature__num">a.</span>
-          <h3>Live + recorded</h3>
-          <p>Attend live cohort classes or watch the recorded session later. One clear path per language — no endless tutorial maze.</p>
-          <div class="feature__art feature__art--rings"><i></i><i></i><i></i></div>
-        </article>
-        <article class="feature reveal">
-          <span class="feature__num">b.</span>
-          <h3>Instant analysis</h3>
-          <p>Every practice test scores accuracy, pace, and topic strength — rendered the moment you finish, not buried in a PDF.</p>
-          <div class="feature__art feature__art--bars"><i></i><i></i><i></i><i></i><i></i></div>
-        </article>
-        <article class="feature reveal">
-          <span class="feature__num">c.</span>
-          <h3>Honest review</h3>
-          <p>Every answer revisited side-by-side with the correct one, so a bug never happens twice.</p>
-          <div class="feature__art feature__art--check">
-            <svg viewBox="0 0 48 48" fill="none"><path class="check-path" d="M10 25l9 9 19-20" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </article>
+      <div class="courses" id="trendingList">
+        <p class="courses__note" style="grid-column:1/-1;text-align:center;color:var(--ink-soft);">Loading trending courses...</p>
       </div>
     </section>
 
@@ -435,8 +417,51 @@
         container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">Courses loading unavailable. Please try again later.</p>';
       }
     }
+    async function loadTrendingCourses() {
+      const container = document.getElementById('trendingList');
+      if (!container) return;
+      try {
+        const courses = await api('/courses?trending=true');
+        if (!courses.length) {
+          container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">No trending courses right now. Check the full <a href="menu.html" style="color:var(--accent);">course list</a>.</p>';
+          return;
+        }
+        const batchesByCourse = {};
+        const batchRes = await Promise.all(courses.map(c => getBatches(c.id).catch(() => [])));
+        courses.forEach((c, i) => { batchesByCourse[c.id] = batchRes[i]; });
+
+        container.innerHTML = courses.map((c, idx) => {
+          const batches = batchesByCourse[c.id] || [];
+          const batchTags = batches.map(b => `<span class="course__batch-tag">${b.name}</span>`).join('');
+          return `
+            <article class="course reveal" data-course="${slugify(c.name)}">
+              <div class="course__content">
+                <div class="course__head">
+                  <span class="course__index">${String(idx + 1).padStart(2, '0')}</span>
+                  <span class="course__lang">${c.name.split(' ')[0]}</span>
+                  <span class="course__badge">${c.badge || c.name}</span>
+                </div>
+                <h3 class="course__name">${c.name}</h3>
+                <p class="course__desc">${c.description || 'Comprehensive course with hands-on projects and live mentoring.'}</p>
+                ${batchTags ? '<div class="course__batches">' + batchTags + '</div>' : ''}
+                <div class="course__foot">
+                  <span class="course__duration">${c.duration || 'Self-paced'}${c.endDate ? ' · ends ' + formatDate(c.endDate) : ''}</span>
+                  <a class="course__cta" href="menu.html">
+                    <span class="cta__text">$ view course details</span>
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </a>
+                </div>
+              </div>
+            </article>`;
+        }).join('');
+      } catch (err) {
+        console.warn('Trending courses:', err.message);
+        container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">Unable to load trending courses.</p>';
+      }
+    }
 
     loadIndexCourses();
+    loadTrendingCourses();
   </script>
 </body>
 </html>

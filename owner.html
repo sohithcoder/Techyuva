@@ -1117,8 +1117,13 @@
             <div class="field">
               <span>Badge / Tag</span>
               <input type="text" id="courseBadge" placeholder="e.g. Backend · OOP" />
+            <div class="field">
+              <span>Trending</span>
+              <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font:inherit;color:var(--ink);margin-top:.3rem;">
+                <input type="checkbox" id="courseTrending" style="width:18px;height:18px;accent-color:var(--accent);" />
+                <span style="font-size:.78rem;">Show on homepage</span>
+              </label>
             </div>
-          </div>
           <input type="hidden" id="editCourseId" value="" />
           <div class="form-actions">
             <button class="btn btn--primary" onclick="saveCourse()">
@@ -1271,6 +1276,7 @@
               <input type="date" id="expDate" />
             </div>
           </div>
+          <input type="hidden" id="editExpenseId" value="" />
           <div class="form-actions">
             <button class="btn btn--primary" onclick="addExpense()">
               <span>$ add expense</span>
@@ -2130,16 +2136,17 @@
       const endDate = $('#courseEndDate').value;
       const fee = parseFloat($('#courseFee').value) || 0;
       const badge = $('#courseBadge').value.trim();
+      const trending = $('#courseTrending').checked;
       const editId = $('#editCourseId').value;
       if (!name) { showToast('Please enter a course name', 'error'); return; }
       try {
         if (editId) {
-          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, endDate, fee, badge }) });
+          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, endDate, fee, badge, trending }) });
           const idx = courses.findIndex(c => c.id === editId);
           if (idx !== -1) courses[idx] = updated;
         } else {
           if (courses.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Course already exists', 'error'); return; }
-          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, endDate, fee, badge }) });
+          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, endDate, fee, badge, trending }) });
           courses.push(saved);
         }
         clearCourseForm(); updateCourses(); updateCourseFilters();
@@ -2155,6 +2162,7 @@
       $('#editCourseId').value = c.id;
       $('#courseName').value = c.name; $('#courseEndDate').value = c.endDate || '';
       $('#courseFee').value = c.fee || ''; $('#courseBadge').value = c.badge || '';
+      $('#courseTrending').checked = !!c.trending;
       $('#courseName').focus();
     }
 
@@ -2174,7 +2182,7 @@
     function clearCourseForm() {
       $('#editCourseId').value = '';
       $('#courseName').value = ''; $('#courseEndDate').value = '';
-      $('#courseFee').value = ''; $('#courseBadge').value = '';
+      $('#courseFee').value = ''; $('#courseBadge').value = ''; $('#courseTrending').checked = false;
     }
 
     function showCourseDetail(courseName) {
@@ -2368,7 +2376,7 @@
       const tbody = $('#expensesTable');
       tbody.innerHTML = filtered.map((e, i) => {
         const modeLabel = e.mode === 'online' ? '<span style="color:var(--good);font-weight:600;">Online</span>' : '<span style="color:var(--ink-soft);font-weight:600;">Cash</span>';
-        return `<tr><td>${i + 1}</td><td><div class="owner-table__name">${e.name}</div></td><td style="color:var(--bad);font-weight:600;">₹${(parseFloat(e.amount) || 0).toLocaleString('en-IN')}</td><td>${modeLabel}</td><td>${formatDate(e.date)}</td><td><div class="action-btns"><button class="action-btn action-btn--danger" onclick="deleteExpense('${e.id}')" title="Delete">✕</button></div></td></tr>`;
+        return `<tr><td>${i + 1}</td><td><div class="owner-table__name">${e.name}</div></td><td style="color:var(--bad);font-weight:600;">₹${(parseFloat(e.amount) || 0).toLocaleString('en-IN')}</td><td>${modeLabel}</td><td>${formatDate(e.date)}</td><td><div class="action-btns"><button class="action-btn" onclick="editExpense('${e.id}')" title="Edit">✏</button><button class="action-btn action-btn--danger" onclick="deleteExpense('${e.id}')" title="Delete">✕</button></div></td></tr>`;
       }).join('') || emptyRow(6, 'No expenses found', 'Add an expense or adjust filters');
 
       const fTotal = filtered.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
@@ -2382,19 +2390,37 @@
     }
 
     async function addExpense() {
+      const editId = $('#editExpenseId').value;
       const name = $('#expName').value.trim();
       const amount = parseFloat($('#expAmount').value) || 0;
       const mode = $('#expMode').value;
       const date = $('#expDate').value;
       if (!name || amount <= 0 || !date) { showToast('Please fill name, amount, and date', 'error'); return; }
       try {
-        const saved = await api('/expenses', { method: 'POST', body: JSON.stringify({ name, amount, date, mode }) });
-        expenses.unshift(saved);
+        if (editId) {
+          await api(`/expenses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, amount, date, mode }) });
+          const idx = expenses.findIndex(e => e.id === editId);
+          if (idx !== -1) { expenses[idx] = { ...expenses[idx], name, amount, date, mode }; }
+        } else {
+          const saved = await api('/expenses', { method: 'POST', body: JSON.stringify({ name, amount, date, mode }) });
+          expenses.unshift(saved);
+        }
         clearExpenseForm(); renderExpenses();
-        showToast('Expense added!', 'success');
+        showToast(editId ? 'Expense updated!' : 'Expense added!', 'success');
       } catch (err) { showToast('Failed: ' + err.message, 'error'); }
     }
+
+    function editExpense(id) {
+      const e = expenses.find(x => x.id === id);
+      if (!e) return;
+      $('#editExpenseId').value = e.id;
+      $('#expName').value = e.name;
+      $('#expAmount').value = e.amount;
+      $('#expMode').value = e.mode || 'cash';
+      $('#expDate').value = e.date;
+    }
     function clearExpenseForm() {
+      $('#editExpenseId').value = '';
       $('#expName').value = ''; $('#expAmount').value = ''; $('#expDate').value = new Date().toISOString().split('T')[0]; $('#expMode').value = 'cash';
     }
     async function deleteExpense(id) {
