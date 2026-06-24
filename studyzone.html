@@ -40,6 +40,13 @@
       max-width: 960px; margin: 0 auto;
     }
 
+    .sz-updates { margin-bottom: 2rem; }
+    .sz-updates__label {
+      font-family: var(--font-mono); font-size: .65rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--ink-soft); margin-bottom: .6rem; display: block;
+    }
+    .sz-updates__grid { display: flex; flex-direction: column; gap: .5rem; }
+
     /* --- Section headers — cleaner, with colored dots --- */
 
     .sz-latest {
@@ -224,6 +231,11 @@
       <button class="sz-nav__btn" data-target="mocktest">Mock Tests</button>
     </nav>
 
+    <div class="sz-updates" id="szUpdates">
+      <span class="sz-updates__label">Latest</span>
+      <div class="sz-updates__grid" id="szUpdatesGrid">Loading...</div>
+    </div>
+
     <div class="sz-sec" id="career">
       <div class="sz-sec__head">
         <span class="sz-sec__dot"></span>
@@ -357,6 +369,28 @@
         </a>`;
       }).join('');
     }
+    (async function loadLatest() {
+      const grid = document.getElementById('szUpdatesGrid');
+      if (!grid) return;
+      const colors = { 'career-roadmap':'#d4784a','placement-guideline':'#3d8b63','job-opening':'#4075a8','study-material':'#7b5ea7','mock-test':'#c74552' };
+      const labels = { 'career-roadmap':'Career','placement-guideline':'Placement','job-opening':'Job','study-material':'Material','mock-test':'Mock Test' };
+      try {
+        const items = await api('/studyzone');
+        const recent = (items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+        if (!recent.length) { grid.innerHTML = '<span class="sz-empty">No updates yet.</span>'; return; }
+        grid.innerHTML = recent.map(item => {
+          const m = item.meta || {}; let tags = '';
+          if (item.type === 'career-roadmap' && Array.isArray(m.skills)) tags += m.skills.slice(0, 3).map(s => '<span class="sz-tag">' + s + '</span>').join('');
+          if (item.type === 'job-opening') { if (m.company) tags += '<span class="sz-tag sz-tag--a">' + m.company + '</span>'; if (m.location) tags += '<span class="sz-tag">' + m.location + '</span>'; }
+          if (item.type === 'study-material') { if (m.fileType) tags += '<span class="sz-tag">' + m.fileType + '</span>'; if (m.size) tags += '<span class="sz-tag">' + m.size + '</span>'; }
+          if (item.type === 'mock-test') { if (m.difficulty) tags += '<span class="sz-tag sz-tag--a">' + m.difficulty + '</span>'; if (m.topic) tags += '<span class="sz-tag">' + m.topic + '</span>'; }
+          const c = colors[item.type] || '#888';
+          const d = new Date(item.createdAt || Date.now());
+          const lk = item.link || '#', ex = /^https?:\/\//i.test(lk) ? ' target="_blank" rel="noopener"' : '';
+          return '<a class="sz-update-card" href="' + lk + '"' + ex + ' style="--accent:' + c + '"><div class="sz-update__body"><div class="sz-update__top"><h3 class="sz-update__title">' + item.title + '</h3><svg class="sz-update__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><p class="sz-update__desc">' + (item.description || '') + '</p><div class="sz-update__tags"><span class="sz-tag sz-tag--a" style="background:' + c + '15;color:' + c + ';border-color:' + c + '30;">' + (labels[item.type] || item.type) + '</span>' + tags + '<span class="sz-update__date">' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span></div></div></a>';
+        }).join('');
+      } catch (e) { grid.innerHTML = '<span class="sz-empty">Unable to load.</span>'; }
+    })();
 
     (async () => {
       try {
@@ -366,5 +400,4 @@
       } catch (e) { console.warn('Study zone:', e.message); }
     })();
   </script>
-</body>
 </html>
