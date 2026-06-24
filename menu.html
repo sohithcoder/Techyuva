@@ -285,8 +285,9 @@
       padding: 2rem 0;
     }
 
+    .footer--page { padding-left: calc(var(--nav-edge) + var(--pad)); padding-right: var(--pad); }
     @media (max-width: 900px) {
-      .course-page { padding-left: var(--pad); }
+      .course-page, .footer--page { padding-left: var(--pad); }
     }
     @media (max-width: 640px) {
       .course-grid { grid-template-columns: 1fr; }
@@ -374,14 +375,35 @@
   </main>
 
   <!-- Footer -->
-  <footer class="footer" style="padding-left: calc(var(--nav-edge) + var(--pad));">
+  <footer class="footer footer--page">
     <span class="footer__logo">>_TechYuva</span>
     <p>Online coding institute. Built for learners, by engineers.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
+  <script>
+    // API helpers (inlined — no module imports for file:// compatibility)
+    const API_BASE = (!window.location.hostname || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3001/api'
+      : window.location.origin + '/api';
 
-  <script type="module">
-    import { getCourses, getBatches, formatCurrency, formatDate } from './api.js';
+    async function api(path, options = {}) {
+      const config = { headers: { 'Content-Type': 'application/json' }, ...options };
+      const res = await fetch(`${API_BASE}${path}`, config);
+      if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || `API error ${res.status}`); }
+      return res.json();
+    }
+
+    async function getCourses() { return api('/courses'); }
+    async function getBatches(courseId) {
+      const query = courseId ? `?courseId=${encodeURIComponent(courseId)}` : '';
+      return api('/batches' + query);
+    }
+    function formatCurrency(n) { return '₹' + (parseFloat(n) || 0).toLocaleString('en-IN'); }
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
 
     const $  = (s, c = document) => c.querySelector(s);
     const $$ = (s, c = document) => [...c.querySelectorAll(s)];
