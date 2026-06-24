@@ -158,9 +158,16 @@
         <h2 class="section__title reveal" data-ascii-title>Current <em>Batches</em></h2>
         <p class="section__sub reveal">All active courses and their running batches. Pick one and enroll today.</p>
       </div>
-      <div class="owner-table-wrap" style="margin:0 auto;max-width:900px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;">
-        <table class="owner-table" style="min-width:0;">
-          <thead><tr><th>Course</th><th>Batch</th><th>Duration</th><th>Timing</th></tr></thead>
+      <div class="schedule-wrap" style="margin:0 auto;max-width:900px;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.78rem;">
+          <thead>
+            <tr style="background:var(--paper-2);border-bottom:2px solid var(--line);">
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Course</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Batch</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Duration</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Timing</th>
+            </tr>
+          </thead>
           <tbody id="scheduleTable"><tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">Loading schedule...</div></div></td></tr></tbody>
         </table>
       </div>
@@ -300,11 +307,24 @@
       try {
         const [courses, allBatches] = await Promise.all([getCourses(), getBatches()]);
         if (!courses.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No courses yet</div></div></td></tr>'; return; }
-        let rows = '';
+        let rows = '', even = false;
         courses.forEach(c => {
           const batches = allBatches.filter(b => b.courseId === c.id);
-          if (!batches.length) rows += '<tr><td><span class="owner-table__name">' + c.name + '</span></td><td colspan="3" style="color:var(--ink-faint);">No batches yet</td></tr>';
-          else batches.forEach((b, i) => rows += '<tr><td>' + (i === 0 ? '<span class="owner-table__name">' + c.name + '</span>' : '') + '</td><td>' + b.name + '</td><td>' + b.duration + ' days</td><td>' + (b.timing || '—') + '</td></tr>');
+          if (!batches.length) {
+            rows += '<tr style="background:' + (even ? 'var(--paper-2)' : 'var(--paper)') + ';border-bottom:1px solid var(--line);"><td style="padding:.75rem 1.1rem;font-weight:600;color:var(--ink);">' + c.name + '</td><td colspan="3" style="padding:.75rem 1.1rem;color:var(--ink-faint);font-size:.72rem;">No batches yet</td></tr>';
+            even = !even;
+          } else {
+            batches.forEach((b, i) => {
+              const bg = even ? 'var(--paper-2)' : 'var(--paper)';
+              const cell = 'padding:.7rem 1.1rem;border-bottom:1px solid var(--line);';
+              rows += '<tr style="background:' + bg + ';">' +
+                '<td style="' + cell + (i === 0 ? 'font-weight:600;color:var(--ink);' : '') + '">' + (i === 0 ? c.name : '') + '</td>' +
+                '<td style="' + cell + '">' + b.name + '</td>' +
+                '<td style="' + cell + '">' + b.duration + ' days</td>' +
+                '<td style="' + cell + 'font-family:var(--font-mono);color:var(--ink-soft);">' + (b.timing || '—') + '</td></tr>';
+              even = !even;
+            });
+          }
         });
         tbody.innerHTML = rows || '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No batches scheduled</div></div></td></tr>';
       } catch (err) { tbody.innerHTML = '<tr><td colspan="4">Unable to load</td></tr>'; }
