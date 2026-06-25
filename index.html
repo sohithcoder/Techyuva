@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TechYuva — Code Craft Institute</title>
-  <meta name="description" content="TechYuva — an online coding institute. Master Java, C++ and Python with live classes, real projects, and a student zone built for results." />
+  <meta name="description" content="TechYuva — a practical coding institute. Master Java, C++ and Python with live classes, real projects, and a student zone built for results." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -22,7 +22,7 @@
     </button>
     <div class="nav__explorer" id="navExplorer">
       <div class="nav__explorer-head">
-        <span class="nav__explorer-title">EXPLORER</span>
+        <span class="nav__explorer-title">MENU</span>
         <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -54,13 +54,17 @@
     </div>
     <div class="nav__bar">
       <a href="#top" class="nav__logo">
-        <span class="nav__logo-mark">>_</span>TechYuva
+        <span class="nav__logo-mark"><img src="unnamed.webp" alt="TechYuva" /></span>
+        <div class="nav__logo-text">
+          <span class="nav__logo-name">TechYuva</span>
+          <span class="nav__logo-sub">ISO Certified Coding Institute</span>
+        </div>
       </a>
       <div class="nav__actions">
         <button class="nav__cmd" id="cmdPalette">
-          <kbd>⌘</kbd><kbd>K</kbd>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </button>
-        <a href="#courses" class="btn btn--small">
+        <a href="menu.html" class="btn btn--small">
           <span>$ enroll</span>
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
@@ -85,7 +89,7 @@
     <!-- ===== Hero ===== -->
     <section class="hero">
       <div class="hero__content">
-        <p class="hero__eyebrow reveal">Online coding institute · Live + self-paced</p>
+        <p class="hero__eyebrow reveal">Practical coaching · Real results</p>
         <h1 class="hero__title" id="heroTitle">
           <span class="line"><span>Code with</span></span>
           <span class="line"><span><em>intention</em>,</span></span>
@@ -98,7 +102,7 @@
             measurable progress.
           </p>
           <div class="hero__actions reveal">
-            <a href="#courses" class="btn btn--primary" id="heroEnroll">
+            <a href="menu.html" class="btn btn--primary" id="heroEnroll">
               <span class="btn__text">$ techyuva enroll</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
@@ -147,16 +151,17 @@
         <p class="section__sub reveal">What's hot right now. Pick one and start learning today.</p>
       </div>
       <div class="courses" id="trendingList">
-        <p class="courses__note" style="grid-column:1/-1;text-align:center;color:var(--ink-soft);">Loading trending courses...</p>
+        <article class="course"><div class="course__content"><div class="skeleton skeleton--title"></div><div class="skeleton skeleton--text"></div><div class="skeleton skeleton--text skeleton--text-sm"></div></div></article>
+        <article class="course"><div class="course__content"><div class="skeleton skeleton--title"></div><div class="skeleton skeleton--text"></div><div class="skeleton skeleton--text skeleton--text-sm"></div></div></article>
       </div>
     </section>
 
-    <!-- ===== Course Schedule ===== -->
+    <!-- ===== Upcoming Batches ===== -->
     <section class="section section--dark" id="schedule">
       <div class="section__head">
         <span class="section__index reveal">02</span>
-        <h2 class="section__title reveal" data-ascii-title>Current <em>Batches</em></h2>
-        <p class="section__sub reveal">All active courses and their running batches. Pick one and enroll today.</p>
+        <h2 class="section__title reveal" data-ascii-title>Upcoming <em>Batches</em></h2>
+        <p class="section__sub reveal">New batches starting soon. Reserve your seat before they fill up.</p>
       </div>
       <div class="schedule-wrap" style="margin:0 auto;max-width:900px;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;">
         <table style="width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.78rem;">
@@ -164,11 +169,11 @@
             <tr style="background:var(--paper-2);border-bottom:2px solid var(--line);">
               <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Course</th>
               <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Batch</th>
-              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Duration</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Starting Date</th>
               <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Timing</th>
             </tr>
           </thead>
-          <tbody id="scheduleTable"><tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">Loading schedule...</div></div></td></tr></tbody>
+          <tbody id="scheduleTable"><tr><td colspan="4"><table style="width:100%;" class="skeleton-table"><tr><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td></tr><tr><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td></tr><tr><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td></tr></table></td></tr></tbody>
         </table>
       </div>
     </section>
@@ -181,7 +186,9 @@
         <p class="section__sub reveal">Recent updates — roadmaps, jobs, materials, and mock tests.</p>
       </div>
       <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:.6rem;" id="zoneUpdates">
-        <p style="text-align:center;color:var(--ink-soft);padding:2rem;">Loading recent updates...</p>
+        <div class="skeleton skeleton--card" style="height:72px;"></div>
+        <div class="skeleton skeleton--card" style="height:72px;"></div>
+        <div class="skeleton skeleton--card" style="height:72px;"></div>
       </div>
       <p style="text-align:center;margin-top:1.5rem;">
         <a href="studyzone.html" class="link-arrow" style="font-size:.85rem;">View full Study Zone →</a>
@@ -252,25 +259,134 @@
       </div>
     </section>
 
-    <!-- ===== CTA ===== -->
-    <section class="cta">
-      <div class="cta__orb" aria-hidden="true"></div>
-      <h2 class="cta__title" data-ascii-title>
-        <span class="line"><span>Ready when</span></span>
-        <span class="line"><span><em>you</em> are.</span></span>
-      </h2>
-      <a href="#courses" class="btn btn--primary btn--big" id="ctaEnroll">
-        <span class="btn__text">$ techyuva enroll --now</span>
-      </a>
+    <!-- ===== YouTube Channel ===== -->
+    <section class="section" id="youtube">
+      <div class="section__head">
+        <span class="section__index reveal">04</span>
+        <h2 class="section__title reveal" data-ascii-title>Watch <em>on YouTube</em></h2>
+        <p class="section__sub reveal">Tutorials, project walkthroughs & coding tips from Lokesh TechYuva.</p>
+      </div>
+      <div class="reveal yt-section" style="max-width:900px;margin:0 auto;padding:0 var(--pad);">
+        <div class="yt-channel-card">
+          <div class="yt-channel-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-1.94C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 1.94A29.94 29.94 0 001 11.75a29.94 29.94 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-1.94 29.94 29.94 0 00.46-5.25 29.94 29.94 0 00-.46-5.39z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h3 class="yt-channel-card__name">Lokesh TechYuva</h3>
+            <p class="yt-channel-card__sub">YouTube Channel</p>
+          </div>
+          <a href="https://www.youtube.com/@lokesh-techyuva1984" target="_blank" rel="noopener" class="btn btn--primary" style="margin-left:auto;">
+            <span>$ subscribe</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <div class="yt-videos">
+          <a href="https://www.youtube.com/@lokesh-techyuva1984/videos" target="_blank" rel="noopener" class="yt-video-card">
+            <div class="yt-video-card__thumb">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M10 8l6 4-6 4V8z" fill="var(--accent)"/></svg>
+            </div>
+            <div class="yt-video-card__info">
+              <span class="yt-video-card__title">View All Videos</span>
+              <span class="yt-video-card__meta">Latest tutorials & projects</span>
+            </div>
+          </a>
+          <a href="https://www.youtube.com/@lokesh-techyuva1984/playlists" target="_blank" rel="noopener" class="yt-video-card">
+            <div class="yt-video-card__thumb">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M10 8l6 4-6 4V8z" fill="var(--accent)"/></svg>
+            </div>
+            <div class="yt-video-card__info">
+              <span class="yt-video-card__title">Browse Playlists</span>
+              <span class="yt-video-card__meta">Organized by topic</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Location ===== -->
+    <section class="section" id="location">
+      <div class="section__head">
+        <span class="section__index reveal">05</span>
+        <h2 class="section__title reveal" data-ascii-title>Our <em>Location</em></h2>
+        <p class="section__sub reveal">Visit our campus — where learning meets real-world skills.</p>
+      </div>
+      <div class="reveal" style="max-width:900px;margin:0 auto;border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+        <iframe src="https://maps.google.com/maps?q=Tech+Yuva+Computers+Eluru&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="340" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="TechYuva Location"></iframe>
+      </div>
     </section>
   </main>
+
+  <!-- ===== Contact ===== -->
+  <section class="section" id="contact">
+    <div class="section__head">
+      <span class="section__index reveal">06</span>
+      <h2 class="section__title reveal" data-ascii-title>Get in <em>Touch</em></h2>
+      <p class="section__sub reveal">Questions? We'd love to hear from you.</p>
+    </div>
+    <div class="reveal contact-grid">
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="contact-card__label">Phone</div>
+        <a href="tel:+919876543210" class="contact-card__value">+91 98765 43210</a>
+        <a href="tel:+919876543211" class="contact-card__value">+91 98765 43211</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="contact-card__label">Email</div>
+        <a href="mailto:hello@techyuva.com" class="contact-card__value">hello@techyuva.com</a>
+        <a href="mailto:support@techyuva.com" class="contact-card__value">support@techyuva.com</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="contact-card__label">Follow Us</div>
+        <div class="contact-card__socials">
+          <a href="https://instagram.com/techyuva" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+          </a>
+          <a href="https://facebook.com/techyuva" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3V2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://linkedin.com/company/techyuva" target="_blank" rel="noopener" class="social-link" aria-label="LinkedIn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="9" width="4" height="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:1.5rem;">
+      <div class="ratings-row">
+        <span class="ratings-row__stars">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill-opacity=".8"/></svg>
+        </span>
+        <span class="ratings-row__score">4.9</span>
+        <span class="ratings-row__sep">·</span>
+        <a href="https://g.page/techyuva" target="_blank" rel="noopener" class="ratings-row__link">Google Reviews</a>
+        <span class="ratings-row__sep">·</span>
+        <a href="https://www.justdial.com/Eluru/Tech-Yuva-Computers" target="_blank" rel="noopener" class="ratings-row__link">Justdial</a>
+      </div>
+    </div>
+  </section>
 
   <!-- ===== Footer ===== -->
   <footer class="footer">
     <span class="footer__logo">>_TechYuva</span>
-    <p>Online coding institute. Built for learners, by engineers.</p>
+    <p>Practical coding institute. Built for learners, by engineers.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
+
+  <div class="footer-credits">
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
 
   <script src="script.js"></script>
   <script>
@@ -302,32 +418,36 @@
       return String(text).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     }
 
+    function countdownLabel(startingDate) {
+      if (!startingDate) return '';
+      const now = new Date(); now.setHours(0,0,0,0);
+      const start = new Date(startingDate); start.setHours(0,0,0,0);
+      const diff = start - now;
+      if (diff <= 0) return '<span style="color:var(--good);">Started</span>';
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      if (days <= 1) return '<span style="color:var(--bad);animation:pulse 1s infinite;">Starting tomorrow</span>';
+      if (days <= 7) return '<span style="color:var(--accent);font-weight:600;">' + days + ' days to go</span>';
+      return '<span style="color:var(--ink-soft);">' + days + ' days</span>';
+    }
+
     async function loadSchedule() {
       const tbody = document.getElementById('scheduleTable');
       if (!tbody) return;
       try {
-        const [courses, allBatches] = await Promise.all([getCourses(), getBatches()]);
-        if (!courses.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No courses yet</div></div></td></tr>'; return; }
+        const upcoming = await api('/upcoming-batches');
+        if (!upcoming.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No upcoming batches</div><div class="empty-state__desc">Check back soon for new batches!</div></div></td></tr>'; return; }
         let rows = '', even = false;
-        courses.forEach(c => {
-          const batches = allBatches.filter(b => b.courseId === c.id);
-          if (!batches.length) {
-            rows += '<tr style="background:' + (even ? 'var(--paper-2)' : 'var(--paper)') + ';border-bottom:1px solid var(--line);"><td style="padding:.75rem 1.1rem;font-weight:600;color:var(--ink);">' + c.name + '</td><td colspan="3" style="padding:.75rem 1.1rem;color:var(--ink-faint);font-size:.72rem;">No batches yet</td></tr>';
-            even = !even;
-          } else {
-            batches.forEach((b, i) => {
-              const bg = even ? 'var(--paper-2)' : 'var(--paper)';
-              const cell = 'padding:.7rem 1.1rem;border-bottom:1px solid var(--line);';
-              rows += '<tr style="background:' + bg + ';">' +
-                '<td style="' + cell + (i === 0 ? 'font-weight:600;color:var(--ink);' : '') + '">' + (i === 0 ? c.name : '') + '</td>' +
-                '<td style="' + cell + '">' + b.name + '</td>' +
-                '<td style="' + cell + '">' + b.duration + ' days</td>' +
-                '<td style="' + cell + 'font-family:var(--font-mono);color:var(--ink-soft);">' + (b.timing || '—') + '</td></tr>';
-              even = !even;
-            });
-          }
+        upcoming.forEach(b => {
+          const bg = even ? 'var(--paper-2)' : 'var(--paper)';
+          const cell = 'padding:.7rem 1.1rem;border-bottom:1px solid var(--line);color:var(--ink);';
+          rows += '<tr style="background:' + bg + ';">' +
+            '<td style="' + cell + 'font-weight:600;">' + b.courseName + '</td>' +
+            '<td style="' + cell + '">' + b.batchName + '</td>' +
+            '<td style="' + cell + 'font-family:var(--font-mono);">' + (b.startingDate ? formatDate(b.startingDate) + '<br><span style="font-size:.65rem;">' + countdownLabel(b.startingDate) + '</span>' : '—') + '</td>' +
+            '<td style="' + cell + 'font-family:var(--font-mono);">' + (b.timing || '—') + '</td></tr>';
+          even = !even;
         });
-        tbody.innerHTML = rows || '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No batches scheduled</div></div></td></tr>';
+        tbody.innerHTML = rows;
       } catch (err) { tbody.innerHTML = '<tr><td colspan="4">Unable to load</td></tr>'; }
     }
 
@@ -381,6 +501,21 @@
     loadTrendingCourses();
     loadSchedule();
     loadZoneUpdates();
+    (async function loadWaNumber() {
+      try {
+        const data = await api('/settings/whatsapp');
+        if (data && data.number) {
+          const wa = document.getElementById('waFloat');
+          if (wa) wa.href = 'https://wa.me/' + data.number;
+        }
+      } catch (e) { /* use default */ }
+    })();
   </script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/919876543210" target="_blank" rel="noopener" class="wa-float" id="waFloat" aria-label="Chat on WhatsApp">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
 </body>
 </html>

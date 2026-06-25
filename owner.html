@@ -715,7 +715,7 @@
     </button>
     <div class="nav__explorer" id="navExplorer">
       <div class="nav__explorer-head">
-        <span class="nav__explorer-title">EXPLORER</span>
+        <span class="nav__explorer-title">MENU</span>
         <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -748,7 +748,11 @@
     </div>
     <div class="nav__bar">
       <a href="index.html#top" class="nav__logo">
-        <span class="nav__logo-mark">>_</span>TechYuva
+        <span class="nav__logo-mark"><img src="unnamed.webp" alt="TechYuva" /></span>
+        <div class="nav__logo-text">
+          <span class="nav__logo-name">TechYuva</span>
+          <span class="nav__logo-sub">ISO Certified Coding Institute</span>
+        </div>
       </a>
       <div class="nav__actions">
         <a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a>
@@ -813,14 +817,33 @@
     </div>
 
     <!-- Charts Row -->
-    <div class="charts-row reveal">
+    <div class="charts-row reveal" style="grid-template-columns:1fr;">
       <div class="chart-card">
         <div class="chart-title">Payment Status</div>
         <div class="chart-container"><canvas id="paymentStatusChart"></canvas></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">Students per Course</div>
-        <div class="chart-container"><canvas id="courseDistributionChart"></canvas></div>
+    </div>
+
+    <!-- WhatsApp Number Setting -->
+    <div class="owner-section reveal" style="margin-bottom:2rem;">
+      <div class="owner-section__header">
+        <div class="owner-section__title">
+          <div class="owner-section__icon owner-section__icon--green">⚙</div>
+          <div>
+            <h2>WhatsApp Number</h2>
+            <span>Used for course registrations & homepage chat button</span>
+          </div>
+        </div>
+        <button class="owner-section__action" onclick="saveWhatsappNumber()">
+          <span>$ save</span>
+        </button>
+      </div>
+      <div class="owner-section__body">
+        <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">
+          <span style="font-family:var(--font-mono);font-size:.75rem;color:var(--ink-soft);">+91</span>
+          <input type="text" id="whatsappNumber" placeholder="9876543210" style="flex:1;min-width:180px;font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;box-sizing:border-box;max-width:280px;" />
+          <span id="waSavedStatus" style="font-family:var(--font-mono);font-size:.65rem;color:var(--good);"></span>
+        </div>
       </div>
     </div>
 
@@ -833,6 +856,7 @@
       <button class="owner-tab" data-tab="expenses">Expenses</button>
       <button class="owner-tab" data-tab="analytics">Analytics</button>
       <button class="owner-tab" data-tab="studyzone">Study Zone</button>
+      <button class="owner-tab" data-tab="upcoming">Upcoming</button>
     </div>
 
     <!-- TAB: Register -->
@@ -905,10 +929,6 @@
               <span>Total Course Fee (₹)</span>
               <input type="number" id="studentTotalFee" placeholder="25000" />
             </div>
-            <div class="field">
-              <span>Amount Paid (₹)</span>
-              <input type="number" id="studentPaidFee" placeholder="0" value="0" />
-            </div>
           </div>
           <div class="form-actions">
             <button class="btn btn--primary" onclick="addStudent()">
@@ -945,7 +965,7 @@
               <span class="search-icon">$</span>
               <input type="text" placeholder="Search by name or reg no..." id="studentSearch" onkeyup="filterStudents()" />
             </div>
-            <select class="filter-select" id="studentCourseFilter" onchange="filterStudents()">
+            <select class="filter-select" id="studentCourseFilter" onchange="onCourseFilterChange()">
               <option value="">All Courses</option>
             </select>
             <select class="filter-select" id="studentBatchFilter" onchange="filterStudents()">
@@ -1117,6 +1137,10 @@
             <div class="field">
               <span>Badge / Tag</span>
               <input type="text" id="courseBadge" placeholder="e.g. Backend · OOP" />
+            </div>
+            <div class="field">
+              <span>Info Link (Know More)</span>
+              <input type="url" id="courseInfoLink" placeholder="https://example.com/course-info" />
             </div>
             <div class="field">
               <span>Trending</span>
@@ -1354,6 +1378,15 @@
 
     <!-- TAB: Analytics -->
     <div class="owner-tab-panel" id="panel-analytics">
+      <div class="toolbar reveal" style="margin-bottom:1.2rem;">
+        <span style="font-family:var(--font-mono);font-size:.72rem;color:var(--ink-soft);">From:</span>
+        <input type="date" id="analyticsDateFrom" onchange="updateAnalytics()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+        <span style="color:var(--ink-faint);font-size:.7rem;">to</span>
+        <input type="date" id="analyticsDateTo" onchange="updateAnalytics()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+        <button class="btn" onclick="clearAnalyticsDateFilter()" style="font-size:.7rem;padding:.35rem .8rem;margin-left:.3rem;">
+          <span>$ clear</span>
+        </button>
+      </div>
       <div class="stats-grid reveal" style="margin-bottom:1.5rem;">
         <div class="stat-card stat-card--green">
           <div class="stat-card__label">Total Fees Collected</div>
@@ -1479,6 +1512,59 @@
       </div>
     </div>
 
+    <!-- TAB: Upcoming -->
+    <div class="owner-tab-panel" id="panel-upcoming">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--green">📅</div>
+            <div>
+              <h2>Manage Upcoming Batches</h2>
+              <span>Add or edit upcoming batches shown on the main page</span>
+            </div>
+          </div>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid">
+            <div class="field">
+              <span>Course Name</span>
+              <input type="text" id="upCourseName" placeholder="e.g. Java Mastery" />
+            </div>
+            <div class="field">
+              <span>Batch Name</span>
+              <input type="text" id="upBatchName" placeholder="e.g. Batch 6" />
+            </div>
+            <div class="field">
+              <span>Starting Date</span>
+              <input type="date" id="upStartingDate" />
+            </div>
+            <div class="field">
+              <span>Timing</span>
+              <input type="text" id="upTiming" placeholder="e.g. 9:00 AM - 3:00 PM" />
+            </div>
+          </div>
+          <input type="hidden" id="editUpcomingId" value="" />
+          <div class="form-actions">
+            <button class="btn btn--primary" onclick="saveUpcomingBatch()">
+              <span>$ save batch</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="btn" onclick="clearUpcomingForm()">
+              <span>$ clear</span>
+            </button>
+          </div>
+          <div class="owner-table-wrap" style="margin-top:1.2rem;">
+            <table class="owner-table">
+              <thead>
+                <tr><th>Course</th><th>Batch</th><th>Starting Date</th><th>Timing</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="upcomingTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Footer -->
@@ -1487,6 +1573,11 @@
     <p>Owner dashboard. Built for analysis, not distraction.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
+
+  <div class="footer-credits">
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
 
   <!-- Payment Modal -->
   <div class="modal-overlay" id="paymentModal">
@@ -1650,6 +1741,7 @@
     let expenses = [];
     let courses = [];
     let batches = [];
+    let upcomingBatches = [];
     let currentPaymentId = null;
     let charts = {};
 
@@ -1720,6 +1812,7 @@
         try { if (panelId === 'expenses') renderExpenses(); } catch(e) { console.warn(e); }
         try { if (panelId === 'analytics') updateAnalytics(); } catch(e) { console.warn(e); }
         try { if (panelId === 'studyzone') { updateStudyZoneMetaFields(); renderStudyZoneTable(); } } catch(e) { console.warn(e); }
+        try { if (panelId === 'upcoming') renderUpcomingTable(); } catch(e) { console.warn(e); }
       });
     });
 
@@ -1751,10 +1844,6 @@
       const pendingCount = students.filter(s => s.status === 'Pending').length;
       if (charts.paymentStatus) charts.paymentStatus.destroy();
       charts.paymentStatus = new Chart($('#paymentStatusChart'), { type:'doughnut', data:{ labels:['Paid','Partial','Pending'], datasets:[{ data:[paidCount,partialCount,pendingCount], backgroundColor:['#4a7c59','#c4a030','#a03030'], borderWidth:0, hoverOffset:4 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, cutout:'68%', plugins:{ legend:{ position:'bottom', labels:{ padding:16, font:{ family:'JetBrains Mono', size:11 }, usePointStyle:true, boxWidth:8 } } } } });
-      const courseBatchCounts = {};
-      students.forEach(s => { const key = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : ''); courseBatchCounts[key] = (courseBatchCounts[key] || 0) + 1; });
-      if (charts.courseDist) charts.courseDist.destroy();
-      charts.courseDist = new Chart($('#courseDistributionChart'), { type:'bar', data:{ labels:Object.keys(courseBatchCounts), datasets:[{ label:'Students', data:Object.values(courseBatchCounts), backgroundColor:'#b85c38', borderRadius:5, barThickness:22 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280', maxRotation:35 } } } } });
     }
 
     // ==================== BATCH HELPERS ====================
@@ -1835,8 +1924,17 @@
     function updateCourseFilters() {
       const list = getCourseList();
       const s1 = $('#studentCourseFilter'); const v1 = s1.value; s1.innerHTML = '<option value="">All Courses</option>' + list.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); s1.value = v1;
-      const allBatches = getBatches();
-      const s2 = $('#studentBatchFilter'); const v2 = s2.value; s2.innerHTML = '<option value="">All Batches</option>' + allBatches.map(b => `<option value="${batchLabel(b)}">${b.name}</option>`).join(''); s2.value = v2;
+      updateBatchFilter();
+    }
+    function updateBatchFilter() {
+      const courseFilter = $('#studentCourseFilter').value;
+      const course = courseFilter ? (courses || []).find(c => c.name === courseFilter) : null;
+      const filteredBatches = course ? (batches || []).filter(b => b.courseId === course.id) : (batches || []);
+      const s2 = $('#studentBatchFilter'); const v2 = s2.value; s2.innerHTML = '<option value="">All Batches</option>' + filteredBatches.map(b => `<option value="${batchLabel(b)}">${b.name}</option>`).join(''); s2.value = v2;
+    }
+    function onCourseFilterChange() {
+      updateBatchFilter();
+      filterStudents();
     }
     function populateCourseSelects() {
       const list = getCourseList();
@@ -1864,13 +1962,10 @@
       const joinDate = $('#studentJoinDate').value;
       const expectedEndDate = $('#studentExpectedEndDate').value;
       const totalFee = parseFloat($('#studentTotalFee').value) || 0;
-      const paidFee = parseFloat($('#studentPaidFee').value) || 0;
       if (!name || !course || !batch || !joinDate) { showToast('Please fill name, course, batch, and join date', 'error'); return; }
-      const status = paidFee >= totalFee && totalFee > 0 ? 'Paid' : paidFee > 0 ? 'Partial' : 'Pending';
-      const payments = paidFee > 0 ? [{ id:Date.now()+1, amount:paidFee, date:joinDate, mode:paymentMode === 'internship' ? 'offline' : paymentMode }] : [];
-      const newStudent = { regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee, status, payments };
+      const newStudent = { regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee: 0, status: 'Pending', payments: [] };
       try {
-        const saved = await api('/students', { method: 'POST', body: JSON.stringify({ regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee, status, payments }) });
+        const saved = await api('/students', { method: 'POST', body: JSON.stringify({ regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee: 0, status: 'Pending', payments: [] }) });
         students.unshift(saved);
       } catch (err) { showToast('Failed: ' + err.message, 'error'); return; }
       clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
@@ -1885,7 +1980,7 @@
       ['studentName','studentRegNo','studentPhone','studentPhone2'].forEach(id => $('#'+id).value = '');
       $('#studentAddress').value = ''; $('#studentReference').value = '';
       $('#studentCourse').value = ''; $('#studentBatch').value = ''; $('#studentJoinDate').value = '';
-      $('#studentExpectedEndDate').value = ''; $('#studentTotalFee').value = ''; $('#studentPaidFee').value = '0';
+      $('#studentExpectedEndDate').value = ''; $('#studentTotalFee').value = '';
       $('#studentPaymentMode').value = 'offline';
     }
 
@@ -2146,17 +2241,18 @@
       const endDate = $('#courseEndDate').value;
       const fee = parseFloat($('#courseFee').value) || 0;
       const badge = $('#courseBadge').value.trim();
+      const infoLink = $('#courseInfoLink').value.trim();
       const trending = $('#courseTrending').checked;
       const editId = $('#editCourseId').value;
       if (!name) { showToast('Please enter a course name', 'error'); return; }
       try {
         if (editId) {
-          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, endDate, fee, badge, trending }) });
+          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, endDate, fee, badge, infoLink, trending }) });
           const idx = courses.findIndex(c => c.id === editId);
           if (idx !== -1) courses[idx] = updated;
         } else {
           if (courses.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Course already exists', 'error'); return; }
-          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, endDate, fee, badge, trending }) });
+          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, endDate, fee, badge, infoLink, trending }) });
           courses.push(saved);
         }
         clearCourseForm(); updateCourses(); updateCourseFilters();
@@ -2172,6 +2268,7 @@
       $('#editCourseId').value = c.id;
       $('#courseName').value = c.name; $('#courseEndDate').value = c.endDate || '';
       $('#courseFee').value = c.fee || ''; $('#courseBadge').value = c.badge || '';
+      $('#courseInfoLink').value = c.infoLink || '';
       $('#courseTrending').checked = !!c.trending;
       $('#courseName').focus();
     }
@@ -2192,7 +2289,7 @@
     function clearCourseForm() {
       $('#editCourseId').value = '';
       $('#courseName').value = ''; $('#courseEndDate').value = '';
-      $('#courseFee').value = ''; $('#courseBadge').value = ''; $('#courseTrending').checked = false;
+      $('#courseFee').value = ''; $('#courseBadge').value = ''; $('#courseInfoLink').value = ''; $('#courseTrending').checked = false;
     }
 
     function showCourseDetail(courseName) {
@@ -2449,19 +2546,35 @@
 
     // ==================== ANALYTICS ====================
     function updateAnalytics() {
-      const feesCollected = students.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const totalExp = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      const pendingFees = students.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const dateFrom = $('#analyticsDateFrom').value;
+      const dateTo = $('#analyticsDateTo').value;
+
+      const filteredStudents = students.filter(s => {
+        if (!dateFrom && !dateTo) return true;
+        if (dateFrom && (!s.joinDate || s.joinDate < dateFrom)) return false;
+        if (dateTo && (!s.joinDate || s.joinDate > dateTo)) return false;
+        return true;
+      });
+      const filteredExpenses = expenses.filter(e => {
+        if (!dateFrom && !dateTo) return true;
+        if (dateFrom && (!e.date || e.date < dateFrom)) return false;
+        if (dateTo && (!e.date || e.date > dateTo)) return false;
+        return true;
+      });
+
+      const feesCollected = filteredStudents.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const totalExp = filteredExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const pendingFees = filteredStudents.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
       const netBal = feesCollected - totalExp;
       $('#analyticsFeesCollected').textContent = '₹' + feesCollected.toLocaleString('en-IN');
       $('#analyticsTotalExpenses').textContent = '₹' + totalExp.toLocaleString('en-IN');
       $('#analyticsNetBalance').textContent = '₹' + netBal.toLocaleString('en-IN');
       $('#analyticsPendingFees').textContent = '₹' + pendingFees.toLocaleString('en-IN');
 
-      const onlineFees = students.filter(s => s.paymentMode === 'online').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const offlineFees = students.filter(s => s.paymentMode === 'offline').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const cashExp = expenses.filter(e => e.mode === 'cash').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      const onlineExp = expenses.filter(e => e.mode === 'online').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const onlineFees = filteredStudents.filter(s => s.paymentMode === 'online').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const offlineFees = filteredStudents.filter(s => s.paymentMode === 'offline').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const cashExp = filteredExpenses.filter(e => e.mode === 'cash').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const onlineExp = filteredExpenses.filter(e => e.mode === 'online').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
       $('#analyticsOnlineFees').textContent = '₹' + onlineFees.toLocaleString('en-IN');
       $('#analyticsOfflineFees').textContent = '₹' + offlineFees.toLocaleString('en-IN');
       $('#analyticsCashExp').textContent = '₹' + cashExp.toLocaleString('en-IN');
@@ -2470,20 +2583,90 @@
       // Charts
       const monthlyData = {}; const now = new Date();
       for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); monthlyData[d.toLocaleString('en-US', { month: 'short' })] = 0; }
-      students.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyData.hasOwnProperty(key)) monthlyData[key]++; });
+      filteredStudents.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyData.hasOwnProperty(key)) monthlyData[key]++; });
       if (charts.enrollmentTrend) charts.enrollmentTrend.destroy();
       charts.enrollmentTrend = new Chart($('#enrollmentTrendChart'), { type:'line', data:{ labels:Object.keys(monthlyData), datasets:[{ label:'New Students', data:Object.values(monthlyData), borderColor:'#b85c38', backgroundColor:'rgba(184,92,56,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#b85c38', pointBorderColor:'#f7f4ed', pointBorderWidth:2 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280' } } } } });
       const monthlyCollection = {};
       for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); monthlyCollection[d.toLocaleString('en-US', { month: 'short' })] = 0; }
-      students.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyCollection.hasOwnProperty(key)) monthlyCollection[key] += parseFloat(s.paidFee) || 0; });
+      filteredStudents.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyCollection.hasOwnProperty(key)) monthlyCollection[key] += parseFloat(s.paidFee) || 0; });
       if (charts.collectionTrend) charts.collectionTrend.destroy();
       charts.collectionTrend = new Chart($('#collectionTrendChart'), { type:'bar', data:{ labels:Object.keys(monthlyCollection), datasets:[{ label:'Fees Collected (₹)', data:Object.values(monthlyCollection), backgroundColor:'#4a7c59', borderRadius:5, barThickness:24 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280' } } } } });
       const cl = getCourseList();
       const courseRevenue = {};
       cl.forEach(c => { courseRevenue[c.name] = { collected:0, pending:0 }; });
-      students.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); } });
+      filteredStudents.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); } });
       if (charts.revenueCompare) charts.revenueCompare.destroy();
       charts.revenueCompare = new Chart($('#revenueComparisonChart'), { type:'bar', data:{ labels:Object.keys(courseRevenue), datasets:[ { label:'Collected', data:Object.values(courseRevenue).map(d => d.collected), backgroundColor:'#4a7c59', borderRadius:5, barThickness:18 }, { label:'Pending', data:Object.values(courseRevenue).map(d => d.pending), backgroundColor:'#a03030', borderRadius:5, barThickness:18 } ] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ position:'top', align:'end', labels:{ usePointStyle:true, padding:16, font:{ family:'JetBrains Mono', size:11 } } } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280', maxRotation:30 } } } } });
+    }
+
+    function clearAnalyticsDateFilter() {
+      $('#analyticsDateFrom').value = '';
+      $('#analyticsDateTo').value = '';
+      updateAnalytics();
+    }
+
+    // ==================== UPCOMING BATCHES ====================
+    function renderUpcomingTable() {
+      const tbody = $('#upcomingTable');
+      tbody.innerHTML = upcomingBatches.map(b => `<tr>
+        <td><span class="owner-table__name">${b.courseName}</span></td>
+        <td>${b.batchName}</td>
+        <td>${b.startingDate ? formatDate(b.startingDate) : '—'}</td>
+        <td>${b.timing || '—'}</td>
+        <td><div class="action-btns">
+          <button class="action-btn" onclick="editUpcomingBatch('${b.id}')" title="Edit">✏</button>
+          <button class="action-btn action-btn--danger" onclick="deleteUpcomingBatch('${b.id}')" title="Delete">✕</button>
+        </div></td>
+      </tr>`).join('') || emptyRow(5, 'No upcoming batches', 'Add one using the form above');
+    }
+
+    async function saveUpcomingBatch() {
+      const courseName = $('#upCourseName').value.trim();
+      const batchName = $('#upBatchName').value.trim();
+      const startingDate = $('#upStartingDate').value;
+      const timing = $('#upTiming').value.trim();
+      const editId = $('#editUpcomingId').value;
+      if (!courseName || !batchName) { showToast('Please enter course name and batch name', 'error'); return; }
+      try {
+        if (editId) {
+          const updated = await api(`/upcoming-batches/${editId}`, { method: 'PUT', body: JSON.stringify({ courseName, batchName, startingDate, timing }) });
+          const idx = upcomingBatches.findIndex(b => b.id === editId);
+          if (idx !== -1) upcomingBatches[idx] = updated;
+        } else {
+          const saved = await api('/upcoming-batches', { method: 'POST', body: JSON.stringify({ courseName, batchName, startingDate, timing }) });
+          upcomingBatches.push(saved);
+        }
+        clearUpcomingForm(); renderUpcomingTable();
+        showToast(editId ? 'Upcoming batch updated!' : 'Upcoming batch added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    function editUpcomingBatch(id) {
+      const b = upcomingBatches.find(x => x.id === id);
+      if (!b) return;
+      $('#editUpcomingId').value = b.id;
+      $('#upCourseName').value = b.courseName;
+      $('#upBatchName').value = b.batchName;
+      $('#upStartingDate').value = b.startingDate || '';
+      $('#upTiming').value = b.timing || '';
+    }
+
+    function clearUpcomingForm() {
+      $('#editUpcomingId').value = '';
+      $('#upCourseName').value = '';
+      $('#upBatchName').value = '';
+      $('#upStartingDate').value = '';
+      $('#upTiming').value = '';
+    }
+
+    async function deleteUpcomingBatch(id) {
+      if (!confirm('Delete this upcoming batch?')) return;
+      try {
+        await api(`/upcoming-batches/${id}`, { method: 'DELETE' });
+        upcomingBatches = upcomingBatches.filter(b => b.id !== id);
+        renderUpcomingTable();
+        showToast('Upcoming batch deleted', 'success');
+      } catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
     }
 
     // ==================== EXPORTS ====================
@@ -2525,17 +2708,34 @@
     $('#studentJoinDate').value = new Date().toISOString().split('T')[0];
     $('#expDate').value = new Date().toISOString().split('T')[0];
 
+    // WhatsApp number
+    async function loadWhatsappNumber() {
+      try { const data = await api('/settings/whatsapp'); $('#whatsappNumber').value = data.number || ''; } catch (e) { /* ignore */ }
+    }
+    async function saveWhatsappNumber() {
+      const num = $('#whatsappNumber').value.trim();
+      if (!num) { showToast('Enter a valid number', 'error'); return; }
+      try {
+        await api('/settings/whatsapp', { method: 'PUT', body: JSON.stringify({ number: num }) });
+        $('#waSavedStatus').textContent = '✓ Saved';
+        setTimeout(() => $('#waSavedStatus').textContent = '', 2000);
+        showToast('WhatsApp number updated', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+    loadWhatsappNumber();
+
     // Init — load from Firestore first
     // Init — load data in background, render immediately
     (async function init() {
       try {
-        const [s, e, c, b] = await Promise.all([
+        const [s, e, c, b, ub] = await Promise.all([
           api('/students'),
           api('/expenses'),
           api('/courses'),
           api('/batches'),
+          api('/upcoming-batches'),
         ]);
-        students = s; expenses = e; courses = c; batches = b;
+        students = s; expenses = e; courses = c; batches = b; upcomingBatches = ub;
       } catch (err) { console.warn('API unavailable:', err.message); }
       renderBatchesTable();
       updateDashboard();

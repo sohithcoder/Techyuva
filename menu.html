@@ -278,6 +278,23 @@
       transform: translateX(3px);
     }
 
+    .course-card__actions {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .course-card__cta--outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: .6rem 1rem;
+      font-size: .72rem;
+    }
+    .course-card__cta--outline:hover {
+      background: var(--accent);
+      color: var(--paper);
+    }
+
     .course-grid__empty {
       grid-column: 1 / -1;
       color: var(--ink-soft);
@@ -318,7 +335,7 @@
     </button>
     <div class="nav__explorer" id="navExplorer">
       <div class="nav__explorer-head">
-        <span class="nav__explorer-title">EXPLORER</span>
+        <span class="nav__explorer-title">MENU</span>
         <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -350,7 +367,11 @@
       </div>
     <div class="nav__bar">
       <a href="index.html#top" class="nav__logo">
-        <span class="nav__logo-mark">>_</span>TechYuva
+        <span class="nav__logo-mark"><img src="unnamed.webp" alt="TechYuva" /></span>
+        <div class="nav__logo-text">
+          <span class="nav__logo-name">TechYuva</span>
+          <span class="nav__logo-sub">ISO Certified Coding Institute</span>
+        </div>
       </a>
       <div class="nav__actions">
         <a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a>
@@ -384,6 +405,11 @@
     <p>Online coding institute. Built for learners, by engineers.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
+
+  <div class="footer-credits">
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
   <script>
     // API helpers (inlined — no module imports for file:// compatibility)
     const API_BASE = (!window.location.hostname || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -396,6 +422,11 @@
       if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || `API error ${res.status}`); }
       return res.json();
     }
+
+    let whatsappNumber = '919876543210';
+    (async function loadWaNumber() {
+      try { const data = await api('/settings/whatsapp'); if (data && data.number) whatsappNumber = data.number; } catch (e) { /* use default */ }
+    })();
 
     async function getCourses() { return api('/courses'); }
     async function getBatches(courseId) {
@@ -537,10 +568,16 @@
                   ${formatCurrency(c.fee)}
                   <small>one-time fee</small>
                 </div>
-                <a class="course-card__cta" href="https://wa.me/919876543210?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener">
-                  <span>Register</span>
-                  <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a>
+                <div class="course-card__actions">
+                  ${c.infoLink ? `<a class="course-card__cta course-card__cta--outline" href="${c.infoLink}" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <span>Know More</span>
+                  </a>` : ''}
+                  <a class="course-card__cta" href="https://wa.me/${whatsappNumber}?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener">
+                    <span>Register</span>
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </a>
+                </div>
               </div>
             </article>`;
         }).join('');

@@ -217,15 +217,18 @@ const CommandPalette = (() => {
   let selectedIndex = -1;
 
   const COMMANDS = [
-    { label: "Go to Courses", action: () => { window.location.href = "menu.html"; }, shortcut: "↵", keywords: "courses enroll learn" },
-    { label: "Go to Student Zone", action: () => { window.location.href = "studyzone.html"; }, shortcut: "↵", keywords: "student zone login dashboard" },
-    { label: "Take Placement Test", action: () => $("#takePlacement")?.click(), shortcut: "↵", keywords: "placement test quiz assessment" },
-    { label: "Practice — Java", action: () => Quiz.start("java"), shortcut: "↵", keywords: "java practice quiz test" },
-    { label: "Practice — C++", action: () => Quiz.start("cpp"), shortcut: "↵", keywords: "cpp c++ practice quiz" },
-    { label: "Practice — Python", action: () => Quiz.start("python"), shortcut: "↵", keywords: "python practice quiz" },
-    { label: "Toggle Theme", action: () => document.body.classList.toggle("theme-dark"), shortcut: "↵", keywords: "theme dark light mode" },
-    { label: "Show ASCII Art", action: () => alert("ASCII art mode activated! (demo)"), shortcut: "↵", keywords: "ascii art fun" },
+    { label: "Trending Courses", action: () => scrollToSection("#trending"), shortcut: "↵", keywords: "courses trending learn popular" },
+    { label: "Upcoming Batches", action: () => scrollToSection("#schedule"), shortcut: "↵", keywords: "batches upcoming schedule timing" },
+    { label: "Study Zone Updates", action: () => scrollToSection("#zone"), shortcut: "↵", keywords: "study zone materials jobs roadmap" },
+    { label: "YouTube Channel", action: () => scrollToSection("#youtube"), shortcut: "↵", keywords: "youtube videos tutorials watch" },
+    { label: "Our Location", action: () => scrollToSection("#location"), shortcut: "↵", keywords: "location map campus visit" },
+    { label: "Contact Information", action: () => scrollToSection("#contact"), shortcut: "↵", keywords: "contact phone email support help" },
   ];
+
+  function scrollToSection(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   function open() {
     overlay.hidden = false;

@@ -191,7 +191,7 @@ app.post('/api/courses', async (req, res) => {
   try {
     const d = req.body;
     const ref = await getDB().collection('courses').add({
-      name: d.name, description: d.description || '', duration: d.duration || '', endDate: d.endDate || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', modules: Array.isArray(d.modules) ? d.modules : [], order: parseInt(d.order) || 0, trending: !!d.trending, createdAt: new Date().toISOString()
+      name: d.name, description: d.description || '', duration: d.duration || '', endDate: d.endDate || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', infoLink: d.infoLink || '', modules: Array.isArray(d.modules) ? d.modules : [], order: parseInt(d.order) || 0, trending: !!d.trending, createdAt: new Date().toISOString()
     });
     const doc = await ref.get();
     res.json(formatDoc(doc));
@@ -205,7 +205,7 @@ app.put('/api/courses/:id', async (req, res) => {
     const doc = await docRef.get();
     if (!doc.exists) return res.status(404).json({ error: 'Course not found' });
     const update = {};
-    ['name','description','duration','endDate','badge','modules'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
+    ['name','description','duration','endDate','badge','infoLink','modules'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
     if (d.fee !== undefined) update.fee = parseFloat(d.fee);
     if (d.order !== undefined) update.order = parseInt(d.order);
     if (d.hasOwnProperty('trending')) update.trending = !!d.trending;
@@ -269,6 +269,52 @@ app.put('/api/batches/:id', async (req, res) => {
 app.delete('/api/batches/:id', async (req, res) => {
   try {
     await getDB().collection('batches').doc(req.params.id).delete();
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── UPCOMING BATCHES (separate from courses/batches) ───
+app.get('/api/upcoming-batches', async (req, res) => {
+  try {
+    const snap = await getDB().collection('upcomingBatches').orderBy('startingDate', 'asc').get();
+    res.json(snap.docs.map(formatDoc));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/upcoming-batches', async (req, res) => {
+  try {
+    const d = req.body;
+    if (!d.courseName || !d.batchName) return res.status(400).json({ error: 'courseName and batchName required' });
+    const ref = await getDB().collection('upcomingBatches').add({
+      courseName: d.courseName,
+      batchName: d.batchName,
+      timing: d.timing || '',
+      startingDate: d.startingDate || '',
+      createdAt: new Date().toISOString(),
+    });
+    res.json(formatDoc(await ref.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/upcoming-batches/:id', async (req, res) => {
+  try {
+    const d = req.body;
+    const docRef = getDB().collection('upcomingBatches').doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Not found' });
+    const update = {};
+    if (d.courseName !== undefined) update.courseName = d.courseName;
+    if (d.batchName !== undefined) update.batchName = d.batchName;
+    if (d.timing !== undefined) update.timing = d.timing;
+    if (d.startingDate !== undefined) update.startingDate = d.startingDate;
+    await docRef.update(update);
+    res.json(formatDoc(await docRef.get()));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/upcoming-batches/:id', async (req, res) => {
+  try {
+    await getDB().collection('upcomingBatches').doc(req.params.id).delete();
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -350,6 +396,23 @@ app.put('/api/expenses/:id', async (req, res) => {
     const update = { name: d.name || snap.data().name, amount: parseFloat(d.amount) || snap.data().amount, date: d.date || snap.data().date, mode: d.mode || snap.data().mode, updatedAt: new Date().toISOString() };
     await docRef.update(update);
     res.json({ id: req.params.id, ...update });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── SETTINGS ───
+app.get('/api/settings/whatsapp', async (req, res) => {
+  try {
+    const doc = await getDB().collection('settings').doc('whatsapp').get();
+    res.json(doc.exists ? doc.data() : { number: '919876543210' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/settings/whatsapp', async (req, res) => {
+  try {
+    const { number } = req.body;
+    if (!number) return res.status(400).json({ error: 'number required' });
+    await getDB().collection('settings').doc('whatsapp').set({ number, updatedAt: new Date().toISOString() });
+    res.json({ number });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
