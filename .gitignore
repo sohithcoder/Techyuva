@@ -14,7 +14,7 @@ desktop.ini
 npm-debug.log*
 node_modules/
 
-# Build artifacts (none expected, but just in case)
+# Build artifacts
 dist/
 build/
 
@@ -25,3 +25,4 @@ backend/firebase-key.json
 # Environment files (secrets)
 .env
 backend/.env
+.vercel

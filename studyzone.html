@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Zone — TechYuva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase Web SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArg4bQAOblW-EHTRsEJi25pDsBODf2x0M",
+      authDomain: "techyuva-19645.firebaseapp.com",
+      projectId: "techyuva-19645",
+      storageBucket: "techyuva-19645.firebasestorage.app",
+      messagingSenderId: "266294653012",
+      appId: "1:266294653012:web:cc2199e3f0c2a0e25a7dc1",
+      measurementId: "G-T73CGDZN71"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+  <style>
+    /* --- Color Palette —— matching our scheme --- */
+    :root {
+      --sz-career:  #d4784a;  --sz-career-bg: rgba(212,120,74,.06);
+      --sz-place:   #3d8b63;  --sz-place-bg:  rgba(61,139,99,.06);
+      --sz-jobs:    #4075a8;  --sz-jobs-bg:   rgba(64,117,168,.06);
+      --sz-mats:    #7b5ea7;  --sz-mats-bg:   rgba(123,94,167,.06);
+      --sz-test:    #c74552;  --sz-test-bg:   rgba(199,69,82,.06);
+    }
+
+    /* Top filter nav */
+    .sz-nav {
+      display: flex; gap: .35rem; margin-bottom: 2.5rem;
+      position: sticky; top: 56px; z-index: 50;
+      background: var(--paper); padding: .5rem 0;
+      flex-wrap: wrap;
+    }
+    .sz-nav__btn {
+      font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
+      padding: .45rem .9rem; border-radius: 100px;
+      border: 1px solid var(--line); background: var(--paper);
+      color: var(--ink-soft); cursor: pointer;
+      transition: all .2s; white-space: nowrap;
+    }
+    .sz-nav__btn:hover { border-color: var(--accent); color: var(--ink); }
+    .sz-nav__btn.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); cursor: default; }
+    .sz-page {
+      padding: clamp(5rem, 10vh, 8rem) var(--pad) clamp(3rem, 6vh, 5rem);
+      padding-left: calc(var(--nav-edge) + var(--pad));
+      max-width: 960px; margin: 0 auto;
+    }
+
+    .sz-updates { margin-bottom: 2rem; }
+    .sz-updates__label {
+      font-family: var(--font-mono); font-size: .65rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--ink-soft); margin-bottom: .6rem; display: block;
+    }
+    .sz-updates__grid { display: flex; flex-direction: column; gap: .5rem; }
+
+    /* --- Section headers — cleaner, with colored dots --- */
+
+    .sz-latest {
+      display: flex; align-items: center; gap: .8rem;
+      margin-bottom: 1.5rem; padding: .6rem 1rem;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: var(--paper-2); font-size: .75rem;
+    }
+    .sz-latest__label {
+      font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--ink-soft); white-space: nowrap;
+    }
+    .sz-latest__items {
+      display: flex; gap: .5rem; overflow-x: auto; flex: 1;
+      font-size: .74rem; color: var(--ink-soft);
+    }
+    .sz-latest__item {
+      white-space: nowrap; color: var(--ink);
+      text-decoration: none; transition: .15s;
+      display: inline-flex; align-items: center; gap: .3rem;
+    }
+    .sz-latest__item:hover { color: var(--accent); }
+    .sz-latest__dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sz-latest__item small {
+      font-size: .62rem; color: var(--ink-faint);
+    }
+    .sz-sec { margin-bottom: 3rem; }
+    .sz-sec__head {
+      display: flex; align-items: center; gap: .65rem;
+      margin-bottom: 1rem; padding-bottom: .6rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .sz-sec__dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sz-sec__title {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+      font-size: 1.25rem; letter-spacing: -.01em;
+    }
+    #career .sz-sec__dot       { background: var(--sz-career); }
+    #career .sz-sec__title     { color: var(--sz-career); }
+    #placement .sz-sec__dot    { background: var(--sz-place); }
+    #placement .sz-sec__title  { color: var(--sz-place); }
+    #jobs .sz-sec__dot         { background: var(--sz-jobs); }
+    #jobs .sz-sec__title       { color: var(--sz-jobs); }
+    #materials .sz-sec__dot    { background: var(--sz-mats); }
+    #materials .sz-sec__title  { color: var(--sz-mats); }
+    #mocktest .sz-sec__dot     { background: var(--sz-test); }
+    #mocktest .sz-sec__title   { color: var(--sz-test); }
+
+    .sz-sec__count {
+      font-family: var(--font-mono); font-size: .7rem; font-weight: 500;
+      color: var(--ink-soft); background: var(--paper-2);
+      border: 1px solid var(--line); padding: .12rem .55rem;
+      border-radius: 100px; margin-left: auto; white-space: nowrap;
+    }
+
+    /* --- Cards — full-width with ::before accent line --- */
+    .sz-grid { display: flex; flex-direction: column; gap: .7rem; }
+    .sz-card {
+      position: relative; overflow: hidden;
+      display: flex; align-items: flex-start; gap: 1rem;
+      background: var(--paper); border: 1px solid var(--line);
+      border-radius: 12px; padding: 1.1rem 1.3rem;
+      text-decoration: none; color: inherit;
+      transition: border-color .2s, box-shadow .2s, transform .15s;
+    }
+    .sz-card:hover {
+      border-color: var(--line-strong);
+      box-shadow: 0 3px 12px rgba(0,0,0,.05);
+      transform: translateY(-1px);
+    }
+    /* Left accent line — colors on hover */
+    .sz-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; background: var(--line); transition: background .25s;
+    }
+    #career .sz-card:hover::before    { background: var(--sz-career); }
+    #placement .sz-card:hover::before { background: var(--sz-place); }
+    #jobs .sz-card:hover::before      { background: var(--sz-jobs); }
+    #materials .sz-card:hover::before { background: var(--sz-mats); }
+    #mocktest .sz-card:hover::before  { background: var(--sz-test); }
+
+    .sz-card__img {
+      width: 44px; height: 44px; border-radius: 8px;
+      object-fit: contain; flex-shrink: 0;
+      background: var(--paper-2); padding: 5px;
+    }
+    .sz-card__body { flex: 1; min-width: 0; }
+    .sz-card__top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: .6rem; margin-bottom: .25rem;
+    }
+    .sz-card__title {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: 1.05rem; line-height: 1.3;
+    }
+    .sz-card__arrow {
+      color: var(--ink-soft); flex-shrink: 0;
+      transition: transform .2s, color .2s;
+    }
+    .sz-card:hover .sz-card__arrow { color: var(--ink); transform: translateX(2px); }
+    .sz-card__desc {
+      font-size: .8rem; color: var(--ink-soft); line-height: 1.5;
+      margin-bottom: .55rem;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .sz-card__tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .sz-card__tag {
+      font-family: var(--font-mono); font-size: .62rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: .04em;
+      padding: .15em .55em; border-radius: 100px;
+      background: var(--paper-2); color: var(--ink-soft);
+      border: 1px solid var(--line);
+    }
+    .sz-empty {
+      text-align: center; color: var(--ink-faint); font-size: .8rem;
+      padding: 1.2rem; border: 1px dashed var(--line);
+      border-radius: 8px; background: var(--paper);
+    }
+
+    @media (max-width: 900px) {
+      .sz-page { padding: 4.5rem 1rem 2rem; max-width: 100%; }
+      .sz-page__head { margin-bottom: 1.5rem; }
+      .sz-page__head h1 { font-size: 1.5rem; }
+      .sz-page__head p { font-size: .76rem; max-width: 100%; }
+
+      .sz-latest { flex-direction: column; align-items: flex-start; gap: .4rem; padding: .6rem .9rem; }
+      .sz-latest__label { font-size: .58rem; }
+      .sz-latest__items { font-size: .68rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .sz-latest__item { font-size: .65rem; }
+
+      .sz-sec { margin-bottom: 2rem; }
+      .sz-sec__head { margin-bottom: .8rem; padding-bottom: .5rem; }
+      .sz-sec__title { font-size: 1rem; }
+      .sz-sec__count { font-size: .62rem; padding: .1rem .45rem; }
+
+      .sz-grid { gap: .6rem; }
+      .sz-card { padding: .85rem .9rem; gap: .7rem; border-radius: 10px; }
+      .sz-card__title { font-size: .85rem; }
+      .sz-card__desc { font-size: .7rem; }
+      .sz-card__img { width: 32px; height: 32px; }
+    }
+    @media (max-width: 420px) {
+      .sz-page__head h1 { font-size: 1.3rem; }
+      .sz-sec__title { font-size: .9rem; }
+      .sz-card { padding: .75rem .8rem; }
+      .sz-card__title { font-size: .8rem; }
+      .sz-card__desc { font-size: .68rem; }
+      .sz-card__img { width: 28px; height: 28px; }
+    }
+  </style>
+</head>
+<body data-theme="paper">
+
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
+
+  <header class="nav" id="nav">
+    <button class="nav__expand" id="navExpand" aria-label="Show explorer">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="nav__explorer" id="navExplorer">
+      <div class="nav__explorer-head">
+        <span class="nav__explorer-title">MENU</span>
+        <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="nav__tree" id="navTree">
+        <div class="nav__tree-item nav__tree-item--root">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg><span>techyuva</span>
+        </div>
+        <div class="nav__tree-children">
+          <a href="index.html" class="nav__tree-item" data-file="main">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg><span>Main</span>
+          </a>
+          <a href="menu.html" class="nav__tree-item" data-file="courses">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg><span>Courses</span>
+          </a>
+          <a href="studyzone.html" class="nav__tree-item is-active" data-file="study-zone">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg><span>Study Zone</span>
+          </a>
+          <a href="owner.html" class="nav__tree-item" data-file="owner">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg><span>Owner</span>
+          </a>
+        </div>
+    </div>
+
+    <div class="nav__bar">
+      <a href="index.html#top" class="nav__logo"><span class="nav__logo-mark"><img src="unnamed.webp" alt="TechYuva" /></span><div class="nav__logo-text"><span class="nav__logo-name">TechYuva</span><span class="nav__logo-sub">ISO Certified Coding Institute</span></div></a>
+      <div class="nav__actions"><a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a></div>
+    </div>
+  </header>
+
+  <main class="sz-page">
+
+    <!-- Top filter nav -->
+    <nav class="sz-nav" id="szNav">
+      <button class="sz-nav__btn is-active" data-target="career">Career</button>
+      <button class="sz-nav__btn" data-target="placement">Placement</button>
+      <button class="sz-nav__btn" data-target="jobs">Jobs</button>
+      <button class="sz-nav__btn" data-target="materials">Materials</button>
+      <button class="sz-nav__btn" data-target="mocktest">Mock Tests</button>
+    </nav>
+
+    <div class="sz-updates" id="szUpdates">
+      <span class="sz-updates__label">Latest</span>
+      <div class="sz-updates__grid" id="szUpdatesGrid">Loading...</div>
+    </div>
+
+    <div class="sz-sec" id="career">
+      <div class="sz-sec__head">
+        <span class="sz-sec__dot"></span>
+        <span class="sz-sec__title">Career Roadmap</span>
+        <span class="sz-sec__count" id="careerCount">0</span>
+      </div>
+      <div class="sz-grid" id="careerGrid"></div>
+    </div>
+
+    <div class="sz-sec" id="placement">
+      <div class="sz-sec__head">
+        <span class="sz-sec__dot"></span>
+        <span class="sz-sec__title">Placement</span>
+        <span class="sz-sec__count" id="placementCount">0</span>
+      </div>
+      <div class="sz-grid" id="placementGrid"></div>
+    </div>
+
+    <div class="sz-sec" id="jobs">
+      <div class="sz-sec__head">
+        <span class="sz-sec__dot"></span>
+        <span class="sz-sec__title">Jobs</span>
+        <span class="sz-sec__count" id="jobsCount">0</span>
+      </div>
+      <div class="sz-grid" id="jobsGrid"></div>
+    </div>
+
+    <div class="sz-sec" id="materials">
+      <div class="sz-sec__head">
+        <span class="sz-sec__dot"></span>
+        <span class="sz-sec__title">Materials</span>
+        <span class="sz-sec__count" id="materialsCount">0</span>
+      </div>
+      <div class="sz-grid" id="materialsGrid"></div>
+    </div>
+
+    <div class="sz-sec" id="mocktest">
+      <div class="sz-sec__head">
+        <span class="sz-sec__dot"></span>
+        <span class="sz-sec__title">Mock Tests</span>
+        <span class="sz-sec__count" id="mocktestCount">0</span>
+      </div>
+      <div class="sz-grid" id="mocktestGrid"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <span class="footer__logo">>_TechYuva</span>
+    <p>Online coding institute. Built for learners, by engineers.</p>
+    <span class="footer__year">&copy; 2026 TechYuva</span>
+  </footer>
+
+  <div class="footer-credits">
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
+
+  <script>
+    const API_BASE = (!window.location.hostname || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3001/api' : window.location.origin + '/api';
+    async function api(p, o = {}) {
+      const c = { headers: { 'Content-Type': 'application/json' }, ...o };
+      const r = await fetch(API_BASE + p, c);
+      if (!r.ok) { const e = await r.json().catch(() => ({ error: r.statusText })); throw new Error(e.error || 'API error'); }
+      return r.json();
+    }
+    async function getItems(t) { return api('/studyzone' + (t ? '?type=' + encodeURIComponent(t) : '')); }
+
+    const $ = (s, c = document) => c.querySelector(s);
+    const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+
+    $("#explorerToggle")?.addEventListener("click", () => $("#nav").classList.add("is-collapsed"));
+    $("#navExpand")?.addEventListener("click", () => $("#nav").classList.remove("is-collapsed"));
+
+
+    /* Top filter nav — scroll to section */
+    const navBtns = $$('.sz-nav__btn');
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (!target) return;
+        navBtns.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+    /* Update active on scroll */
+    const secs = $$('.sz-sec');
+    let ticking = false;
+    addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        let current = '';
+        secs.forEach(sec => { if (sec.getBoundingClientRect().top <= 150) current = sec.id; });
+        if (current) navBtns.forEach(b => b.classList.toggle('is-active', b.dataset.target === current));
+        ticking = false;
+      });
+    }, { passive: true });
+
+    const CFG = {
+      'career-roadmap':  { count: '#careerCount',    grid: '#careerGrid' },
+      'placement-guideline': { count: '#placementCount', grid: '#placementGrid' },
+      'job-opening':     { count: '#jobsCount',      grid: '#jobsGrid' },
+      'study-material':  { count: '#materialsCount',  grid: '#materialsGrid' },
+      'mock-test':       { count: '#mocktestCount',    grid: '#mocktestGrid' },
+    };
+
+    function esc(s) { return s ? String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) : ''; }
+    function tags(arr) { return Array.isArray(arr) && arr.length ? arr.map(t => `<span class="sz-card__tag">${esc(t)}</span>`).join('') : ''; }
+
+    function render(type, items) {
+      const c = CFG[type]; if (!c) return;
+      $(c.count).textContent = items.length + ' item' + (items.length !== 1 ? 's' : '');
+      const g = $(c.grid);
+      if (!items.length) { g.innerHTML = '<div class="sz-empty">Nothing here yet.</div>'; return; }
+      g.innerHTML = items.map((it, i) => {
+        const m = it.meta || {}; let t = [];
+        if (type === 'career-roadmap') t = (m.skills || []).slice(0, 4);
+        else if (type === 'job-opening') { if (m.company) t.push(m.company); if (m.location) t.push(m.location); if (Array.isArray(m.tags)) t.push(...m.tags); }
+        else if (type === 'study-material') { if (m.fileType) t.push(m.fileType); if (m.size) t.push(m.size); }
+        else if (type === 'mock-test') { if (m.difficulty) t.push(m.difficulty); if (m.topic) t.push(m.topic); if (m.platform) t.push(m.platform); }
+        const lk = it.link || '#', ex = /^https?:\/\//i.test(lk) ? ' target="_blank" rel="noopener"' : '';
+        const num = type === 'mock-test' ? `<span class="sz-card__tag">#${i + 1}</span>` : '';
+        const img = it.icon && /^https?:\/\//i.test(it.icon) ? `<img src="${esc(it.icon)}" alt="${esc(it.title)}" class="sz-card__img" />` : '';
+        return `<a class="sz-card" href="${esc(lk)}"${ex}>
+          ${img}
+          <div class="sz-card__body">
+            <div class="sz-card__top">
+              <h3 class="sz-card__title">${esc(it.title)}</h3>
+              <svg class="sz-card__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="sz-card__desc">${esc(it.description || '')}</p>
+            <div class="sz-card__tags">${num}${tags(t.slice(0, 4))}</div>
+          </div>
+        </a>`;
+      }).join('');
+    }
+    (async function loadLatest() {
+      const grid = document.getElementById('szUpdatesGrid');
+      if (!grid) return;
+      const colors = { 'career-roadmap':'#d4784a','placement-guideline':'#3d8b63','job-opening':'#4075a8','study-material':'#7b5ea7','mock-test':'#c74552' };
+      const labels = { 'career-roadmap':'Career','placement-guideline':'Placement','job-opening':'Job','study-material':'Material','mock-test':'Mock Test' };
+      try {
+        const items = await api('/studyzone');
+        const recent = (items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+        if (!recent.length) { grid.innerHTML = '<span class="sz-empty">No updates yet.</span>'; return; }
+        grid.innerHTML = recent.map(item => {
+          const m = item.meta || {}; let tags = '';
+          if (item.type === 'career-roadmap' && Array.isArray(m.skills)) tags += m.skills.slice(0, 3).map(s => '<span class="sz-tag">' + s + '</span>').join('');
+          if (item.type === 'job-opening') { if (m.company) tags += '<span class="sz-tag sz-tag--a">' + m.company + '</span>'; if (m.location) tags += '<span class="sz-tag">' + m.location + '</span>'; }
+          if (item.type === 'study-material') { if (m.fileType) tags += '<span class="sz-tag">' + m.fileType + '</span>'; if (m.size) tags += '<span class="sz-tag">' + m.size + '</span>'; }
+          if (item.type === 'mock-test') { if (m.difficulty) tags += '<span class="sz-tag sz-tag--a">' + m.difficulty + '</span>'; if (m.topic) tags += '<span class="sz-tag">' + m.topic + '</span>'; }
+          const c = colors[item.type] || '#888';
+          const d = new Date(item.createdAt || Date.now());
+          const lk = item.link || '#', ex = /^https?:\/\//i.test(lk) ? ' target="_blank" rel="noopener"' : '';
+          return '<a class="sz-update-card" href="' + lk + '"' + ex + ' style="--accent:' + c + '"><div class="sz-update__body"><div class="sz-update__top"><h3 class="sz-update__title">' + item.title + '</h3><svg class="sz-update__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><p class="sz-update__desc">' + (item.description || '') + '</p><div class="sz-update__tags"><span class="sz-tag sz-tag--a" style="background:' + c + '15;color:' + c + ';border-color:' + c + '30;">' + (labels[item.type] || item.type) + '</span>' + tags + '<span class="sz-update__date">' + d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span></div></div></a>';
+        }).join('');
+      } catch (e) { grid.innerHTML = '<span class="sz-empty">Unable to load.</span>'; }
+    })();
+
+    (async () => {
+      try {
+        const ks = Object.keys(CFG);
+        const rs = await Promise.all(ks.map(k => getItems(k).catch(() => [])));
+        ks.forEach((k, i) => render(k, rs[i]));
+      } catch (e) { console.warn('Study zone:', e.message); }
+    })();
+  </script>
+</html>

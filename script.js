@@ -1,7 +1,7 @@
 /* ============================================================
-   TECHYUVA — script.js
-   Preloader · cursor · reveals · magnetic · 3D ·
-   quiz engine · analysis · student zone
+   TECHYUVA v2 — script.js
+   Gravity Sling · ASCII Fluid · File Explorer · Command Palette
+   Mascot · Thinking States · Quiz · Terminal · Everything
    ============================================================ */
 "use strict";
 
@@ -11,112 +11,82 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
 /* ============================================================
-   1. PRELOADER — terminal boot sequence
-   Types realistic boot lines, fills a progress bar, then slides away.
+   0. UTILITY
    ============================================================ */
-(() => {
-  const pre   = $("#preloader");
-  const log   = $("#preLog");
-  const count = $("#preCount");
-  const bar   = $("#preBar");
-
-  // boot log lines: { txt, cls } — cls colors the line
-  const LINES = [
-    { t: "TechYuva OS v2.6.0 — booting",              c: "pl-accent" },
-    { t: "$ ./init.sh",                                 c: "pl-prompt" },
-    { t: "→ loading curriculum modules ........ [ ok ]", c: "" },
-    { t: "→ mounting student_zone .............. [ ok ]", c: "" },
-    { t: "→ warming up java | cpp | python runtimes . [ ok ]", c: "" },
-    { t: "→ calibrating practice engine ......... [ ok ]", c: "" },
-    { t: "→ 12,000+ students synced ............ [ ok ]", c: "" },
-    { t: "✓ all systems nominal",                         c: "pl-ok" },
-  ];
-
-  let lineI = 0;
-  let charI = 0;
-  let current = "";
-  let progress = 0;
-
-  const type = () => {
-    if (lineI >= LINES.length) {
-      // finish
-      count.textContent = "100%";
-      bar.style.width = "100%";
-      log.innerHTML += '<br><span class="pl-accent">welcome back, coder ▸</span> <span class="pl-cursor"></span>';
-      setTimeout(() => {
-        pre.classList.add("is-done");
-        document.body.classList.add("is-loaded");
-        $(".hero__title").classList.add("lines-in");
-        setTimeout(() => pre.remove(), 1100);
-      }, 480);
-      return;
-    }
-
-    const line = LINES[lineI];
-    if (charI === 0) current = "";
-    if (charI < line.t.length) {
-      current += line.t[charI];
-      renderLog(line);
-      charI++;
-      setTimeout(type, 14 + Math.random() * 24);
-    } else {
-      // commit this line, advance progress, move on
-      committed.push({ t: line.t, c: line.c });
-      lineI++; charI = 0; current = "";
-      progress = Math.round((lineI / LINES.length) * 100);
-      count.textContent = progress + "%";
-      bar.style.width = progress + "%";
-      setTimeout(type, 90 + Math.random() * 120);
-    }
-  };
-
-  const committed = [];
-  function renderLog(currentLine) {
-    let html = committed.map(l =>
-      `<span class="${l.c}">${escapeHtml(l.t)}</span>`
-    ).join("\n");
-    if (currentLine) {
-      html += (committed.length ? "\n" : "") +
-              `<span class="${currentLine.c}">${escapeHtml(current)}</span>`;
-    }
-    log.innerHTML = html;
-  }
-  function escapeHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
-
-  if (reducedMotion) {
-    pre.remove();
-    $(".hero__title").classList.add("lines-in");
-  } else {
-    type();
-  }
-})();
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const rand = (min, max) => Math.random() * (max - min) + min;
+const randInt = (min, max) => Math.floor(rand(min, max + 1));
 
 /* ============================================================
-   1b. BINARY RAIN — subtle 0s and 1s drifting in the background
+   1. PRELOADER (disabled)
+   The animated character/intro loader was removed — the page
+   now loads directly. This stub keeps the legacy init() call
+   working and ensures the hero animates in immediately.
    ============================================================ */
-(() => {
-  const canvas = $("#binaryRain");
-  if (!canvas || reducedMotion) { if (canvas) canvas.style.display = "none"; return; }
+const Preloader = (() => {
+  function init() {
+    document.body.classList.add("is-loaded");
+    $(".hero__title")?.classList.add("lines-in");
+  }
+  return { init };
+})();
+
+/* ---------- shared helpers (must be global to all modules) ---------- */
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/* ============================================================
+   2. ASCII FLUID BACKGROUND
+   White chars on paper, reacting to mouse like water ripples
+   ============================================================ */
+const AsciiFluid = (() => {
+  const canvas = $("#asciiFluid");
+  if (!canvas || reducedMotion) {
+    if (canvas) canvas.style.display = "none";
+    return {};
+  }
   const ctx = canvas.getContext("2d");
 
-  let w, h, cols, drops;
-  const FONT = 14;
-  const CHARS = "01";
-  const CHANCE = 0.965; // most cells blank → very sparse, not matrix-dense
+  let w, h, cols, rows;
+  const FONT = 13;
+  const CHARS = " .-~=+*/|\{}[]()<>;:,!?&%$#@";
+  const grid = [];
+  let mouse = { x: -1000, y: -1000, vx: 0, vy: 0 };
+  let lastMouse = { x: -1000, y: -1000 };
+  let time = 0;
 
   function resize() {
     w = canvas.width = innerWidth;
     h = canvas.height = innerHeight;
-    cols = Math.floor(w / FONT);
-    drops = Array.from({ length: cols }, () => Math.random() * -h);
+    cols = Math.ceil(w / FONT);
+    rows = Math.ceil(h / FONT);
+    grid.length = 0;
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        grid.push({
+          x: x * FONT,
+          y: y * FONT,
+          baseChar: CHARS[randInt(0, CHARS.length - 1)],
+          phase: rand(0, Math.PI * 2),
+          speed: rand(0.3, 1.2),
+          amp: rand(0, 0.3),
+        });
+      }
+    }
   }
   resize();
   addEventListener("resize", resize);
 
+  addEventListener("mousemove", e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
   let running = true;
-  // pause when tab hidden (perf)
   document.addEventListener("visibilitychange", () => {
     running = !document.hidden;
     if (running) draw();
@@ -124,25 +94,226 @@ const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
   function draw() {
     if (!running) return;
+    time += 0.016;
+
+    // Mouse velocity
+    mouse.vx = mouse.x - lastMouse.x;
+    mouse.vy = mouse.y - lastMouse.y;
+    lastMouse.x = mouse.x;
+    lastMouse.y = mouse.y;
+
     ctx.clearRect(0, 0, w, h);
     ctx.font = `${FONT}px "JetBrains Mono", monospace`;
-    for (let i = 0; i < cols; i++) {
-      if (Math.random() > CHANCE) {
-        const ch = CHARS[(Math.random() * CHARS.length) | 0];
-        // leading char brighter (accent), trailing ones faint
-        const bright = Math.random() > 0.85;
-        ctx.fillStyle = bright ? "rgba(228, 87, 46, 0.95)" : "rgba(120, 110, 95, 0.6)";
-        ctx.fillText(ch, i * FONT, drops[i]);
+    ctx.textBaseline = "top";
+
+    for (const cell of grid) {
+      const dx = cell.x - mouse.x;
+      const dy = cell.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = 180;
+
+      let char = cell.baseChar;
+      let opacity = 0.04;
+      let offsetY = 0;
+
+      // Wave motion
+      const wave = Math.sin(time * cell.speed + cell.phase) * cell.amp;
+
+      if (dist < maxDist) {
+        const influence = 1 - dist / maxDist;
+        const ripple = Math.sin(dist * 0.05 - time * 3) * influence;
+
+        // Char changes based on ripple intensity
+        const charIndex = Math.floor((ripple + 1) * 0.5 * (CHARS.length - 1));
+        char = CHARS[Math.min(charIndex, CHARS.length - 1)];
+        opacity = 0.04 + influence * 0.12;
+        offsetY = ripple * 8;
+
+        // Mouse velocity push
+        if (Math.abs(mouse.vx) > 2 || Math.abs(mouse.vy) > 2) {
+          const pushX = (mouse.vx / 20) * influence;
+          const pushY = (mouse.vy / 20) * influence;
+          ctx.save();
+          ctx.translate(pushX, pushY);
+        }
       }
-      drops[i] = drops[i] > h && Math.random() > 0.975 ? 0 : drops[i] + 10;
+
+      ctx.fillStyle = `rgba(28, 25, 21, ${opacity + wave * 0.02})`;
+      ctx.fillText(char, cell.x, cell.y + offsetY);
+
+      if (dist < maxDist && (Math.abs(mouse.vx) > 2 || Math.abs(mouse.vy) > 2)) {
+        ctx.restore();
+      }
     }
+
     requestAnimationFrame(draw);
   }
+
   draw();
+  return {};
 })();
 
 /* ============================================================
-   1c. SCROLL PROGRESS BAR
+   3. FILE EXPLORER NAV
+   ============================================================ */
+const FileExplorer = (() => {
+  const nav = $("#nav");
+  const toggle = $("#explorerToggle");
+  const expand = $("#navExpand");
+  const folders = $$('[data-folder]');
+
+  // Collapse (hide the explorer tree)
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      nav.classList.add("is-collapsed");
+    });
+  }
+  // Expand (show it again) — handle lives in the slim rail so it's
+  // always reachable even while collapsed.
+  if (expand) {
+    expand.addEventListener("click", () => {
+      nav.classList.remove("is-collapsed");
+    });
+  }
+
+  folders.forEach(folder => {
+    folder.addEventListener("click", () => {
+      const id = folder.dataset.folder;
+      const children = $(`#folder-${id}`);
+      if (children) {
+        children.classList.toggle("is-collapsed");
+        folder.classList.toggle("is-open");
+      }
+    });
+  });
+
+  // Active state on scroll
+  const sections = ["#about", "#courses", "#zone", "#analysis"];
+  const fileMap = { "#top": "index.html", "#about": "about.md", "#courses": "java.md", "#zone": "student-zone/", "#analysis": "practice.md" };
+
+  addEventListener("scroll", () => {
+    const y = scrollY + 200;
+    let active = "#top";
+    for (const sec of sections) {
+      const el = $(sec);
+      if (el && el.offsetTop <= y) active = sec;
+    }
+    $$(".nav__tree-item[data-file]").forEach(item => {
+      item.classList.toggle("is-active", item.dataset.file === fileMap[active]);
+    });
+  }, { passive: true });
+
+  return {};
+})();
+
+/* ============================================================
+   4. COMMAND PALETTE
+   ============================================================ */
+const CommandPalette = (() => {
+  const overlay = $("#cmdPaletteOverlay");
+  const input = $("#cmdInput");
+  const results = $("#cmdResults");
+  const btn = $("#cmdPalette");
+  let selectedIndex = -1;
+
+  const COMMANDS = [
+    { label: "Trending Courses", action: () => scrollToSection("#trending"), shortcut: "↵", keywords: "courses trending learn popular" },
+    { label: "Upcoming Batches", action: () => scrollToSection("#schedule"), shortcut: "↵", keywords: "batches upcoming schedule timing" },
+    { label: "Study Zone Updates", action: () => scrollToSection("#zone"), shortcut: "↵", keywords: "study zone materials jobs roadmap" },
+    { label: "YouTube Channel", action: () => scrollToSection("#youtube"), shortcut: "↵", keywords: "youtube videos tutorials watch" },
+    { label: "Our Location", action: () => scrollToSection("#location"), shortcut: "↵", keywords: "location map campus visit" },
+    { label: "Contact Information", action: () => scrollToSection("#contact"), shortcut: "↵", keywords: "contact phone email support help" },
+  ];
+
+  function scrollToSection(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function open() {
+    overlay.hidden = false;
+    requestAnimationFrame(() => {
+      overlay.classList.add("is-open");
+      input.value = "";
+      input.focus();
+      renderResults("");
+    });
+  }
+
+  function close() {
+    overlay.classList.remove("is-open");
+    setTimeout(() => { overlay.hidden = true; }, 300);
+  }
+
+  function renderResults(query) {
+    const q = query.toLowerCase().trim();
+    const filtered = q
+      ? COMMANDS.filter(c => c.label.toLowerCase().includes(q) || c.keywords.includes(q))
+      : COMMANDS;
+
+    results.innerHTML = filtered.map((c, i) => `
+      <div class="cmd-palette__result ${i === 0 ? 'is-selected' : ''}" data-index="${i}">
+        <span>${escapeHtml(c.label)}</span>
+        <kbd>${escapeHtml(c.shortcut)}</kbd>
+      </div>
+    `).join("");
+
+    selectedIndex = 0;
+
+    $$('.cmd-palette__result').forEach(el => {
+      el.addEventListener("click", () => {
+        const idx = +el.dataset.index;
+        filtered[idx]?.action?.();
+        close();
+      });
+    });
+  }
+
+  input?.addEventListener("input", e => renderResults(e.target.value));
+
+  input?.addEventListener("keydown", e => {
+    const items = $$('.cmd-palette__result');
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      selectedIndex = (selectedIndex + 1) % items.length;
+      updateSelection(items);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+      updateSelection(items);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const q = input.value.toLowerCase().trim();
+      const filtered = q
+        ? COMMANDS.filter(c => c.label.toLowerCase().includes(q) || c.keywords.includes(q))
+        : COMMANDS;
+      filtered[selectedIndex]?.action?.();
+      close();
+    } else if (e.key === "Escape") {
+      close();
+    }
+  });
+
+  function updateSelection(items) {
+    items.forEach((el, i) => el.classList.toggle("is-selected", i === selectedIndex));
+  }
+
+  btn?.addEventListener("click", open);
+
+  addEventListener("keydown", e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      overlay.hidden ? open() : close();
+    }
+  });
+
+  $(".cmd-palette__backdrop")?.addEventListener("click", close);
+
+  return { open, close };
+})();
+
+/* ============================================================
+   5. SCROLL PROGRESS
    ============================================================ */
 (() => {
   const bar = $("#scrollProgress")?.querySelector("span");
@@ -158,43 +329,13 @@ const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 })();
 
 /* ============================================================
-   1d. HERO TERMINAL — 3D parallax (tracks cursor across hero)
-   ============================================================ */
-(() => {
-  if (isTouch || reducedMotion) return;
-  const stage = $(".hero__terminal");
-  if (!stage) return;
-  let rx = 0, ry = 0, tx = 0, ty = 0;
-  let raf = null;
-
-  addEventListener("mousemove", e => {
-    const cx = innerWidth / 2, cy = innerHeight / 2;
-    tx = (e.clientX - cx) / cx;   // -1 .. 1
-    ty = (e.clientY - cy) / cy;
-    if (!raf) raf = requestAnimationFrame(loop);
-  });
-
-  function loop() {
-    // ease toward target for smooth parallax
-    rx += (tx - rx) * 0.06;
-    ry += (ty - ry) * 0.06;
-    stage.style.transform =
-      `perspective(1400px) rotateY(${rx * 6}deg) rotateX(${-ry * 5}deg)`;
-    if (Math.abs(tx - rx) > 0.001 || Math.abs(ty - ry) > 0.001) {
-      raf = requestAnimationFrame(loop);
-    } else {
-      raf = null;
-    }
-  }
-})();
-
-/* ============================================================
-   2. CUSTOM CURSOR (lerped follow + hover states)
+   6. CUSTOM CURSOR
    ============================================================ */
 (() => {
   if (isTouch) return;
   const ring = $("#cursor");
   const dot  = $("#cursorDot");
+  if (!ring || !dot) return;
   let mx = innerWidth / 2, my = innerHeight / 2;
   let rx = mx, ry = my;
 
@@ -206,36 +347,36 @@ const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
   addEventListener("mouseup",   () => ring.classList.remove("is-down"));
 
   const loop = () => {
-    rx += (mx - rx) * 0.16;
-    ry += (my - ry) * 0.16;
+    rx += (mx - rx) * 0.14;
+    ry += (my - ry) * 0.14;
     ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
     requestAnimationFrame(loop);
   };
   loop();
 
   document.addEventListener("mouseover", e => {
-    if (e.target.closest("a, button, .option, [data-magnetic]"))
+    if (e.target.closest("a, button, .option, [data-magnetic], .nav__tree-item, .cmd-palette__result"))
       ring.classList.add("is-hover");
   });
   document.addEventListener("mouseout", e => {
-    if (e.target.closest("a, button, .option, [data-magnetic]"))
+    if (e.target.closest("a, button, .option, [data-magnetic], .nav__tree-item, .cmd-palette__result"))
       ring.classList.remove("is-hover");
   });
 })();
 
 /* ============================================================
-   3. MAGNETIC ELEMENTS
+   7. MAGNETIC ELEMENTS
    ============================================================ */
 (() => {
   if (isTouch || reducedMotion) return;
   $$("[data-magnetic]").forEach(el => {
-    const strength = 0.35;
+    const strength = 0.3;
     el.addEventListener("mousemove", e => {
       const r = el.getBoundingClientRect();
       const x = e.clientX - (r.left + r.width / 2);
       const y = e.clientY - (r.top + r.height / 2);
       el.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
-      el.style.transition = "transform .15s ease-out";
+      el.style.transition = "transform .12s ease-out";
     });
     el.addEventListener("mouseleave", () => {
       el.style.transition = "transform .5s cubic-bezier(.16,1,.3,1)";
@@ -245,21 +386,7 @@ const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 })();
 
 /* ============================================================
-   4. NAV — hide on scroll down, show on scroll up
-   ============================================================ */
-(() => {
-  const nav = $("#nav");
-  let lastY = 0;
-  addEventListener("scroll", () => {
-    const y = scrollY;
-    nav.classList.toggle("is-scrolled", y > 40);
-    nav.classList.toggle("is-hidden", y > 300 && y > lastY);
-    lastY = y;
-  }, { passive: true });
-})();
-
-/* ============================================================
-   5. SCROLL REVEALS + COUNTER STATS
+   8. SCROLL REVEALS + COUNTER STATS
    ============================================================ */
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(en => {
@@ -267,7 +394,7 @@ const revealObserver = new IntersectionObserver(entries => {
     en.target.classList.add("is-visible", "lines-in");
     revealObserver.unobserve(en.target);
   });
-}, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+}, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
 
 $$(".reveal, .cta__title").forEach(el => revealObserver.observe(el));
 
@@ -276,7 +403,7 @@ const countObserver = new IntersectionObserver(entries => {
     if (!en.isIntersecting) return;
     const el = en.target;
     const target = +el.dataset.count;
-    const dur = 1600;
+    const dur = 1400;
     const t0 = performance.now();
     const step = now => {
       const p = Math.min(1, (now - t0) / dur);
@@ -287,12 +414,12 @@ const countObserver = new IntersectionObserver(entries => {
     requestAnimationFrame(step);
     countObserver.unobserve(el);
   });
-}, { threshold: 0.6 });
+}, { threshold: 0.5 });
 
 $$("[data-count]").forEach(el => countObserver.observe(el));
 
 /* ============================================================
-   6. TILT CARDS
+   9. TILT CARDS
    ============================================================ */
 (() => {
   if (isTouch || reducedMotion) return;
@@ -302,14 +429,183 @@ $$("[data-count]").forEach(el => countObserver.observe(el));
       const px = (e.clientX - r.left) / r.width  - 0.5;
       const py = (e.clientY - r.top)  / r.height - 0.5;
       card.style.transform =
-        `perspective(800px) rotateX(${-py * 6}deg) rotateY(${px * 6}deg) translateY(-4px)`;
+        `perspective(800px) rotateX(${-py * 5}deg) rotateY(${px * 5}deg) translateY(-3px)`;
     });
     card.addEventListener("mouseleave", () => { card.style.transform = ""; });
   });
 })();
 
 /* ============================================================
-   7. QUESTION BANK — Java · C++ · Python
+   10. ASCII TITLE SCRAMBLE — removed (static text only now)
+   ============================================================ */
+
+/* ============================================================
+   11. COURSE ASCII ART
+   ============================================================ */
+const CourseAscii = (() => {
+  const ARTS = {
+    java: [
+      "    ┌─────────────┐",
+      "    │  public     │",
+      "    │  class      │",
+      "    │  Java       │",
+      "    │  { }        │",
+      "    └─────────────┘",
+      "         │extends│",
+      "    ┌────┴───────┐",
+      "    │  Object    │",
+      "    └────────────┘"
+    ],
+    cpp: [
+      "    #include <iostream>",
+      "    int main() {",
+      "      int* ptr;",
+      "      ptr = new int;",
+      "      *ptr = 42;",
+      "      std::cout <<",
+      "        *ptr;",
+      "      delete ptr;",
+      "      return 0;",
+      "    }"
+    ],
+    python: [
+      "    import numpy as np",
+      "    data = [1,2,3,4,5]",
+      "    arr = np.array(data)",
+      "    ",
+      "    def analyze(x):",
+      "      return x ** 2",
+      "    ",
+      "    result = analyze(arr)",
+      "    print(result)"
+    ]
+  };
+
+  Object.entries(ARTS).forEach(([key, lines]) => {
+    const el = $(`#ascii-${key}`);
+    if (el) el.textContent = lines.join("\n");
+  });
+
+  return {};
+})();
+
+/* ============================================================
+   12. MASCOT
+   ============================================================ */
+const Mascot = (() => {
+  const mascot = $("#mascot");
+  const bubble = $("#mascotBubble");
+  const text = $("#mascotText");
+  const ascii = $("#mascotAscii");
+  if (!mascot) return {};
+
+  const TIPS = [
+    "Try Cmd+K for commands!",
+    "Hover over course cards...",
+    "The terminal types real code!",
+    "Take a placement test?",
+    "Java track has 48 sessions.",
+    "C++ is fastest — 10 weeks.",
+    "Python: 8 weeks, 32 sessions.",
+    "Student Zone has live cohorts!",
+    "Press 1-4 during quizzes.",
+    "We have 12,000+ students.",
+    "94% complete their track.",
+    "45+ hands-on projects."
+  ];
+
+  let tipIndex = 0;
+  let bubbleTimer = null;
+
+  function showTip() {
+    text.textContent = TIPS[tipIndex];
+    bubble.hidden = false;
+    tipIndex = (tipIndex + 1) % TIPS.length;
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(() => { bubble.hidden = true; }, 4000);
+  }
+
+  mascot.addEventListener("click", showTip);
+
+  // Show first tip after 5 seconds
+  setTimeout(showTip, 5000);
+
+  // Periodic tips
+  setInterval(() => {
+    if (bubble.hidden) showTip();
+  }, 15000);
+
+  // Look at cursor
+  if (!isTouch) {
+    addEventListener("mousemove", e => {
+      const r = mascot.getBoundingClientRect();
+      const mx = r.left + r.width / 2;
+      const my = r.top + r.height / 2;
+      const angle = Math.atan2(e.clientY - my, e.clientX - mx);
+      const lookX = Math.cos(angle) * 2;
+      const lookY = Math.sin(angle) * 1;
+      ascii.style.transform = `translate(${lookX}px, ${lookY}px)`;
+    });
+  }
+
+  return { showTip };
+})();
+
+/* ============================================================
+   13. THINKING STATES
+   ============================================================ */
+const Thinking = (() => {
+  const overlay = $("#thinkingOverlay");
+  const log = $("#thinkingLog");
+  if (!overlay) return {};
+
+  const SEQUENCES = {
+    enroll: [
+      "$ techyuva enroll --course=java",
+      "→ Parsing request...",
+      "→ Validating prerequisites...",
+      "→ Allocating cohort slot...",
+      "→ Generating learning path...",
+      "→ Optimizing curriculum...",
+      "✓ Enrolled successfully!"
+    ],
+    placement: [
+      "$ techyuva test --placement",
+      "→ Loading question bank...",
+      "→ Calibrating difficulty...",
+      "→ Shuffling questions...",
+      "→ Timer synchronized...",
+      "✓ Ready to begin!"
+    ],
+    login: [
+      "$ auth.login(user)",
+      "→ Verifying credentials...",
+      "→ Loading student profile...",
+      "→ Syncing progress...",
+      "→ Fetching cohort data...",
+      "✓ Welcome back, coder!"
+    ]
+  };
+
+  async function show(type) {
+    const seq = SEQUENCES[type] || SEQUENCES.enroll;
+    overlay.hidden = false;
+    log.textContent = "";
+
+    for (const line of seq) {
+      log.textContent += line + "\n";
+      await wait(300 + Math.random() * 400);
+    }
+
+    await wait(600);
+    overlay.hidden = true;
+  }
+
+  return { show };
+})();
+
+/* ============================================================
+   14. QUESTION BANK
    ============================================================ */
 const QUESTION_BANK = {
   java: {
@@ -366,7 +662,7 @@ const QUESTION_BANK = {
 };
 
 /* ============================================================
-   8. QUIZ ENGINE
+   15. QUIZ ENGINE
    ============================================================ */
 const Quiz = (() => {
   const SECONDS_PER_Q = 20;
@@ -393,7 +689,6 @@ const Quiz = (() => {
     return a;
   };
 
-  /* ---------- timer ---------- */
   function startTimer() {
     stopTimer();
     timeLeft = SECONDS_PER_Q;
@@ -414,7 +709,6 @@ const Quiz = (() => {
     elRing.classList.toggle("is-low", timeLeft <= 5);
   }
 
-  /* ---------- render one question ---------- */
   function renderQuestion() {
     const item = questions[index];
     locked = false;
@@ -432,7 +726,7 @@ const Quiz = (() => {
       const btn = document.createElement("button");
       btn.className = "option";
       btn.type = "button";
-      btn.innerHTML = `<kbd>${keys[i]}</kbd><span>${opt.text}</span>`;
+      btn.innerHTML = `<kbd>${keys[i]}</kbd><span>${escapeHtml(opt.text)}</span>`;
       btn.addEventListener("click", () => lockAnswer(i));
       elOpts.appendChild(btn);
     });
@@ -441,7 +735,6 @@ const Quiz = (() => {
     startTimer();
   }
 
-  /* ---------- answer handling ---------- */
   function lockAnswer(choiceIndex) {
     if (locked) return;
     locked = true;
@@ -474,11 +767,10 @@ const Quiz = (() => {
         index++;
         if (index < questions.length) renderQuestion();
         else finish();
-      }, 380);
-    }, isRight ? 750 : 1300);
+      }, 350);
+    }, isRight ? 700 : 1200);
   }
 
-  /* ---------- lifecycle ---------- */
   function start(key) {
     subjectKey = key;
     const bank = QUESTION_BANK[key];
@@ -514,7 +806,6 @@ const Quiz = (() => {
     Analysis.show(QUESTION_BANK[subjectKey].label, results, subjectKey);
   }
 
-  /* ---------- keyboard support ---------- */
   addEventListener("keydown", e => {
     if (overlay.hidden) return;
     if (e.key === "Escape") return quit();
@@ -526,13 +817,13 @@ const Quiz = (() => {
     }
   });
 
-  $("#quizQuit").addEventListener("click", quit);
+  $("#quizQuit")?.addEventListener("click", quit);
 
   return { start, quit };
 })();
 
 /* ============================================================
-   9. ANALYSIS / RESULTS
+   16. ANALYSIS / RESULTS
    ============================================================ */
 const Analysis = (() => {
   const DONUT_LEN = 414.7;
@@ -567,7 +858,6 @@ const Analysis = (() => {
     const pct     = Math.round((correct / total) * 100);
     const avgTime = (results.reduce((s, r) => s + r.timeUsed, 0) / total).toFixed(1);
 
-    /* --- topic strengths --- */
     const topics = {};
     results.forEach(r => {
       topics[r.topic] ??= { right: 0, total: 0 };
@@ -578,14 +868,12 @@ const Analysis = (() => {
       .map(([name, t]) => ({ name, score: t.right / t.total }))
       .sort((a, b) => b.score - a.score);
 
-    /* --- stat cards --- */
     elCorrect.textContent = `${correct} / ${total}`;
     elAvgTime.textContent = `${avgTime}s`;
-    elBest.textContent    = ranked[0].name;
-    elWorst.textContent   = ranked[ranked.length - 1].name;
+    elBest.textContent    = ranked[0]?.name || "—";
+    elWorst.textContent   = ranked[ranked.length - 1]?.name || "—";
     elVerdict.textContent = verdictFor(pct);
 
-    /* --- donut + count up --- */
     elDonut.style.strokeDashoffset = DONUT_LEN;
     let shown = 0;
     const t0 = performance.now();
@@ -596,54 +884,49 @@ const Analysis = (() => {
       if (p < 1) requestAnimationFrame(tick);
     };
 
-    /* --- per-question time bar chart --- */
     elChart.innerHTML = "";
     const maxT = Math.max(...results.map(r => r.timeUsed), 1);
     results.forEach((r, i) => {
       const bar = document.createElement("div");
       bar.className = "bar" + (r.right ? "" : " is-wrong");
-      bar.style.height = `${Math.max(6, (r.timeUsed / maxT) * 100)}%`;
-      bar.style.animationDelay = `${0.3 + i * 0.07}s`;
+      bar.style.height = `${Math.max(5, (r.timeUsed / maxT) * 100)}%`;
+      bar.style.animationDelay = `${0.25 + i * 0.06}s`;
       bar.innerHTML = `<span>${r.timeUsed}s</span>`;
       bar.title = `Q${i + 1}: ${r.timeUsed}s — ${r.right ? "correct" : "wrong"}`;
       elChart.appendChild(bar);
     });
 
-    /* --- review list --- */
     elReview.innerHTML = results.map((r, i) => `
       <div class="review-item ${r.right ? "is-right" : "is-wrong"}">
         <div class="review-item__mark">${r.right ? "✓" : "✗"}</div>
         <div>
-          <p class="review-item__q">${i + 1}. ${r.question}</p>
+          <p class="review-item__q">${i + 1}. ${escapeHtml(r.question)}</p>
           <p class="review-item__a">
             ${r.right
-              ? `Answered: <b>${r.correctText}</b>`
+              ? `Answered: <b>${escapeHtml(r.correctText)}</b>`
               : r.chosenText
-                ? `You chose <s>${r.chosenText}</s> — correct: <b>${r.correctText}</b>`
-                : `Timed out — correct: <b>${r.correctText}</b>`}
+                ? `You chose <s>${escapeHtml(r.chosenText)}</s> — correct: <b>${escapeHtml(r.correctText)}</b>`
+                : `Timed out — correct: <b>${escapeHtml(r.correctText)}</b>`}
           </p>
-          <span class="review-item__topic">${r.topic}</span>
+          <span class="review-item__topic">${escapeHtml(r.topic)}</span>
         </div>
       </div>
     `).join("");
 
-    /* --- reveal section & kick off animations --- */
     section.hidden = false;
     section.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
 
     setTimeout(() => {
       elDonut.style.strokeDashoffset = DONUT_LEN * (1 - pct / 100);
       requestAnimationFrame(tick);
-    }, 400);
+    }, 350);
   }
 
-  /* --- retry the same subject --- */
-  btnRetry.addEventListener("click", () => {
+  btnRetry?.addEventListener("click", () => {
     if (lastSubjectKey) Quiz.start(lastSubjectKey);
   });
 
-  /* --- pick another subject: scroll to courses --- */
-  btnOther.addEventListener("click", () => {
+  btnOther?.addEventListener("click", () => {
     const courses = $("#courses");
     if (courses) courses.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
   });
@@ -652,36 +935,48 @@ const Analysis = (() => {
 })();
 
 /* ============================================================
-   10. WIRE UP COURSE / SUBJECT BUTTONS
+   17. WIRE UP COURSE / SUBJECT BUTTONS + THINKING STATES
    ============================================================ */
 $$("[data-subject]").forEach(btn => {
-  btn.addEventListener("click", () => Quiz.start(btn.dataset.subject));
+  btn.addEventListener("click", async () => {
+    await Thinking.show("enroll");
+    Quiz.start(btn.dataset.subject);
+  });
 });
 
-/* placement test → random language */
-$("#takePlacement")?.addEventListener("click", () => {
+$("#takePlacement")?.addEventListener("click", async () => {
+  await Thinking.show("placement");
   const keys = Object.keys(QUESTION_BANK);
   Quiz.start(keys[Math.floor(Math.random() * keys.length)]);
 });
 
+$("#heroEnroll")?.addEventListener("click", async (e) => {
+  // Let the anchor work, but show thinking if it's a button action
+});
+
+$("#ctaEnroll")?.addEventListener("click", async (e) => {
+  // Same
+});
+
 /* ============================================================
-   11. STUDENT ZONE — login form (demo handler)
+   18. STUDENT ZONE — login form
    ============================================================ */
 (() => {
   const form = $("#zoneLogin");
   if (!form) return;
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     const email = form.email.value.trim();
     const pass  = form.pass.value.trim();
     if (!email || !pass) {
-      const hint = $(".zone__hint", form.parentElement) || form.querySelector(".zone__hint");
+      const hint = $(".zone__hint", form);
       if (hint) {
         hint.textContent = "Please enter both your ID and password.";
-        hint.style.color = "var(--python)";
+        hint.style.color = "var(--accent)";
       }
       return;
     }
+    await Thinking.show("login");
     const btn = $("button[type=submit]", form);
     const original = btn.innerHTML;
     btn.innerHTML = "<span>Welcome! 🎉</span>";
@@ -691,8 +986,7 @@ $("#takePlacement")?.addEventListener("click", () => {
 })();
 
 /* ============================================================
-   12. TERMINAL SHOWCASE — typewriter "video"
-   Types real code → "compiles" → prints friendly output, on loop.
+   19. WHITE PAPER TERMINAL — typewriter showcase
    ============================================================ */
 const Terminal = (() => {
   const elCode   = $("#termCode");
@@ -701,8 +995,6 @@ const Terminal = (() => {
   const elStatus = $("#termStatus");
   const tabs     = $$(".term-tab");
 
-  // Each snippet is an array of { text, cls } tokens so we can color it.
-  // cls options: kw, fn, str, num, com, type, punc  (or "" for default)
   const SNIPPETS = {
     java: {
       title: "techyuva — java",
@@ -768,24 +1060,21 @@ const Terminal = (() => {
     },
   };
 
-  const TYPE_SPEED = 24;     // ms per char
-  const LINE_DELAY = 90;     // pause between lines
-  const RUN_DELAY  = 600;    // pause before output
-  const OUT_DELAY  = 320;    // ms between output lines
-  const LOOP_DELAY = 2600;   // pause before next language
+  const TYPE_SPEED = 20;
+  const LINE_DELAY = 70;
+  const RUN_DELAY  = 500;
+  const OUT_DELAY  = 280;
+  const LOOP_DELAY = 2200;
   const ORDER = ["java", "cpp", "python"];
 
   let current = "java";
   let timer = null;
   let cancelled = false;
 
-  const wait = ms => new Promise(r => timer = setTimeout(r, ms));
-
-  /* render accumulated tokens as colored HTML */
   function render(typedTokens) {
     let html = "";
     for (const {t, c} of typedTokens) {
-      const esc = t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const esc = escapeHtml(t);
       html += c ? `<span class="tok-${c}">${esc}</span>` : esc;
     }
     elCode.innerHTML = html + '<span class="term-caret"></span>';
@@ -804,7 +1093,6 @@ const Terminal = (() => {
     elOut.innerHTML = "";
     setStatus("running", snip.status.running);
 
-    // flatten tokens with line breaks
     const lines = snip.code;
     const typed = [];
     for (let li = 0; li < lines.length; li++) {
@@ -822,11 +1110,9 @@ const Terminal = (() => {
       await wait(LINE_DELAY);
     }
 
-    // "compile/run" beat
     await wait(RUN_DELAY);
     if (cancelled) return;
 
-    // print output lines one by one
     setStatus("running", "running…");
     let outHtml = "";
     for (const line of snip.out) {
@@ -838,14 +1124,9 @@ const Terminal = (() => {
     }
     setStatus("done", snip.status.done);
 
-    // loop to next language
     await wait(LOOP_DELAY);
     if (cancelled) return;
     next();
-  }
-
-  function escapeHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   }
 
   function setActiveTab(lang) {
@@ -859,7 +1140,6 @@ const Terminal = (() => {
     typeSnippet(current);
   }
 
-  /* play a specific language (user clicked a tab / replay) */
   function play(lang) {
     clearTimeout(timer);
     cancelled = true;
@@ -867,14 +1147,9 @@ const Terminal = (() => {
       current = lang;
       setActiveTab(lang);
       typeSnippet(lang);
-    }, 60);
+    }, 50);
   }
 
-  function replay() {
-    play(current);
-  }
-
-  /* start only when the terminal scrolls into view */
   const startObserver = new IntersectionObserver((entries, obs) => {
     entries.forEach(en => {
       if (en.isIntersecting) {
@@ -882,22 +1157,23 @@ const Terminal = (() => {
         obs.disconnect();
       }
     });
-  }, { threshold: 0.4 });
+  }, { threshold: 0.3 });
 
   startObserver.observe($(".terminal"));
 
-  /* tab clicks */
   tabs.forEach(tab => {
     tab.addEventListener("click", () => play(tab.dataset.term));
   });
 
-  $("#termReplay")?.addEventListener("click", replay);
-
-  return { play, replay };
+  return { play };
 })();
 
 /* ============================================================
-   13. SMOOTH ANCHOR SCROLLING (respects fixed nav)
+   20. SHELL PROMPT CTA HOVER EFFECT — removed (static text only now)
+   ============================================================ */
+
+/* ============================================================
+   21. SMOOTH ANCHOR SCROLLING
    ============================================================ */
 $$('a[href^="#"]').forEach(link => {
   link.addEventListener("click", e => {
@@ -906,4 +1182,11 @@ $$('a[href^="#"]').forEach(link => {
     e.preventDefault();
     target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
   });
+});
+
+/* ============================================================
+   22. INIT
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  Preloader.init();
 });

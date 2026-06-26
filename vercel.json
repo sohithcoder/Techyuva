@@ -1,18 +1,15 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "backend/api/index.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/index.js": {
+      "memory": 512,
+      "maxDuration": 10
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/api/index.js"
+      "dest": "api/index.js"
     }
-  ],
-  "env": {
-    "FIREBASE_PROJECT_ID": "techyuya"
-  }
+  ]
 }

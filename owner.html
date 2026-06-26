@@ -9,7 +9,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase Web SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArg4bQAOblW-EHTRsEJi25pDsBODf2x0M",
+      authDomain: "techyuva-19645.firebaseapp.com",
+      projectId: "techyuva-19645",
+      storageBucket: "techyuva-19645.firebasestorage.app",
+      messagingSenderId: "266294653012",
+      appId: "1:266294653012:web:cc2199e3f0c2a0e25a7dc1",
+      measurementId: "G-T73CGDZN71"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     /* ============================================================
        OWNER PAGE — Dedicated Dashboard Styles
@@ -62,11 +81,6 @@
       border-radius: 16px;
       overflow: visible;
       background: var(--paper);
-      transition: border-color .4s, box-shadow .4s;
-    }
-    .owner-section:hover {
-      border-color: rgba(184, 92, 56, .3);
-      box-shadow: 0 20px 50px -20px rgba(28, 25, 21, .1);
     }
 
     .owner-section__header {
@@ -81,9 +95,6 @@
       position: sticky;
       top: 64px;
       z-index: 10;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      background: color-mix(in srgb, var(--paper-2) 92%, transparent);
     }
     .owner-section__title {
       display: flex;
@@ -125,22 +136,19 @@
       color: var(--accent);
       display: inline-flex;
       align-items: center;
-      gap: .3rem;
-      transition: gap .3s;
+      gap: .4rem;
       white-space: nowrap;
       border: 1px solid var(--accent);
       border-radius: 100px;
       padding: .4rem 1rem;
       background: none;
-      cursor: none;
+      cursor: pointer;
     }
     .owner-section__action:hover {
-      gap: .5rem;
       background: var(--accent);
       color: var(--paper);
     }
     .owner-section__action svg { width: 1em; height: 1em; }
-    .owner-section__action:hover svg { transform: translateX(2px); }
 
     .owner-section__body {
       padding: clamp(1.2rem, 2.5vw, 1.8rem);
@@ -158,31 +166,10 @@
       border-radius: 14px;
       padding: 1.6rem 1.4rem;
       background: var(--paper);
-      transition: transform .4s var(--ease-out), border-color .35s, box-shadow .4s;
-      position: relative;
-      overflow: hidden;
     }
-    .stat-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 16px 36px -16px rgba(28, 25, 21, .14);
-    }
-    .stat-card::before {
-      content: "";
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      transform: scaleX(0); transform-origin: center;
-      transition: transform .5s var(--ease);
-    }
-    .stat-card:hover::before { transform: scaleX(1); }
-
-    .stat-card--green:hover { border-color: var(--good); }
-    .stat-card--green::before { background: linear-gradient(90deg, transparent, var(--good), transparent); }
-    .stat-card--orange:hover { border-color: #c4a030; }
-    .stat-card--orange::before { background: linear-gradient(90deg, transparent, #c4a030, transparent); }
-    .stat-card--red:hover { border-color: var(--bad); }
-    .stat-card--red::before { background: linear-gradient(90deg, transparent, var(--bad), transparent); }
+    .stat-card--green { border-color: rgba(74, 124, 89, .35); }
+    .stat-card--orange { border-color: rgba(196, 160, 48, .35); }
+    .stat-card--red { border-color: rgba(160, 48, 48, .35); }
 
     .stat-card__label {
       font-family: var(--font-mono);
@@ -229,25 +216,23 @@
       color: var(--ink-soft);
       font-family: var(--font-mono);
     }
-    .field input, .field select {
+    .field input, .field select, .field textarea {
       font: inherit; color: var(--ink);
       background: var(--paper-2);
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: .7rem .8rem;
-      transition: border-color .3s, background-color .3s, box-shadow .3s;
       font-family: var(--font-mono);
       font-size: .82rem;
       width: 100%;
       min-width: 0;
       box-sizing: border-box;
     }
-    .field input::placeholder, .field select::placeholder { color: var(--ink-faint); overflow: visible; }
-    .field input:focus, .field select:focus {
+    .field input::placeholder, .field select::placeholder { color: var(--ink-faint); }
+    .field input:focus, .field select:focus, .field textarea:focus {
       outline: none;
       border-color: var(--accent);
       background: var(--paper);
-      box-shadow: 0 0 0 3px var(--accent-glow);
     }
     .field--full { grid-column: 1 / -1; }
 
@@ -284,7 +269,6 @@
       vertical-align: middle;
     }
     .owner-table tr:last-child td { border-bottom: none; }
-    .owner-table tr:hover td { background: var(--paper-2); transition: background .2s; }
     .owner-table__name { font-weight: 500; color: var(--ink); }
     .owner-table__meta { font-size: .65rem; color: var(--ink-soft); display: block; margin-top: .15rem; }
 
@@ -322,7 +306,6 @@
       display: block;
       height: 100%;
       border-radius: 100px;
-      transition: width .6s var(--ease);
     }
     .progress-fill--green { background: var(--good); }
     .progress-fill--orange { background: #c4a030; }
@@ -341,16 +324,11 @@
       border: 1px solid var(--line);
       display: flex; align-items: center; justify-content: center;
       font-size: 12px;
-      transition: all .25s;
       background: var(--paper);
-      cursor: none;
+      cursor: pointer;
       padding: 0;
     }
-    .action-btn:hover {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
+    .action-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
     .action-btn--danger:hover { border-color: var(--bad); background: rgba(160,48,48,.1); }
     .action-btn--success:hover { border-color: var(--good); background: rgba(74,124,89,.1); }
 
@@ -377,12 +355,10 @@
       font-size: .78rem;
       color: var(--ink);
       background: var(--paper-2);
-      transition: border-color .3s, box-shadow .3s;
     }
     .search-box input:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
     }
     .search-box input::placeholder { color: var(--ink-faint); }
     .search-icon {
@@ -401,8 +377,7 @@
       font-size: .72rem;
       color: var(--ink);
       background: var(--paper-2);
-      transition: border-color .3s;
-      cursor: none;
+      cursor: pointer;
     }
     .filter-select:focus { outline: none; border-color: var(--accent); }
 
@@ -417,12 +392,6 @@
       border-radius: 12px;
       padding: 1.4rem;
       background: var(--paper);
-      transition: transform .4s var(--ease-out), border-color .35s, box-shadow .4s;
-    }
-    .course-mini-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 16px 32px -16px rgba(28, 25, 21, .12);
     }
     .course-mini-card__head {
       display: flex;
@@ -484,11 +453,6 @@
       border-radius: 14px;
       padding: 1.4rem;
       background: var(--paper);
-      transition: border-color .4s, box-shadow .4s;
-    }
-    .chart-card:hover {
-      border-color: rgba(184, 92, 56, .3);
-      box-shadow: 0 16px 36px -16px rgba(28, 25, 21, .12);
     }
     .chart-title {
       font-family: var(--font-display);
@@ -529,11 +493,6 @@
       max-height: 90vh;
       overflow-y: auto;
       box-shadow: 0 40px 80px -20px rgba(28, 25, 21, .2);
-      animation: modalIn .35s var(--ease-out);
-    }
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(12px) scale(.98); }
-      to { opacity: 1; transform: none; }
     }
     .modal__header {
       padding: 1.4rem 1.6rem 0;
@@ -551,8 +510,7 @@
       border: none;
       font-size: 1.4rem;
       color: var(--ink-soft);
-      transition: color .2s;
-      cursor: none;
+      cursor: pointer;
       width: 32px; height: 32px;
       display: flex; align-items: center; justify-content: center;
       border-radius: 6px;
@@ -610,7 +568,6 @@
       font-size: .78rem;
       font-weight: 500;
       box-shadow: 0 16px 32px -12px rgba(28, 25, 21, .3);
-      animation: toastIn .3s var(--ease-out);
       display: flex;
       align-items: center;
       gap: .6rem;
@@ -619,10 +576,6 @@
     }
     .toast--success { border-left-color: var(--good); }
     .toast--error { border-left-color: var(--bad); }
-    @keyframes toastIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
 
     /* ---------- Empty State ---------- */
     .empty-state {
@@ -660,8 +613,7 @@
       border: none;
       background: none;
       border-radius: 8px 8px 0 0;
-      transition: color .25s, background .25s;
-      cursor: none;
+      cursor: pointer;
       position: relative;
       letter-spacing: .02em;
     }
@@ -680,24 +632,16 @@
     }
 
     .owner-tab-panel { display: none; }
-    .owner-tab-panel.is-active { display: block; animation: fadeIn .35s var(--ease-out); }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: none; }
-    }
+    .owner-tab-panel.is-active { display: block; }
 
     /* ---------- Visual Bug Fixes ---------- */
     /* Fix sticky header z-index conflict with nav bar */
     .owner-section__header { z-index: 5; }
     /* Fix cursor on form elements */
-    select, input, button, textarea { cursor: auto; }
-    @media (hover: hover) and (pointer: fine) {
-      select, input, button, textarea { cursor: none; }
-    }
-    /* Fix date input width consistency */
-    .toolbar input[type="date"] { min-width: 130px; }
-    /* Fix table ensures no overflow clipping */
-    .owner-table { width: 100%; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    input, textarea, select { cursor: auto; }
+    /* Allow horizontal scroll on narrow screens without breaking table layout */
+    .owner-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .owner-table { width: 100%; min-width: 680px; }
     .owner-table td, .owner-table th { white-space: nowrap; }
     .owner-table td:first-child, .owner-table th:first-child { padding-left: .6rem; }
     /* Ensure nowhere on the page clips content */
@@ -707,47 +651,220 @@
     /* Ensure expected end date field spans properly */
     .field--full { grid-column: 1 / -1 !important; }
 
-    /* ---------- Responsive ---------- */
-    @media (max-width: 1200px) {
-      .form-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 1100px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .course-cards-grid { grid-template-columns: repeat(2, 1fr); }
-    }
+    /* ---------- RESPONSIVE — Tablet (≤900px) ---------- */
     @media (max-width: 900px) {
-      .owner-page { padding-left: var(--pad); }
+      .owner-page { padding: clamp(4rem, 10vh, 6rem) var(--pad) 3rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: .8rem; }
       .charts-row { grid-template-columns: 1fr; }
       .analytics-grid { grid-template-columns: 1fr; }
-      .course-cards-grid { grid-template-columns: 1fr; }
-      .owner-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .owner-table th, .owner-table td { padding: .7rem .6rem; }
-      .toolbar { flex-wrap: wrap; }
-      .toolbar input[type="date"] { width: 120px !important; min-width: 0; }
-      .toolbar > * { flex: 1 1 auto; min-width: 120px; }
-      .search-box { min-width: 140px; }
+      .course-cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .owner-table { min-width: 640px; }
+      .owner-table th, .owner-table td { padding: .65rem .5rem; }
+      .toolbar { flex-wrap: wrap; gap: .5rem; }
+      .toolbar input[type="date"] { width: 130px !important; min-width: 0; }
+      .toolbar > * { flex: 1 1 auto; min-width: 130px; }
+      .search-box { min-width: 160px; }
+      .owner-section__header { padding: .9rem 1.1rem; }
+      .owner-section__body { padding: 1rem 1.1rem; }
+      .owner-section__title h2 { font-size: 1.2rem; }
+      .stat-card { padding: 1.1rem; }
+      .nav__bar .nav__logo-sub { display: none; }
     }
+
+    /* ---------- RESPONSIVE — Phone (≤640px) ---------- */
     @media (max-width: 640px) {
-      .stats-grid { grid-template-columns: 1fr; }
-      .owner-table th, .owner-table td { font-size: .7rem; }
-      .toolbar { flex-direction: column; align-items: stretch; }
+      .owner-page { padding: clamp(3.5rem, 12vh, 5rem) var(--pad) 2rem; }
+      .owner-head h1 { font-size: 1.8rem; }
+      .owner-head p { font-size: .82rem; max-width: 100%; }
+
+      /* Stats — single column */
+      .stats-grid { grid-template-columns: 1fr; gap: .6rem; }
+      .stat-card { padding: 1rem 1rem; border-radius: 10px; }
+      .stat-card__value { font-size: 1.5rem; }
+      .stat-card__label { font-size: .62rem; }
+
+      /* Toolbar — stacked */
+      .toolbar { flex-direction: column; align-items: stretch; gap: .4rem; }
       .toolbar input[type="date"] { width: 100% !important; }
       .search-box { max-width: none; min-width: 0; }
-      .owner-section__header { flex-direction: column; align-items: flex-start; }
+      .filter-select { width: 100%; }
+
+      /* Tabs — horizontal scroll, sticky */
+      .owner-tabs {
+        overflow-x: auto; -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap; gap: .2rem; padding-bottom: .3rem;
+        scrollbar-width: none; scroll-behavior: smooth;
+        position: sticky; top: 56px; z-index: 20;
+        background: var(--paper); padding-top: .5rem;
+        margin-left: calc(-1 * var(--pad)); margin-right: calc(-1 * var(--pad));
+        padding-left: var(--pad); padding-right: var(--pad);
+      }
+      .owner-tabs::-webkit-scrollbar { display: none; }
+      .owner-tab {
+        white-space: nowrap; flex-shrink: 0;
+        font-size: .75rem; padding: .6rem 1rem;
+        border-radius: 8px 8px 0 0;
+        min-height: 40px; display: flex; align-items: center;
+      }
+
+      /* Section headers */
+      .owner-section__header { flex-direction: column; align-items: flex-start; gap: .5rem; padding: .8rem 1rem; }
+      .owner-section__body { padding: .8rem 1rem; }
+
+      /* Forms — single column, larger touch targets */
+      .form-grid { grid-template-columns: 1fr !important; gap: .7rem; }
+      .field span { font-size: .65rem; }
+      .field input, .field select, .field textarea {
+        padding: .75rem .8rem;
+        font-size: 16px !important; /* Prevent iOS zoom */
+      }
+      .form-actions { flex-direction: column; gap: .5rem; }
+      .form-actions .btn {
+        width: 100%; justify-content: center;
+        min-height: 44px; padding: .75rem 1rem;
+        font-size: .82rem;
+      }
+
+      /* Tables — compact */
+      .owner-table { min-width: 600px; }
+      .owner-table th, .owner-table td { font-size: .68rem; padding: .6rem .45rem; }
+      .owner-table-wrap {
+        border-radius: 10px;
+        /* Scroll hint — right shadow */
+        background-image: linear-gradient(to right, var(--paper), var(--paper)),
+                          linear-gradient(to right, var(--paper), var(--paper)),
+                          linear-gradient(to right, rgba(0,0,0,.08), transparent),
+                          linear-gradient(to left, rgba(0,0,0,.08), transparent);
+        background-position: left center, right center, left center, right center;
+        background-repeat: no-repeat;
+        background-size: 20px 100%, 20px 100%, 15px 100%, 15px 100%;
+        background-attachment: local, local, scroll, scroll;
+      }
+
+      /* Action buttons — larger for thumbs */
+      .action-btn { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; }
+
+      /* Modals — full width, large inputs */
+      .modal-overlay { padding: .5rem; align-items: flex-end; }
+      .modal {
+        width: 100% !important; max-width: none !important;
+        margin: 0; border-radius: 16px 16px 0 0;
+        max-height: 85vh;
+      }
+      .modal__header { padding: 1.2rem 1.2rem 0; }
+      .modal__title { font-size: 1.1rem; }
+      .modal__close { width: 36px; height: 36px; font-size: 1.6rem; }
+      .modal__body { padding: 1rem 1.2rem; }
+      .modal__footer { padding: 0 1.2rem 1.2rem; }
+      .modal .form-grid { gap: .7rem; }
+      .modal .field input, .modal .field select {
+        font-size: 16px !important; padding: .75rem .8rem;
+      }
+
+      /* Charts */
+      .chart-card { padding: .8rem; border-radius: 10px; }
+      .chart-card .chart-title { font-size: .78rem; }
+      .chart-container { height: 200px; }
+
+      /* Course cards */
+      .course-cards-grid { grid-template-columns: 1fr; gap: .6rem; }
+      .course-mini-card { padding: 1rem; }
+
+      /* Toast — bottom center for mobile */
+      .toast-container { bottom: 1rem; right: 1rem; left: 1rem; align-items: center; }
+      .toast { min-width: 0; width: 100%; justify-content: center; }
+
+      /* Batch & Study Zone forms */
+      #batchesTable { font-size: .7rem; }
+      #szMetaFields > div { grid-template-columns: 1fr !important; }
+
+      /* Settings card */
+      #whatsappNumber { font-size: 16px !important; }
+      #ownerPassword { font-size: 16px !important; }
+
+      /* Hide nav bar subtitle on small screens */
+      .nav__bar .nav__logo-name { font-size: .9rem; }
+      .nav__bar .nav__logo-sub { display: none; }
+
+      /* Fee section buttons — always visible */
+      .fee-breakdown { padding: .8rem; }
+      .fee-breakdown__item { font-size: .74rem; }
     }
+
+    /* ---------- RESPONSIVE — Small Phone (≤420px) ---------- */
+    @media (max-width: 420px) {
+      .owner-page { padding-top: 3.5rem; }
+      .owner-head h1 { font-size: 1.6rem; }
+      .owner-tab { font-size: .7rem; padding: .5rem .75rem; min-height: 36px; }
+      .stat-card__value { font-size: 1.3rem; }
+      .stat-card__label { font-size: .6rem; }
+      .owner-table { min-width: 540px; }
+      .owner-table th, .owner-table td { font-size: .64rem; padding: .5rem .4rem; }
+      .owner-section__title h2 { font-size: 1rem; }
+      .owner-section__icon { width: 28px; height: 28px; font-size: .85rem; }
+      .owner-section__body { padding: .7rem .8rem; }
+      .owner-section__header { padding: .7rem .8rem; }
+      .field input, .field select, .field textarea { padding: .65rem .7rem; }
+      .form-actions .btn { min-height: 42px; padding: .65rem .8rem; }
+      .action-btn { width: 28px; height: 28px; font-size: 13px; }
+      .modal__header { padding: 1rem 1rem 0; }
+      .modal__body { padding: .8rem 1rem; }
+      .modal__footer { padding: 0 1rem 1rem; }
+      /* Nav bar compact */
+      .nav__bar { padding: .5rem var(--pad); }
+      .nav__logo-name { font-size: .82rem; }
+      .nav__logo-mark { width: 26px; height: 26px; }
+    }
+
+    /* Override reveal animation — always visible */
+    .reveal { opacity: 1 !important; transform: none !important; }
+
+    /* Login Overlay */
+    .owner-login {
+      position: fixed; inset: 0; z-index: 5000;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--paper); padding: 1rem;
+    }
+    .owner-login__card {
+      text-align: center; max-width: 340px; width: 100%;
+      padding: 2.5rem 2rem; border: 1px solid var(--line);
+      border-radius: 14px; background: var(--paper);
+    }
+    .owner-login__card h2 {
+      font-family: var(--font-mono); font-size: 1.4rem; font-weight: 600;
+      color: var(--accent); margin-bottom: .2rem;
+    }
+    .owner-login__card p {
+      font-family: var(--font-mono); font-size: .72rem; color: var(--ink-soft);
+      margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: .1em;
+    }
+    .owner-login__card input {
+      width: 100%; padding: .7rem .8rem; border: 1px solid var(--line);
+      border-radius: 8px; font-family: var(--font-mono); font-size: .9rem;
+      text-align: center; letter-spacing: .2em; margin-bottom: .8rem; box-sizing: border-box;
+    }
+    .owner-login__card input:focus { outline: none; border-color: var(--accent); }
+    .owner-login__error {
+      display: block; margin-top: .6rem; font-family: var(--font-mono);
+      font-size: .68rem; color: var(--bad);
+    }
+    .is-authenticated .owner-login { display: none; }
   </style>
 </head>
 <body data-theme="paper">
 
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
+  <!-- Content loads immediately, data fetches in background -->
 
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
-
-  <!-- Grain -->
-  <div class="grain" aria-hidden="true"></div>
+  <!-- Login Overlay -->
+  <div class="owner-login" id="ownerLogin">
+    <div class="owner-login__card">
+      <h2>>_TechYuva</h2>
+      <p>Owner Dashboard</p>
+      <input type="password" id="loginPassword" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" />
+      <button class="btn btn--primary" onclick="doLogin()"><span>$ unlock</span></button>
+      <span class="owner-login__error" id="loginError"></span>
+    </div>
+  </div>
 
   <!-- File Explorer Nav -->
   <header class="nav" id="nav">
@@ -756,7 +873,7 @@
     </button>
     <div class="nav__explorer" id="navExplorer">
       <div class="nav__explorer-head">
-        <span class="nav__explorer-title">EXPLORER</span>
+        <span class="nav__explorer-title">MENU</span>
         <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -767,55 +884,36 @@
           <span>techyuva</span>
         </div>
         <div class="nav__tree-children">
-          <a href="index.html#top" class="nav__tree-item" data-file="index.html">
+          <a href="index.html" class="nav__tree-item" data-file="main">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-            <span>index.html</span>
+            <span>Main</span>
           </a>
-          <a href="index.html#about" class="nav__tree-item" data-file="about.md">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-            <span>about.md</span>
-          </a>
-          <div class="nav__tree-folder">
-            <div class="nav__tree-item nav__tree-item--folder" data-folder="courses">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
-              <span>courses/</span>
-            </div>
-            <div class="nav__tree-children is-collapsed" id="folder-courses">
-              <a href="menu.html#java" class="nav__tree-item" data-file="java.md">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-                <span>java.md</span>
-              </a>
-              <a href="menu.html#cpp" class="nav__tree-item" data-file="cpp.md">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-                <span>cpp.md</span>
-              </a>
-              <a href="menu.html#python" class="nav__tree-item" data-file="python.md">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-                <span>python.md</span>
-              </a>
-            </div>
-          </div>
-          <a href="studyzone.html" class="nav__tree-item" data-file="student-zone/">
+          <a href="menu.html" class="nav__tree-item" data-file="courses">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
-            <span>student-zone/</span>
+            <span>Courses</span>
           </a>
-          <a href="index.html#analysis" class="nav__tree-item" data-file="practice.md">
+          <a href="studyzone.html" class="nav__tree-item" data-file="study-zone">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Study Zone</span>
+          </a>
+          <a href="owner.html" class="nav__tree-item is-active" data-file="owner">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-            <span>practice.md</span>
+            <span>Owner</span>
           </a>
-          <a href="owner.html" class="nav__tree-item is-active" data-file="owner.html">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
-            <span>owner.html</span>
-          </a>
+        </div>
         </div>
       </div>
     </div>
     <div class="nav__bar">
-      <a href="index.html#top" class="nav__logo" data-magnetic>
-        <span class="nav__logo-mark">>_</span>TechYuva
+      <a href="index.html#top" class="nav__logo">
+        <span class="nav__logo-mark"><img src="unnamed.webp" alt="TechYuva" /></span>
+        <div class="nav__logo-text">
+          <span class="nav__logo-name">TechYuva</span>
+          <span class="nav__logo-sub">ISO Certified Coding Institute</span>
+        </div>
       </a>
       <div class="nav__actions">
-        <a href="index.html" class="link-arrow" style="font-size:.78rem;" data-magnetic>← Back home</a>
+        <a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a>
       </div>
     </div>
   </header>
@@ -877,14 +975,45 @@
     </div>
 
     <!-- Charts Row -->
-    <div class="charts-row reveal">
+    <div class="charts-row reveal" style="grid-template-columns:1fr;">
       <div class="chart-card">
         <div class="chart-title">Payment Status</div>
         <div class="chart-container"><canvas id="paymentStatusChart"></canvas></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">Students per Course</div>
-        <div class="chart-container"><canvas id="courseDistributionChart"></canvas></div>
+    </div>
+
+    <!-- WhatsApp Number Setting -->
+    <div class="owner-section reveal" style="margin-bottom:2rem;">
+      <div class="owner-section__header">
+        <div class="owner-section__title">
+          <div class="owner-section__icon owner-section__icon--green">⚙</div>
+          <div>
+            <h2>Settings</h2>
+            <span>WhatsApp number & password</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:.5rem;">
+          <button class="owner-section__action" onclick="saveWhatsappNumber()"><span>$ save</span></button>
+        </div>
+      </div>
+      <div class="owner-section__body">
+        <div class="form-grid">
+          <div class="field">
+            <span>WhatsApp Number</span>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <span style="font-family:var(--font-mono);font-size:.78rem;color:var(--ink-soft);">+91</span>
+              <input type="text" id="whatsappNumber" placeholder="9876543210" style="flex:1;min-width:0;" />
+            </div>
+          </div>
+          <div class="field">
+            <span>Change Password</span>
+            <input type="password" id="ownerPassword" placeholder="New password (min 4 chars)" />
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem;margin-top:.6rem;flex-wrap:wrap;">
+          <button class="btn btn--primary" onclick="saveOwnerSettings()"><span>$ save settings</span></button>
+          <button class="btn" onclick="doLogout()" style="margin-left:auto;"><span>$ logout</span></button>
+        </div>
       </div>
     </div>
 
@@ -896,6 +1025,8 @@
       <button class="owner-tab" data-tab="courses">Courses</button>
       <button class="owner-tab" data-tab="expenses">Expenses</button>
       <button class="owner-tab" data-tab="analytics">Analytics</button>
+      <button class="owner-tab" data-tab="studyzone">Study Zone</button>
+      <button class="owner-tab" data-tab="upcoming">Upcoming</button>
     </div>
 
     <!-- TAB: Register -->
@@ -940,24 +1071,12 @@
               <span>Course</span>
               <select id="studentCourse" onchange="updateBatchesForCourse()">
                 <option value="">Select Course</option>
-                <option value="Web Development">Web Development</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Mobile App Development">Mobile App Development</option>
-                <option value="UI/UX Design">UI/UX Design</option>
-                <option value="Cloud Computing">Cloud Computing</option>
-                <option value="Cybersecurity">Cybersecurity</option>
-                <option value="AI & Machine Learning">AI & Machine Learning</option>
-                <option value="Digital Marketing">Digital Marketing</option>
               </select>
             </div>
             <div class="field">
               <span>Batch</span>
-              <select id="studentBatch">
+              <select id="studentBatch" onchange="updateExpectedEndDate()">
                 <option value="">Select Batch</option>
-                <option value="Batch 1 (45 days)">Batch 1 (45 days)</option>
-                <option value="Batch 2 (45 days)">Batch 2 (45 days)</option>
-                <option value="Batch 3 (45 days)">Batch 3 (45 days)</option>
-                <option value="Batch 4 (45 days)">Batch 4 (45 days)</option>
               </select>
             </div>
             <div class="field">
@@ -966,14 +1085,6 @@
                 <option value="offline">Offline</option>
                 <option value="online">Online</option>
                 <option value="internship">Internship</option>
-              </select>
-            </div>
-            <div class="field">
-              <span>Course Status</span>
-              <select id="studentCourseStatus">
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-                <option value="dropped">Dropped</option>
               </select>
             </div>
             <div class="field">
@@ -988,17 +1099,13 @@
               <span>Total Course Fee (₹)</span>
               <input type="number" id="studentTotalFee" placeholder="25000" />
             </div>
-            <div class="field">
-              <span>Amount Paid (₹)</span>
-              <input type="number" id="studentPaidFee" placeholder="0" value="0" />
-            </div>
           </div>
           <div class="form-actions">
-            <button class="btn btn--primary" onclick="addStudent()" data-magnetic>
+            <button class="btn btn--primary" onclick="addStudent()">
               <span>$ register student</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button class="btn" onclick="clearStudentForm()" data-magnetic>
+            <button class="btn" onclick="clearStudentForm()">
               <span>$ clear</span>
             </button>
           </div>
@@ -1028,7 +1135,7 @@
               <span class="search-icon">$</span>
               <input type="text" placeholder="Search by name or reg no..." id="studentSearch" onkeyup="filterStudents()" />
             </div>
-            <select class="filter-select" id="studentCourseFilter" onchange="filterStudents()">
+            <select class="filter-select" id="studentCourseFilter" onchange="onCourseFilterChange()">
               <option value="">All Courses</option>
             </select>
             <select class="filter-select" id="studentBatchFilter" onchange="filterStudents()">
@@ -1046,25 +1153,26 @@
               <input type="date" id="studentDateTo" onchange="filterStudents()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
             </div>
           </div>
-          <table class="owner-table">
-            <thead>
-              <tr>
-                <th>Reg No</th>
-                <th>Student</th>
-                <th>Course + Batch</th>
-                <th>Type</th>
-                <th>Join Date</th>
-                <th>Expected End</th>
-                <th>Total Fee</th>
-                <th>Paid</th>
-                <th>Certificate</th>
-                <th>Course Status</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="studentsTable"></tbody>
-          </table>
+          <div class="owner-table-wrap">
+            <table class="owner-table">
+              <thead>
+                <tr>
+                  <th>Reg No</th>
+                  <th>Student</th>
+                  <th>Course + Batch</th>
+                  <th>Type</th>
+                  <th>Join Date</th>
+                  <th>Expected End</th>
+                  <th>Total Fee</th>
+                  <th>Paid</th>
+                  <th>Certificate</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentsTable"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -1135,49 +1243,36 @@
               <input type="date" id="feeDateTo" onchange="filterFees()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
             </div>
           </div>
-          <table class="owner-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Course + Batch</th>
-                <th>Type</th>
-                <th>Total Fee</th>
-                <th>Paid</th>
-                <th>Balance</th>
-                <th>Progress</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="feesTable"></tbody>
-            <tfoot id="feesTableFoot" style="font-family:var(--font-mono);font-size:.78rem;border-top:2px solid var(--ink);">
-              <tr>
-                <td colspan="2" style="padding:.8rem 1rem;font-weight:600;">Totals</td>
-                <td id="feeFootType" style="padding:.8rem .4rem;"></td>
-                <td id="feeFootTotal" style="padding:.8rem .4rem;font-weight:600;"></td>
-                <td id="feeFootPaid" style="padding:.8rem .4rem;font-weight:600;color:var(--good);"></td>
-                <td id="feeFootBalance" style="padding:.8rem .4rem;font-weight:600;color:var(--bad);"></td>
-                <td id="feeFootProgress" style="padding:.8rem .4rem;"></td>
-                <td id="feeFootOnline" style="padding:.8rem .4rem;"></td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
-          <table class="owner-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Course</th>
-                <th>Total Fee</th>
-                <th>Paid</th>
-                <th>Balance</th>
-                <th>Progress</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="feesTable"></tbody>
-          </table>
+          <div class="owner-table-wrap">
+            <table class="owner-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Course + Batch</th>
+                  <th>Type</th>
+                  <th>Total Fee</th>
+                  <th>Paid</th>
+                  <th>Balance</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="feesTable"></tbody>
+              <tfoot id="feesTableFoot" style="font-family:var(--font-mono);font-size:.78rem;border-top:2px solid var(--ink);">
+                <tr>
+                  <td colspan="2" style="padding:.8rem 1rem;font-weight:600;">Totals</td>
+                  <td id="feeFootType" style="padding:.8rem .4rem;"></td>
+                  <td id="feeFootTotal" style="padding:.8rem .4rem;font-weight:600;"></td>
+                  <td id="feeFootPaid" style="padding:.8rem .4rem;font-weight:600;color:var(--good);"></td>
+                  <td id="feeFootBalance" style="padding:.8rem .4rem;font-weight:600;color:var(--bad);"></td>
+                  <td id="feeFootProgress" style="padding:.8rem .4rem;"></td>
+                  <td id="feeFootOnline" style="padding:.8rem .4rem;"></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -1202,8 +1297,8 @@
               <input type="text" id="courseName" placeholder="e.g. Web Development" />
             </div>
             <div class="field">
-              <span>Duration</span>
-              <input type="text" id="courseDuration" placeholder="e.g. 12 weeks" />
+              <span>End Date</span>
+              <input type="date" id="courseEndDate" />
             </div>
             <div class="field">
               <span>Fee (₹)</span>
@@ -1213,16 +1308,76 @@
               <span>Badge / Tag</span>
               <input type="text" id="courseBadge" placeholder="e.g. Backend · OOP" />
             </div>
+            <div class="field">
+              <span>Info Link (Know More)</span>
+              <input type="url" id="courseInfoLink" placeholder="https://example.com/course-info" />
+            </div>
+            <div class="field">
+              <span>Trending</span>
+              <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font:inherit;color:var(--ink);margin-top:.3rem;">
+                <input type="checkbox" id="courseTrending" style="width:18px;height:18px;accent-color:var(--accent);" />
+                <span style="font-size:.78rem;">Show on homepage</span>
+              </label>
+            </div>
           </div>
           <input type="hidden" id="editCourseId" value="" />
           <div class="form-actions">
-            <button class="btn btn--primary" onclick="saveCourse()" data-magnetic>
+            <button class="btn btn--primary" onclick="saveCourse()">
               <span>$ save course</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button class="btn" onclick="clearCourseForm()" data-magnetic>
+            <button class="btn" onclick="clearCourseForm()">
               <span>$ clear</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Batches -->
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--orange">📅</div>
+            <div>
+              <h2>Manage Batches</h2>
+              <span>Add, edit or remove batch slots</span>
+            </div>
+          </div>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr 1fr auto;">
+            <div class="field">
+              <span>Course</span>
+              <select id="batchCourse" onchange="renderBatchesTable()" style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;width:100%;box-sizing:border-box;">
+                <option value="">Select Course</option>
+              </select>
+            </div>
+            <div class="field">
+              <span>Batch Name</span>
+              <input type="text" id="batchName" placeholder="e.g. Batch 5" />
+            </div>
+            <div class="field">
+              <span>Duration (days)</span>
+              <input type="number" id="batchDuration" placeholder="45" />
+            </div>
+            <div class="field">
+              <span>Timing</span>
+              <input type="text" id="batchTiming" placeholder="e.g. 9:00 AM - 3:00 PM" />
+            </div>
+            <div class="field" style="align-self:end;">
+              <input type="hidden" id="editBatchId" value="" />
+              <button class="btn btn--primary" onclick="saveBatch()" style="white-space:nowrap;">
+                <span>$ save batch</span>
+              </button>
+            </div>
+          </div>
+          <div class="owner-table-wrap" style="margin-top:1rem;">
+            <table class="owner-table">
+              <thead>
+                <tr><th>Batch</th><th>Course</th><th>Duration</th><th>Timing</th><th>Label</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="batchesTable"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1243,20 +1398,22 @@
           </button>
         </div>
         <div class="owner-section__body">
-          <table class="owner-table" style="margin-bottom:1.4rem;">
-            <thead>
-              <tr>
-                <th>Course</th>
-                <th>Students</th>
-                <th>Total Revenue</th>
-                <th>Collected</th>
-                <th>Pending</th>
-                <th>Collection Rate</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="coursesTable"></tbody>
-          </table>
+          <div class="owner-table-wrap" style="margin-bottom:1.4rem;">
+            <table class="owner-table">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Students</th>
+                  <th>Total Revenue</th>
+                  <th>Collected</th>
+                  <th>Pending</th>
+                  <th>Collection Rate</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="coursesTable"></tbody>
+            </table>
+          </div>
           <div class="course-cards-grid" id="courseCards"></div>
         </div>
       </div>
@@ -1319,12 +1476,13 @@
               <input type="date" id="expDate" />
             </div>
           </div>
+          <input type="hidden" id="editExpenseId" value="" />
           <div class="form-actions">
-            <button class="btn btn--primary" onclick="addExpense()" data-magnetic>
+            <button class="btn btn--primary" onclick="addExpense()">
               <span>$ add expense</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button class="btn" onclick="clearExpenseForm()" data-magnetic>
+            <button class="btn" onclick="clearExpenseForm()">
               <span>$ clear</span>
             </button>
           </div>
@@ -1362,33 +1520,44 @@
               <input type="date" id="expDateTo" onchange="renderExpenses()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
             </div>
           </div>
-          <table class="owner-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Expense Name</th>
-                <th>Amount</th>
-                <th>Mode</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="expensesTable"></tbody>
-            <tfoot id="expensesTableFoot" style="font-family:var(--font-mono);font-size:.78rem;border-top:2px solid var(--ink);">
-              <tr>
-                <td colspan="2" style="padding:.8rem 1rem;font-weight:600;">Totals</td>
-                <td id="expFootTotal" style="padding:.8rem .4rem;font-weight:600;"></td>
-                <td id="expFootMode" style="padding:.8rem .4rem;"></td>
-                <td colspan="2"></td>
-              </tr>
-            </tfoot>
-          </table>
+          <div class="owner-table-wrap">
+            <table class="owner-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Expense Name</th>
+                  <th>Amount</th>
+                  <th>Mode</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="expensesTable"></tbody>
+              <tfoot id="expensesTableFoot" style="font-family:var(--font-mono);font-size:.78rem;border-top:2px solid var(--ink);">
+                <tr>
+                  <td colspan="2" style="padding:.8rem 1rem;font-weight:600;">Totals</td>
+                  <td id="expFootTotal" style="padding:.8rem .4rem;font-weight:600;"></td>
+                  <td id="expFootMode" style="padding:.8rem .4rem;"></td>
+                  <td colspan="2"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- TAB: Analytics -->
     <div class="owner-tab-panel" id="panel-analytics">
+      <div class="toolbar reveal" style="margin-bottom:1.2rem;">
+        <span style="font-family:var(--font-mono);font-size:.72rem;color:var(--ink-soft);">From:</span>
+        <input type="date" id="analyticsDateFrom" onchange="updateAnalytics()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+        <span style="color:var(--ink-faint);font-size:.7rem;">to</span>
+        <input type="date" id="analyticsDateTo" onchange="updateAnalytics()" style="font:inherit;font-family:var(--font-mono);font-size:.72rem;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;width:140px;" />
+        <button class="btn" onclick="clearAnalyticsDateFilter()" style="font-size:.7rem;padding:.35rem .8rem;margin-left:.3rem;">
+          <span>$ clear</span>
+        </button>
+      </div>
       <div class="stats-grid reveal" style="margin-bottom:1.5rem;">
         <div class="stat-card stat-card--green">
           <div class="stat-card__label">Total Fees Collected</div>
@@ -1446,17 +1615,140 @@
           <div class="chart-title">Course Revenue</div>
           <div class="chart-container" style="height:280px;"><canvas id="revenueComparisonChart"></canvas></div>
         </div>
+    </div>
+    </div>
+
+    <!-- TAB: Study Zone -->
+    <div class="owner-tab-panel" id="panel-studyzone">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--blue">📖</div>
+            <div>
+              <h2>Manage Study Zone Items</h2>
+              <span>Add, edit or remove items for the student zone</span>
+            </div>
+          </div>
+          <select id="szTypeFilter" onchange="renderStudyZoneTable()" style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;font-family:var(--font-mono);font-size:.78rem;">
+            <option value="career-roadmap">Career Roadmap</option>
+            <option value="placement-guideline">Placement Guidelines</option>
+            <option value="job-opening">Job Openings</option>
+            <option value="study-material">Study Materials</option>
+            <option value="mock-test">Mock Tests</option>
+          </select>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+            <div class="field">
+              <span>Title</span>
+              <input type="text" id="szTitle" placeholder="e.g. Frontend Roadmap 2026" />
+            </div>
+            <div class="field">
+              <span>Link URL</span>
+              <input type="url" id="szLink" placeholder="https://example.com/resource" />
+            </div>
+            <div class="field field--full">
+              <span>Description</span>
+              <textarea id="szDescription" rows="2" placeholder="Brief description..." style="font:inherit;color:var(--ink);background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem;font-family:var(--font-mono);font-size:.82rem;width:100%;resize:vertical;box-sizing:border-box;"></textarea>
+            </div>
+            <div class="field">
+              <span>Icon (emoji)</span>
+              <input type="text" id="szIcon" placeholder="🗺" />
+            </div>
+            <div class="field">
+              <span>Order</span>
+              <input type="number" id="szOrder" placeholder="0" />
+            </div>
+            <div class="field field--full" id="szMetaFields"></div>
+          </div>
+          <input type="hidden" id="editStudyZoneId" value="" />
+          <div class="form-actions">
+            <button class="btn btn--primary" onclick="saveStudyZoneItem()">
+              <span>$ save item</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="btn" onclick="clearStudyZoneForm()">
+              <span>$ clear</span>
+            </button>
+          </div>
+          <div class="owner-table-wrap" style="margin-top:1rem;">
+            <table class="owner-table">
+              <thead>
+                <tr><th>Title</th><th>Link</th><th>Order</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="studyZoneTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Upcoming -->
+    <div class="owner-tab-panel" id="panel-upcoming">
+      <div class="owner-section reveal">
+        <div class="owner-section__header">
+          <div class="owner-section__title">
+            <div class="owner-section__icon owner-section__icon--green">📅</div>
+            <div>
+              <h2>Manage Upcoming Batches</h2>
+              <span>Add or edit upcoming batches shown on the main page</span>
+            </div>
+          </div>
+        </div>
+        <div class="owner-section__body">
+          <div class="form-grid">
+            <div class="field">
+              <span>Course Name</span>
+              <input type="text" id="upCourseName" placeholder="e.g. Java Mastery" />
+            </div>
+            <div class="field">
+              <span>Batch Name</span>
+              <input type="text" id="upBatchName" placeholder="e.g. Batch 6" />
+            </div>
+            <div class="field">
+              <span>Starting Date</span>
+              <input type="date" id="upStartingDate" />
+            </div>
+            <div class="field">
+              <span>Timing</span>
+              <input type="text" id="upTiming" placeholder="e.g. 9:00 AM - 3:00 PM" />
+            </div>
+          </div>
+          <input type="hidden" id="editUpcomingId" value="" />
+          <div class="form-actions">
+            <button class="btn btn--primary" onclick="saveUpcomingBatch()">
+              <span>$ save batch</span>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="btn" onclick="clearUpcomingForm()">
+              <span>$ clear</span>
+            </button>
+          </div>
+          <div class="owner-table-wrap" style="margin-top:1.2rem;">
+            <table class="owner-table">
+              <thead>
+                <tr><th>Course</th><th>Batch</th><th>Starting Date</th><th>Timing</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="upcomingTable"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
   </main>
 
   <!-- Footer -->
-  <footer class="footer" style="padding-left: calc(var(--nav-edge) + var(--pad)); border-top:1px solid var(--line);">
+  <footer class="footer footer--page" style="border-top:1px solid var(--line);">
     <span class="footer__logo">>_TechYuva</span>
     <p>Owner dashboard. Built for analysis, not distraction.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
+
+  <div class="footer-credits">
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
 
   <!-- Payment Modal -->
   <div class="modal-overlay" id="paymentModal">
@@ -1498,8 +1790,8 @@
         <div class="fee-breakdown" id="paymentBreakdown"></div>
       </div>
       <div class="modal__footer">
-        <button class="btn" onclick="closePaymentModal()" data-magnetic><span>$ cancel</span></button>
-        <button class="btn btn--primary" onclick="recordPayment()" data-magnetic>
+        <button class="btn" onclick="closePaymentModal()"><span>$ cancel</span></button>
+        <button class="btn btn--primary" onclick="recordPayment()">
           <span>$ record payment</span>
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -1543,24 +1835,14 @@
           </div>
           <div class="field">
             <span>Course</span>
-            <select id="editCourse">
-              <option value="Web Development">Web Development</option>
-              <option value="Data Science">Data Science</option>
-              <option value="Mobile App Development">Mobile App Development</option>
-              <option value="UI/UX Design">UI/UX Design</option>
-              <option value="Cloud Computing">Cloud Computing</option>
-              <option value="Cybersecurity">Cybersecurity</option>
-              <option value="AI & Machine Learning">AI & Machine Learning</option>
-              <option value="Digital Marketing">Digital Marketing</option>
+            <select id="editCourse" onchange="updateEditBatchForCourse()">
+              <option value="">Select Course</option>
             </select>
           </div>
           <div class="field">
             <span>Batch</span>
             <select id="editBatch">
-              <option value="Batch 1 (45 days)">Batch 1 (45 days)</option>
-              <option value="Batch 2 (45 days)">Batch 2 (45 days)</option>
-              <option value="Batch 3 (45 days)">Batch 3 (45 days)</option>
-              <option value="Batch 4 (45 days)">Batch 4 (45 days)</option>
+              <option value="">Select Batch</option>
             </select>
           </div>
           <div class="field">
@@ -1569,14 +1851,6 @@
               <option value="offline">Offline</option>
               <option value="online">Online</option>
               <option value="internship">Internship</option>
-            </select>
-          </div>
-          <div class="field">
-            <span>Course Status</span>
-            <select id="editCourseStatus">
-              <option value="ongoing">Ongoing</option>
-              <option value="completed">Completed</option>
-              <option value="dropped">Dropped</option>
             </select>
           </div>
           <div class="field">
@@ -1605,8 +1879,8 @@
         </div>
       </div>
       <div class="modal__footer">
-        <button class="btn" onclick="closeEditModal()" data-magnetic><span>$ cancel</span></button>
-        <button class="btn btn--primary" onclick="saveEditStudent()" data-magnetic>
+        <button class="btn" onclick="closeEditModal()"><span>$ cancel</span></button>
+        <button class="btn btn--primary" onclick="saveEditStudent()">
           <span>$ save changes</span>
           <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -1630,52 +1904,35 @@
 
   <script>
     // ==================== DATA ====================
-    // ─── API Base (auto-detect: local vs production) ───
-    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    const API_BASE = (!window.location.hostname || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       ? 'http://localhost:3001/api'
       : window.location.origin + '/api';
 
-    // ─── State ───
     let students = [];
     let expenses = [];
     let courses = [];
+    let batches = [];
+    let upcomingBatches = [];
     let currentPaymentId = null;
     let charts = {};
-    const COURSES_LIST = [
-      'Web Development','Data Science','Mobile App Development','UI/UX Design',
-      'Cloud Computing','Cybersecurity','AI & Machine Learning','Digital Marketing'
-    ];
-    const BATCHES = [
-      'Batch 1 (45 days)', 'Batch 2 (45 days)', 'Batch 3 (45 days)', 'Batch 4 (45 days)'
-    ];
 
-    // ─── API Helpers ───
-    async function api(path, options = {}) {
-      const config = {
-        headers: { 'Content-Type': 'application/json' },
-        ...options,
-      };
-      const res = await fetch(`${API_BASE}${path}`, config);
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: res.statusText }));
-        throw new Error(err.error || `API error ${res.status}`);
-      }
-      return res.json();
+    function batchLabel(b) { const t = b.timing ? ' · ' + b.timing : ''; return `${b.name} (${b.duration} days${t})`; }
+    function getBatches() { return batches || []; }
+    function getBatchesForCourse(courseName) {
+      const course = (courses || []).find(c => c.name === courseName);
+      if (!course) return [];
+      return (batches || []).filter(b => b.courseId === course.id);
+    }
+    function getCourseNameById(id) {
+      const c = (courses || []).find(x => x.id === id);
+      return c ? c.name : '—';
     }
 
-    async function loadAllData() {
-      try {
-        const [s, e, c] = await Promise.all([
-          api('/students'),
-          api('/expenses'),
-          api('/courses'),
-        ]);
-        students = s;
-        expenses = e;
-        courses = c;
-      } catch (err) {
-        console.warn('Firestore unavailable, using local data:', err.message);
-      }
+    async function api(path, options = {}) {
+      const config = { headers: { 'Content-Type': 'application/json' }, ...options };
+      const res = await fetch(`${API_BASE}${path}`, config);
+      if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || `API error ${res.status}`); }
+      return res.json();
     }
 
     function getBatchDuration(batch) {
@@ -1689,15 +1946,12 @@
       return d.toISOString().split('T')[0];
     }
 
-    function saveData() { /* API handles persistence */ }
-    function saveExpenses() { /* API handles persistence */ }
+    function saveData() {} // API handles persistence
+    function saveExpenses() {} // API handles persistence
 
     // ==================== SHARED UTILITIES ====================
     const $ = (s, c=document) => c.querySelector(s);
     const $$ = (s, c=document) => [...c.querySelectorAll(s)];
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
-
     // Nav
     const nav = $('#nav');
     $('#explorerToggle')?.addEventListener('click', () => nav.classList.add('is-collapsed'));
@@ -1709,44 +1963,27 @@
         if (children) { children.classList.toggle('is-collapsed'); folder.classList.toggle('is-open'); }
       });
     });
-    const bar = $('#scrollProgress')?.querySelector('span');
-    if (bar) {
-      const update = () => { const max = document.documentElement.scrollHeight - innerHeight; bar.style.width = max > 0 ? (scrollY / max) * 100 + '%' : '0%'; };
-      addEventListener('scroll', update, { passive: true }); addEventListener('resize', update); update();
-    }
-    if (!isTouch) {
-      const ring = $('#cursor'), dot = $('#cursorDot');
-      let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
-      addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`; });
-      addEventListener('mousedown', () => ring.classList.add('is-down'));
-      addEventListener('mouseup', () => ring.classList.remove('is-down'));
-      const loop = () => { rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14; ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`; requestAnimationFrame(loop); }; loop();
-      document.addEventListener('mouseover', e => { if (e.target.closest('a, button, [data-magnetic], input, select, .owner-tab, .action-btn')) ring.classList.add('is-hover'); });
-      document.addEventListener('mouseout', e => { if (e.target.closest('a, button, [data-magnetic], input, select, .owner-tab, .action-btn')) ring.classList.remove('is-hover'); });
-    }
-    if (!isTouch && !reducedMotion) {
-      $$('[data-magnetic]').forEach(el => {
-        const strength = 0.3;
-        el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(); el.style.transform = `translate(${(e.clientX - r.left - r.width/2)*strength}px, ${(e.clientY - r.top - r.height/2)*strength}px)`; el.style.transition = 'transform .12s ease-out'; });
-        el.addEventListener('mouseleave', () => { el.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)'; el.style.transform = ''; });
-      });
-    }
-    const revealObserver = new IntersectionObserver(entries => { entries.forEach(en => { if (!en.isIntersecting) return; en.target.classList.add('is-visible'); revealObserver.unobserve(en.target); }); }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-    $$('.reveal').forEach(el => revealObserver.observe(el));
 
     // ==================== TABS ====================
     $$('.owner-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const panelId = tab.dataset.tab;
+        if (!panelId) return;
         $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
         $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
         tab.classList.add('is-active');
-        $(`#panel-${panelId}`).classList.add('is-active');
-        if (panelId === 'students') { updateStudentsTable(); updateCourseFilters(); }
-        if (panelId === 'fees') { populateMonthFilter(); updateFeesTable(); }
-        if (panelId === 'courses') updateCourses();
-        if (panelId === 'expenses') renderExpenses();
-        if (panelId === 'analytics') updateAnalytics();
+        const panel = document.getElementById('panel-' + panelId);
+        if (!panel) return;
+        panel.classList.add('is-active');
+        // Force a reflow to ensure panel is visible before rendering data
+        void panel.offsetHeight;
+        try { if (panelId === 'students') { updateStudentsTable(); updateCourseFilters(); } } catch(e) { console.warn(e); }
+        try { if (panelId === 'fees') { populateMonthFilter(); updateFeesTable(); } } catch(e) { console.warn(e); }
+        try { if (panelId === 'courses') { updateCourses(); renderBatchesTable(); } } catch(e) { console.warn(e); }
+        try { if (panelId === 'expenses') renderExpenses(); } catch(e) { console.warn(e); }
+        try { if (panelId === 'analytics') updateAnalytics(); } catch(e) { console.warn(e); }
+        try { if (panelId === 'studyzone') { updateStudyZoneMetaFields(); renderStudyZoneTable(); } } catch(e) { console.warn(e); }
+        try { if (panelId === 'upcoming') renderUpcomingTable(); } catch(e) { console.warn(e); }
       });
     });
 
@@ -1777,18 +2014,24 @@
       const partialCount = students.filter(s => s.status === 'Partial').length;
       const pendingCount = students.filter(s => s.status === 'Pending').length;
       if (charts.paymentStatus) charts.paymentStatus.destroy();
-      charts.paymentStatus = new Chart($('#paymentStatusChart'), { type:'doughnut', data:{ labels:['Paid','Partial','Pending'], datasets:[{ data:[paidCount,partialCount,pendingCount], backgroundColor:['#4a7c59','#c4a030','#a03030'], borderWidth:0, hoverOffset:4 }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ position:'bottom', labels:{ padding:16, font:{ family:'JetBrains Mono', size:11 }, usePointStyle:true, boxWidth:8 } } } } });
-      const courseBatchCounts = {};
-      students.forEach(s => { const key = s.course + (s.batch ? ' · ' + s.batch.replace(/ \(\d+ days\)/, '') : ''); courseBatchCounts[key] = (courseBatchCounts[key] || 0) + 1; });
-      if (charts.courseDist) charts.courseDist.destroy();
-      charts.courseDist = new Chart($('#courseDistributionChart'), { type:'bar', data:{ labels:Object.keys(courseBatchCounts), datasets:[{ label:'Students', data:Object.values(courseBatchCounts), backgroundColor:'#b85c38', borderRadius:5, barThickness:22 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280', maxRotation:35 } } } } });
+      charts.paymentStatus = new Chart($('#paymentStatusChart'), { type:'doughnut', data:{ labels:['Paid','Partial','Pending'], datasets:[{ data:[paidCount,partialCount,pendingCount], backgroundColor:['#4a7c59','#c4a030','#a03030'], borderWidth:0, hoverOffset:4 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, cutout:'68%', plugins:{ legend:{ position:'bottom', labels:{ padding:16, font:{ family:'JetBrains Mono', size:11 }, usePointStyle:true, boxWidth:8 } } } } });
     }
 
     // ==================== BATCH HELPERS ====================
     function updateBatchesForCourse() {
+      const courseName = $('#studentCourse').value;
+      const courseBatches = courseName ? getBatchesForCourse(courseName) : getBatches();
       const batchSelect = $('#studentBatch');
-      batchSelect.innerHTML = '<option value="">Select Batch</option>' + BATCHES.map(b => `<option value="${b}">${b}</option>`).join('');
+      batchSelect.innerHTML = '<option value="">Select Batch</option>' + courseBatches.map(b => `<option value="${batchLabel(b)}">${batchLabel(b)}</option>`).join('');
       updateExpectedEndDate();
+    }
+    function updateEditBatchForCourse() {
+      const courseName = $('#editCourse').value;
+      const courseBatches = courseName ? getBatchesForCourse(courseName) : getBatches();
+      const batchSelect = $('#editBatch');
+      const v = batchSelect.value;
+      batchSelect.innerHTML = '<option value="">Select Batch</option>' + courseBatches.map(b => `<option value="${batchLabel(b)}">${batchLabel(b)}</option>`).join('');
+      if (v) batchSelect.value = v;
     }
     function updateExpectedEndDate() {
       $('#studentExpectedEndDate').value = calcExpectedEndDate($('#studentJoinDate').value, $('#studentBatch').value);
@@ -1840,24 +2083,33 @@
           <td>₹${(parseFloat(s.totalFee) || 0).toLocaleString('en-IN')}</td>
           <td>₹${(parseFloat(s.paidFee) || 0).toLocaleString('en-IN')}</td>
           <td>${certBadge}</td>
-          <td>${statusLabel}</td>
           <td>${getBadge(s.status)}</td>
           <td><div class="action-btns">
-            <button class="action-btn" onclick="editStudent(${s.id})" title="Edit">✏</button>
-            <button class="action-btn action-btn--success" onclick="openPaymentModal(${s.id})" title="Record Payment">₹</button>
-            <button class="action-btn action-btn--danger" onclick="deleteStudent(${s.id})" title="Delete">✕</button>
+            <button class="action-btn" onclick="editStudent('${s.id}')" title="Edit">✏</button>
+            <button class="action-btn action-btn--success" onclick="openPaymentModal('${s.id}')" title="Record Payment">₹</button>
+            <button class="action-btn action-btn--danger" onclick="deleteStudent('${s.id}')" title="Delete">✕</button>
           </div></td></tr>`;
-      }).join('') || emptyRow(12, 'No students found', 'Add a student or adjust filters');
+      }).join('') || emptyRow(11, 'No students found', 'Add a student or adjust filters');
     }
 
     function updateCourseFilters() {
       const list = getCourseList();
       const s1 = $('#studentCourseFilter'); const v1 = s1.value; s1.innerHTML = '<option value="">All Courses</option>' + list.map(c => `<option value="${c.name}">${c.name}</option>`).join(''); s1.value = v1;
-      const s2 = $('#studentBatchFilter'); const v2 = s2.value; s2.innerHTML = '<option value="">All Batches</option>' + BATCHES.map(b => `<option value="${b}">${b.replace(/ \(\d+ days\)/, '')}</option>`).join(''); s2.value = v2;
+      updateBatchFilter();
+    }
+    function updateBatchFilter() {
+      const courseFilter = $('#studentCourseFilter').value;
+      const course = courseFilter ? (courses || []).find(c => c.name === courseFilter) : null;
+      const filteredBatches = course ? (batches || []).filter(b => b.courseId === course.id) : (batches || []);
+      const s2 = $('#studentBatchFilter'); const v2 = s2.value; s2.innerHTML = '<option value="">All Batches</option>' + filteredBatches.map(b => `<option value="${batchLabel(b)}">${b.name}</option>`).join(''); s2.value = v2;
+    }
+    function onCourseFilterChange() {
+      updateBatchFilter();
+      filterStudents();
     }
     function populateCourseSelects() {
       const list = getCourseList();
-      const selects = ['studentCourse', 'editCourse'];
+      const selects = ['studentCourse', 'editCourse', 'batchCourse'];
       selects.forEach(id => {
         const sel = $(`#${id}`);
         if (!sel) return;
@@ -1878,35 +2130,29 @@
       const paymentMode = $('#studentPaymentMode').value;
       const course = $('#studentCourse').value;
       const batch = $('#studentBatch').value;
-      const courseStatus = $('#studentCourseStatus').value;
       const joinDate = $('#studentJoinDate').value;
       const expectedEndDate = $('#studentExpectedEndDate').value;
       const totalFee = parseFloat($('#studentTotalFee').value) || 0;
-      const paidFee = parseFloat($('#studentPaidFee').value) || 0;
       if (!name || !course || !batch || !joinDate) { showToast('Please fill name, course, batch, and join date', 'error'); return; }
-      const status = paidFee >= totalFee && totalFee > 0 ? 'Paid' : paidFee > 0 ? 'Partial' : 'Pending';
-      const payments = paidFee > 0 ? [{ id:Date.now()+1, amount:paidFee, date:joinDate, mode:paymentMode === 'internship' ? 'offline' : paymentMode }] : [];
+      const newStudent = { regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee: 0, status: 'Pending', payments: [] };
       try {
-        const saved = await api('/students', {
-          method: 'POST',
-          body: JSON.stringify({ regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus, certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee, status, payments }),
-        });
+        const saved = await api('/students', { method: 'POST', body: JSON.stringify({ regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee: 0, status: 'Pending', payments: [] }) });
         students.unshift(saved);
-        clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
-        showToast('Student registered successfully!', 'success');
-        $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
-        $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
-        $(`[data-tab="students"]`).classList.add('is-active');
-        $('#panel-students').classList.add('is-active');
-      } catch (err) { showToast('Failed to register: ' + err.message, 'error'); }
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); return; }
+      clearStudentForm(); updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
+      showToast('Student registered successfully!', 'success');
+      $$('.owner-tab').forEach(t => t.classList.remove('is-active'));
+      $$('.owner-tab-panel').forEach(p => p.classList.remove('is-active'));
+      $(`[data-tab="students"]`).classList.add('is-active');
+      $('#panel-students').classList.add('is-active');
     }
 
     function clearStudentForm() {
       ['studentName','studentRegNo','studentPhone','studentPhone2'].forEach(id => $('#'+id).value = '');
       $('#studentAddress').value = ''; $('#studentReference').value = '';
       $('#studentCourse').value = ''; $('#studentBatch').value = ''; $('#studentJoinDate').value = '';
-      $('#studentExpectedEndDate').value = ''; $('#studentTotalFee').value = ''; $('#studentPaidFee').value = '0';
-      $('#studentPaymentMode').value = 'offline'; $('#studentCourseStatus').value = 'ongoing';
+      $('#studentExpectedEndDate').value = ''; $('#studentTotalFee').value = '';
+      $('#studentPaymentMode').value = 'offline';
     }
 
     async function deleteStudent(id) {
@@ -1920,9 +2166,12 @@
       $('#editStudentId').value = s.id; $('#editName').value = s.name; $('#editRegNo').value = s.regNo || '';
       $('#editPhone').value = s.phone; $('#editPhone2').value = s.phone2 || '';
       $('#editAddress').value = s.address || ''; $('#editReference').value = s.reference || '';
-      $('#editCourse').value = s.course; $('#editBatch').value = s.batch || 'Batch 1 (45 days)';
+      // ensure course select is populated, then set value and update batch options
+      populateCourseSelects();
+      $('#editCourse').value = s.course;
+      updateEditBatchForCourse();
+      $('#editBatch').value = s.batch || '';
       $('#editPaymentMode').value = s.paymentMode || 'offline';
-      $('#editCourseStatus').value = s.courseStatus || 'ongoing';
       $('#editCertificate').value = s.certificateIssued || 'no';
       $('#editTotalFee').value = s.totalFee; $('#editPaidFee').value = s.paidFee; $('#editStatus').value = s.status;
       $('#editModal').classList.add('is-active');
@@ -1936,7 +2185,7 @@
         phone: $('#editPhone').value.trim(), phone2: $('#editPhone2').value.trim(),
         address: $('#editAddress').value.trim(), reference: $('#editReference').value.trim(),
         course: $('#editCourse').value, batch: $('#editBatch').value,
-        paymentMode: $('#editPaymentMode').value, courseStatus: $('#editCourseStatus').value,
+        paymentMode: $('#editPaymentMode').value,
         certificateIssued: $('#editCertificate').value,
         totalFee: parseFloat($('#editTotalFee').value) || 0, paidFee: parseFloat($('#editPaidFee').value) || 0,
         status: $('#editStatus').value,
@@ -1986,10 +2235,7 @@
       const balance = (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0);
       if (amount > balance) { showToast('Amount exceeds balance', 'error'); return; }
       try {
-        const updated = await api(`/students/${currentPaymentId}/payments`, {
-          method: 'POST',
-          body: JSON.stringify({ amount, mode, date: new Date().toISOString().split('T')[0] }),
-        });
+        const updated = await api(`/students/${currentPaymentId}/payments`, { method: 'POST', body: JSON.stringify({ amount, mode, date: new Date().toISOString().split('T')[0] }) });
         const idx = students.findIndex(x => x.id === currentPaymentId);
         if (idx !== -1) students[idx] = updated;
         closePaymentModal(); updateFeesTable(); updateStudentsTable(); updateDashboard(); updateCourses();
@@ -2040,7 +2286,7 @@
           <td style="color:var(--bad);font-weight:600;">₹${balance.toLocaleString('en-IN')}</td>
           <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${pct}%"></div></div><span class="progress-text">${pct}%</span></div></td>
           <td>${getBadge(s.status)}</td>
-          <td><div class="action-btns"><button class="action-btn action-btn--success" onclick="openPaymentModal(${s.id})" title="Record Payment">₹</button></div></td></tr>`;
+          <td><div class="action-btns"><button class="action-btn action-btn--success" onclick="openPaymentModal('${s.id}')" title="Record Payment">₹</button></div></td></tr>`;
       }).join('') || emptyRow(9, 'No fee records', 'Add students to see data');
 
       // Footer totals
@@ -2066,23 +2312,76 @@
     }
     function filterFees() { updateFeesTable(); }
 
-    // ==================== COURSES ====================
-    function getCourseList() {
-      // Use `courses` from Firestore if available, otherwise fallback to defaults
-      if (courses && courses.length > 0) return courses;
-      return [
-        { id:'default-1', name:'Web Development', duration:'12 weeks', fee:25000, badge:'Frontend · Backend' },
-        { id:'default-2', name:'Data Science', duration:'14 weeks', fee:35000, badge:'Python · ML · Stats' },
-        { id:'default-3', name:'Mobile App Development', duration:'10 weeks', fee:30000, badge:'Android · iOS' },
-        { id:'default-4', name:'UI/UX Design', duration:'8 weeks', fee:20000, badge:'Design · Research' },
-        { id:'default-5', name:'Cloud Computing', duration:'10 weeks', fee:28000, badge:'AWS · Azure · GCP' },
-        { id:'default-6', name:'Cybersecurity', duration:'12 weeks', fee:32000, badge:'Network · Security' },
-        { id:'default-7', name:'AI & Machine Learning', duration:'16 weeks', fee:40000, badge:'ML · Deep Learning' },
-        { id:'default-8', name:'Digital Marketing', duration:'8 weeks', fee:18000, badge:'SEO · Social Media' },
-      ];
+    // ==================== BATCHES ====================
+    function renderBatchesTable() {
+      const courseFilter = $('#batchCourse').value;
+      let list = getBatches();
+      if (courseFilter) {
+        const course = (courses || []).find(c => c.name === courseFilter);
+        if (course) list = list.filter(b => b.courseId === course.id);
+        else list = [];
+      }
+      $('#batchesTable').innerHTML = list.map(b => `<tr>
+        <td><span class="owner-table__name">${b.name}</span></td>
+        <td>${getCourseNameById(b.courseId)}</td>
+        <td>${b.duration} days</td>
+        <td>${b.timing || '—'}</td>
+        <td><span class="badge badge--partial">${batchLabel(b)}</span></td>
+        <td><div class="action-btns">
+          <button class="action-btn" onclick="editBatch('${b.id}')" title="Edit">✏</button>
+          <button class="action-btn action-btn--danger" onclick="deleteBatch('${b.id}')" title="Delete">✕</button>
+        </div></td>
+      </tr>`).join('') || '<tr><td colspan="6"><div class="empty-state"><div class="empty-state__title">No batches</div><div class="empty-state__desc">Select a course and add batches</div></div></td></tr>';
     }
-    function saveCourseData() {} // no-op — API handles persistence
 
+    function editBatch(id) {
+      const b = getBatches().find(x => x.id === id);
+      if (!b) return;
+      $('#editBatchId').value = b.id;
+      $('#batchCourse').value = getCourseNameById(b.courseId);
+      $('#batchName').value = b.name;
+      $('#batchDuration').value = b.duration;
+      $('#batchTiming').value = b.timing || '';
+    }
+
+    async function saveBatch() {
+      const courseName = $('#batchCourse').value;
+      const timing = $('#batchTiming').value.trim();
+      const editId = $('#editBatchId').value;
+      if (!courseName || !name || !duration) { showToast('Select course, enter name and duration', 'error'); return; }
+      const course = (courses || []).find(c => c.name === courseName);
+      if (!course) { showToast('Course not found', 'error'); return; }
+      const courseId = course.id;
+      try {
+        if (editId) {
+          await api(`/batches/${editId}`, { method: 'PUT', body: JSON.stringify({ courseId, name, duration, timing }) });
+          const b = batches.find(x => x.id === editId);
+          if (b) { b.courseId = courseId; b.name = name; b.duration = duration; b.timing = timing; }
+        } else {
+          const saved = await api('/batches', { method: 'POST', body: JSON.stringify({ courseId, name, duration, timing }) });
+          batches.push(saved);
+        }
+        $('#editBatchId').value = '';
+        $('#batchCourse').value = ''; $('#batchName').value = '';
+        $('#batchDuration').value = ''; $('#batchTiming').value = '';
+        renderBatchesTable(); updateBatchesForCourse(); updateCourseFilters();
+        showToast(editId ? 'Batch updated!' : 'Batch added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    async function deleteBatch(id) {
+      if (!confirm('Delete this batch?')) return;
+      try {
+        await api(`/batches/${id}`, { method: 'DELETE' });
+        batches = batches.filter(b => b.id !== id);
+        renderBatchesTable();
+        updateBatchesForCourse();
+        updateCourseFilters();
+        showToast('Batch deleted', 'success');
+      } catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
+    }
+
+    // ==================== COURSES ====================
     function updateCourses() {
       const courseList = getCourseList();
       const courseData = {};
@@ -2093,36 +2392,44 @@
         const data = courseData[c.name] || { students:0, totalRevenue:0, collected:0, pending:0 };
         const rate = data.totalRevenue > 0 ? Math.round((data.collected / data.totalRevenue) * 100) : 0;
         let pcls = rate >= 80 ? 'progress-fill--green' : rate >= 50 ? 'progress-fill--orange' : 'progress-fill--red';
-        return `<tr><td><a href="#" onclick="showCourseDetail('${c.name}');return false;" style="color:var(--accent);text-decoration:underline;font-weight:500;">${c.name}</a><div class="owner-table__meta">${c.duration || ''}</div></td><td><strong>${data.students}</strong></td><td>₹${data.totalRevenue.toLocaleString('en-IN')}</td><td style="color:var(--good);font-weight:600;">₹${data.collected.toLocaleString('en-IN')}</td><td style="color:var(--bad);font-weight:600;">₹${data.pending.toLocaleString('en-IN')}</td><td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${rate}%"></div></div><span class="progress-text">${rate}%</span></div></td><td><div class="action-btns"><button class="action-btn" onclick="editCourse('${c.name}')" title="Edit">✏</button><button class="action-btn action-btn--danger" onclick="deleteCourse('${c.name}')" title="Delete">✕</button></div></td></tr>`;
+        const esc = c.name.replace(/'/g, "\\'");
+        return `<tr><td><a href="#" onclick="showCourseDetail('${esc}');return false;" style="color:var(--accent);text-decoration:underline;font-weight:500;">${c.name}</a><div class="owner-table__meta">${c.endDate ? 'Ends ' + formatDate(c.endDate) : ''}</div></td><td><strong>${data.students}</strong></td><td>₹${data.totalRevenue.toLocaleString('en-IN')}</td><td style="color:var(--good);font-weight:600;">₹${data.collected.toLocaleString('en-IN')}</td><td style="color:var(--bad);font-weight:600;">₹${data.pending.toLocaleString('en-IN')}</td><td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${pcls}" style="width:${rate}%"></div></div><span class="progress-text">${rate}%</span></div></td><td><div class="action-btns"><button class="action-btn" onclick="editCourse('${esc}')" title="Edit">✏</button><button class="action-btn action-btn--danger" onclick="deleteCourse('${esc}')" title="Delete">✕</button></div></td></tr>`;
       }).join('') || emptyRow(7, 'No courses added', 'Add a course using the form above');
       $('#courseCards').innerHTML = courseList.map(c => {
         const data = courseData[c.name] || { students:0, totalRevenue:0, collected:0, pending:0 };
-        return `<div class="course-mini-card" onclick="showCourseDetail('${c.name}')" style="cursor:pointer;"><div class="course-mini-card__head"><div class="course-mini-card__name">${c.name}</div><div><div class="course-mini-card__students">${data.students}</div><div class="course-mini-card__students-label">students</div></div></div><div class="course-mini-card__stats"><div><div class="course-mini-card__stat-label">Fee</div><div class="course-mini-card__stat-value">₹${(parseFloat(c.fee)||0).toLocaleString('en-IN')}</div></div><div><div class="course-mini-card__stat-label">Duration</div><div class="course-mini-card__stat-value">${c.duration || '-'}</div></div><div><div class="course-mini-card__stat-label">Collected</div><div class="course-mini-card__stat-value course-mini-card__stat-value--green">₹${data.collected.toLocaleString('en-IN')}</div></div><div><div class="course-mini-card__stat-label">Pending</div><div class="course-mini-card__stat-value course-mini-card__stat-value--red">₹${data.pending.toLocaleString('en-IN')}</div></div></div></div>`;
+        const trendingBadge = c.trending ? '<span class="badge" style="background:var(--accent-soft);color:var(--accent);font-size:.55rem;margin-left:.4rem;">Trending</span>' : '';
+        return '<div class="course-mini-card"><div class="course-mini-card__head"><div class="course-mini-card__name">' + c.name + trendingBadge + '</div><div style="display:flex;gap:.35rem;align-items:center;"><button class="action-btn" onclick="editCourse(\'' + c.name.replace(/'/g, "\\'") + '\')" title="Edit" style="min-width:28px;min-height:28px;">✏</button><button class="action-btn action-btn--danger" onclick="deleteCourse(\'' + c.name.replace(/'/g, "\\'") + '\')" title="Delete" style="min-width:28px;min-height:28px;">✕</button></div></div><div class="course-mini-card__stats"><div><div class="course-mini-card__stat-label">Fee</div><div class="course-mini-card__stat-value">₹' + ((parseFloat(c.fee) || 0).toLocaleString('en-IN')) + '</div></div><div><div class="course-mini-card__stat-label">End Date</div><div class="course-mini-card__stat-value">' + (c.endDate ? formatDate(c.endDate) : '-') + '</div></div></div></div>';
       }).join('');
     }
 
     // ==================== COURSE CRUD ====================
+    function getCourseList() {
+      return courses || [];
+    }
+    function saveCourseData() {} // no-op — API handles persistence
+
     async function saveCourse() {
       const name = $('#courseName').value.trim();
-      const duration = $('#courseDuration').value.trim();
+      const endDate = $('#courseEndDate').value;
       const fee = parseFloat($('#courseFee').value) || 0;
       const badge = $('#courseBadge').value.trim();
+      const infoLink = $('#courseInfoLink').value.trim();
+      const trending = $('#courseTrending').checked;
       const editId = $('#editCourseId').value;
       if (!name) { showToast('Please enter a course name', 'error'); return; }
       try {
         if (editId) {
-          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, duration, fee, badge }) });
+          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, endDate, fee, badge, infoLink, trending }) });
           const idx = courses.findIndex(c => c.id === editId);
           if (idx !== -1) courses[idx] = updated;
-          showToast('Course updated!', 'success');
         } else {
           if (courses.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Course already exists', 'error'); return; }
-          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, duration, fee, badge }) });
+          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, endDate, fee, badge, infoLink, trending }) });
           courses.push(saved);
-          showToast('Course added!', 'success');
         }
         clearCourseForm(); updateCourses(); updateCourseFilters();
         if (typeof populateCourseSelects === 'function') populateCourseSelects();
+        showToast(editId ? 'Course updated!' : 'Course added!', 'success');
       } catch (err) { showToast('Failed: ' + err.message, 'error'); }
     }
 
@@ -2131,8 +2438,10 @@
       const c = list.find(x => x.name === name);
       if (!c) return;
       $('#editCourseId').value = c.id;
-      $('#courseName').value = c.name; $('#courseDuration').value = c.duration || '';
+      $('#courseName').value = c.name; $('#courseEndDate').value = c.endDate || '';
       $('#courseFee').value = c.fee || ''; $('#courseBadge').value = c.badge || '';
+      $('#courseInfoLink').value = c.infoLink || '';
+      $('#courseTrending').checked = !!c.trending;
       $('#courseName').focus();
     }
 
@@ -2151,8 +2460,8 @@
 
     function clearCourseForm() {
       $('#editCourseId').value = '';
-      $('#courseName').value = ''; $('#courseDuration').value = '';
-      $('#courseFee').value = ''; $('#courseBadge').value = '';
+      $('#courseName').value = ''; $('#courseEndDate').value = '';
+      $('#courseFee').value = ''; $('#courseBadge').value = ''; $('#courseInfoLink').value = ''; $('#courseTrending').checked = false;
     }
 
     function showCourseDetail(courseName) {
@@ -2183,6 +2492,144 @@
     }
     function closeCourseDetail() { $('#courseDetailModal').classList.remove('is-active'); }
 
+    // ==================== STUDY ZONE CRUD ====================
+    let studyZoneItems = [];
+    const SZ_TYPE_LABELS = { 'career-roadmap':'Career Roadmap','placement-guideline':'Placement Guidelines','job-opening':'Job Openings','study-material':'Study Materials','mock-test':'Mock Tests' };
+
+    function updateStudyZoneMetaFields() {
+      const type = $('#szTypeFilter').value;
+      let html = '';
+      if (type === 'career-roadmap') {
+        html = '<span>Skills (comma-separated)</span><input type="text" id="szMetaSkills" placeholder="HTML, CSS, JavaScript, React" />';
+      } else if (type === 'job-opening') {
+        html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;"><div class="field"><span>Company</span><input type="text" id="szMetaCompany" placeholder="Google" /></div><div class="field"><span>Location</span><input type="text" id="szMetaLocation" placeholder="Remote" /></div></div><span>Tags (comma-separated)</span><input type="text" id="szMetaTags" placeholder="Internship, Full-time" />';
+      } else if (type === 'study-material') {
+        html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;"><div class="field"><span>File Type</span><input type="text" id="szMetaFileType" placeholder="PDF" /></div><div class="field"><span>Size</span><input type="text" id="szMetaSize" placeholder="2.4 MB" /></div></div>';
+      } else if (type === 'mock-test') {
+        html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;"><div class="field"><span>Difficulty</span><input type="text" id="szMetaDifficulty" placeholder="Easy / Medium / Hard" /></div><div class="field"><span>Topic</span><input type="text" id="szMetaTopic" placeholder="Array, DP, Graph" /></div><div class="field"><span>Platform</span><input type="text" id="szMetaPlatform" placeholder="LeetCode / HackerRank" /></div></div>';
+      }
+      $('#szMetaFields').innerHTML = html;
+    }
+
+    function getStudyZoneMetaFromForm() {
+      const type = $('#szTypeFilter').value;
+      const meta = {};
+      if (type === 'career-roadmap') {
+        const skills = ($('#szMetaSkills')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (skills.length) meta.skills = skills;
+      } else if (type === 'job-opening') {
+        const company = ($('#szMetaCompany')?.value || '').trim();
+        const location = ($('#szMetaLocation')?.value || '').trim();
+        if (company) meta.company = company;
+        if (location) meta.location = location;
+        const tags = ($('#szMetaTags')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (tags.length) meta.tags = tags;
+      } else if (type === 'study-material') {
+        const fileType = ($('#szMetaFileType')?.value || '').trim();
+        const size = ($('#szMetaSize')?.value || '').trim();
+        if (fileType) meta.fileType = fileType;
+        if (size) meta.size = size;
+      } else if (type === 'mock-test') {
+        const difficulty = ($('#szMetaDifficulty')?.value || '').trim();
+        const topic = ($('#szMetaTopic')?.value || '').trim();
+        const platform = ($('#szMetaPlatform')?.value || '').trim();
+        if (difficulty) meta.difficulty = difficulty;
+        if (topic) meta.topic = topic;
+        if (platform) meta.platform = platform;
+      }
+      return meta;
+    }
+
+    function setStudyZoneMetaForm(meta) {
+      const type = $('#szTypeFilter').value;
+      if (!meta) return;
+      if (type === 'career-roadmap' && Array.isArray(meta.skills)) {
+        const el = $('#szMetaSkills'); if (el) el.value = meta.skills.join(', ');
+      } else if (type === 'job-opening') {
+        const elC = $('#szMetaCompany'); if (elC) elC.value = meta.company || '';
+        const elL = $('#szMetaLocation'); if (elL) elL.value = meta.location || '';
+        const elT = $('#szMetaTags'); if (elT && Array.isArray(meta.tags)) elT.value = meta.tags.join(', ');
+      } else if (type === 'study-material') {
+        const elF = $('#szMetaFileType'); if (elF) elF.value = meta.fileType || '';
+        const elS = $('#szMetaSize'); if (elS) elS.value = meta.size || '';
+      } else if (type === 'mock-test') {
+        const elD = $('#szMetaDifficulty'); if (elD) elD.value = meta.difficulty || '';
+        const elT = $('#szMetaTopic'); if (elT) elT.value = meta.topic || '';
+        const elP = $('#szMetaPlatform'); if (elP) elP.value = meta.platform || '';
+      }
+    }
+
+    async function renderStudyZoneTable() {
+      const type = $('#szTypeFilter').value;
+      updateStudyZoneMetaFields();
+      try {
+        studyZoneItems = await api(`/studyzone?type=${encodeURIComponent(type)}`);
+      } catch (err) { studyZoneItems = []; }
+      const tbody = $('#studyZoneTable');
+      tbody.innerHTML = studyZoneItems.map(item => `<tr>
+        <td><span class="owner-table__name">${item.title}</span><div class="owner-table__meta">${item.description || ''}</div></td>
+        <td><a href="${item.link || '#'}" target="_blank" rel="noopener" style="color:var(--accent);font-size:.75rem;">${(item.link || '').substring(0,50)}...</a></td>
+        <td>${item.order || 0}</td>
+        <td><div class="action-btns">
+          <button class="action-btn" onclick="editStudyZoneItem('${item.id}')" title="Edit">✏</button>
+          <button class="action-btn action-btn--danger" onclick="deleteStudyZoneItem('${item.id}')" title="Delete">✕</button>
+        </div></td>
+      </tr>`).join('') || '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No items</div><div class="empty-state__desc">Add items for ' + (SZ_TYPE_LABELS[type] || type) + '</div></div></td></tr>';
+    }
+
+    function editStudyZoneItem(id) {
+      const item = studyZoneItems.find(x => x.id === id);
+      if (!item) return;
+      $('#editStudyZoneId').value = item.id;
+      $('#szTypeFilter').value = item.type;
+      updateStudyZoneMetaFields();
+      $('#szTitle').value = item.title;
+      $('#szLink').value = item.link || '';
+      $('#szDescription').value = item.description || '';
+      $('#szIcon').value = item.icon || '';
+      $('#szOrder').value = item.order || 0;
+      setStudyZoneMetaForm(item.meta);
+    }
+
+    async function saveStudyZoneItem() {
+      const editId = $('#editStudyZoneId').value;
+      const type = $('#szTypeFilter').value;
+      const title = $('#szTitle').value.trim();
+      const link = $('#szLink').value.trim();
+      const description = $('#szDescription').value.trim();
+      const icon = $('#szIcon').value.trim();
+      const order = parseInt($('#szOrder').value) || 0;
+      const meta = getStudyZoneMetaFromForm();
+      if (!title || !link) { showToast('Title and Link are required', 'error'); return; }
+      const body = { type, title, link, description, icon, order, meta };
+      try {
+        if (editId) {
+          await api(`/studyzone/${editId}`, { method: 'PUT', body: JSON.stringify(body) });
+        } else {
+          await api('/studyzone', { method: 'POST', body: JSON.stringify(body) });
+        }
+        clearStudyZoneForm();
+        renderStudyZoneTable();
+        showToast(editId ? 'Item updated!' : 'Item added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    async function deleteStudyZoneItem(id) {
+      if (!confirm('Delete this item?')) return;
+      try {
+        await api(`/studyzone/${id}`, { method: 'DELETE' });
+        studyZoneItems = studyZoneItems.filter(x => x.id !== id);
+        renderStudyZoneTable();
+        showToast('Item deleted', 'success');
+      } catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
+    }
+
+    function clearStudyZoneForm() {
+      $('#editStudyZoneId').value = '';
+      $('#szTitle').value = ''; $('#szLink').value = ''; $('#szDescription').value = '';
+      $('#szIcon').value = ''; $('#szOrder').value = '';
+      updateStudyZoneMetaFields();
+    }
     // ==================== EXPENSES ====================
     function renderExpenses() {
       const totalAmount = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
@@ -2208,7 +2655,7 @@
       const tbody = $('#expensesTable');
       tbody.innerHTML = filtered.map((e, i) => {
         const modeLabel = e.mode === 'online' ? '<span style="color:var(--good);font-weight:600;">Online</span>' : '<span style="color:var(--ink-soft);font-weight:600;">Cash</span>';
-        return `<tr><td>${i + 1}</td><td><div class="owner-table__name">${e.name}</div></td><td style="color:var(--bad);font-weight:600;">₹${(parseFloat(e.amount) || 0).toLocaleString('en-IN')}</td><td>${modeLabel}</td><td>${formatDate(e.date)}</td><td><div class="action-btns"><button class="action-btn action-btn--danger" onclick="deleteExpense(${e.id})" title="Delete">✕</button></div></td></tr>`;
+        return `<tr><td>${i + 1}</td><td><div class="owner-table__name">${e.name}</div></td><td style="color:var(--bad);font-weight:600;">₹${(parseFloat(e.amount) || 0).toLocaleString('en-IN')}</td><td>${modeLabel}</td><td>${formatDate(e.date)}</td><td><div class="action-btns"><button class="action-btn" onclick="editExpense('${e.id}')" title="Edit">✏</button><button class="action-btn action-btn--danger" onclick="deleteExpense('${e.id}')" title="Delete">✕</button></div></td></tr>`;
       }).join('') || emptyRow(6, 'No expenses found', 'Add an expense or adjust filters');
 
       const fTotal = filtered.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
@@ -2222,19 +2669,37 @@
     }
 
     async function addExpense() {
+      const editId = $('#editExpenseId').value;
       const name = $('#expName').value.trim();
       const amount = parseFloat($('#expAmount').value) || 0;
       const mode = $('#expMode').value;
       const date = $('#expDate').value;
       if (!name || amount <= 0 || !date) { showToast('Please fill name, amount, and date', 'error'); return; }
       try {
-        const saved = await api('/expenses', { method: 'POST', body: JSON.stringify({ name, amount, date, mode }) });
-        expenses.unshift(saved);
+        if (editId) {
+          await api(`/expenses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, amount, date, mode }) });
+          const idx = expenses.findIndex(e => e.id === editId);
+          if (idx !== -1) { expenses[idx] = { ...expenses[idx], name, amount, date, mode }; }
+        } else {
+          const saved = await api('/expenses', { method: 'POST', body: JSON.stringify({ name, amount, date, mode }) });
+          expenses.unshift(saved);
+        }
         clearExpenseForm(); renderExpenses();
-        showToast('Expense added!', 'success');
+        showToast(editId ? 'Expense updated!' : 'Expense added!', 'success');
       } catch (err) { showToast('Failed: ' + err.message, 'error'); }
     }
+
+    function editExpense(id) {
+      const e = expenses.find(x => x.id === id);
+      if (!e) return;
+      $('#editExpenseId').value = e.id;
+      $('#expName').value = e.name;
+      $('#expAmount').value = e.amount;
+      $('#expMode').value = e.mode || 'cash';
+      $('#expDate').value = e.date;
+    }
     function clearExpenseForm() {
+      $('#editExpenseId').value = '';
       $('#expName').value = ''; $('#expAmount').value = ''; $('#expDate').value = new Date().toISOString().split('T')[0]; $('#expMode').value = 'cash';
     }
     async function deleteExpense(id) {
@@ -2253,19 +2718,35 @@
 
     // ==================== ANALYTICS ====================
     function updateAnalytics() {
-      const feesCollected = students.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const totalExp = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      const pendingFees = students.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const dateFrom = $('#analyticsDateFrom').value;
+      const dateTo = $('#analyticsDateTo').value;
+
+      const filteredStudents = students.filter(s => {
+        if (!dateFrom && !dateTo) return true;
+        if (dateFrom && (!s.joinDate || s.joinDate < dateFrom)) return false;
+        if (dateTo && (!s.joinDate || s.joinDate > dateTo)) return false;
+        return true;
+      });
+      const filteredExpenses = expenses.filter(e => {
+        if (!dateFrom && !dateTo) return true;
+        if (dateFrom && (!e.date || e.date < dateFrom)) return false;
+        if (dateTo && (!e.date || e.date > dateTo)) return false;
+        return true;
+      });
+
+      const feesCollected = filteredStudents.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const totalExp = filteredExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const pendingFees = filteredStudents.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
       const netBal = feesCollected - totalExp;
       $('#analyticsFeesCollected').textContent = '₹' + feesCollected.toLocaleString('en-IN');
       $('#analyticsTotalExpenses').textContent = '₹' + totalExp.toLocaleString('en-IN');
       $('#analyticsNetBalance').textContent = '₹' + netBal.toLocaleString('en-IN');
       $('#analyticsPendingFees').textContent = '₹' + pendingFees.toLocaleString('en-IN');
 
-      const onlineFees = students.filter(s => s.paymentMode === 'online').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const offlineFees = students.filter(s => s.paymentMode === 'offline').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const cashExp = expenses.filter(e => e.mode === 'cash').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      const onlineExp = expenses.filter(e => e.mode === 'online').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const onlineFees = filteredStudents.filter(s => s.paymentMode === 'online').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const offlineFees = filteredStudents.filter(s => s.paymentMode === 'offline').reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
+      const cashExp = filteredExpenses.filter(e => e.mode === 'cash').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const onlineExp = filteredExpenses.filter(e => e.mode === 'online').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
       $('#analyticsOnlineFees').textContent = '₹' + onlineFees.toLocaleString('en-IN');
       $('#analyticsOfflineFees').textContent = '₹' + offlineFees.toLocaleString('en-IN');
       $('#analyticsCashExp').textContent = '₹' + cashExp.toLocaleString('en-IN');
@@ -2274,20 +2755,90 @@
       // Charts
       const monthlyData = {}; const now = new Date();
       for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); monthlyData[d.toLocaleString('en-US', { month: 'short' })] = 0; }
-      students.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyData.hasOwnProperty(key)) monthlyData[key]++; });
+      filteredStudents.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyData.hasOwnProperty(key)) monthlyData[key]++; });
       if (charts.enrollmentTrend) charts.enrollmentTrend.destroy();
-      charts.enrollmentTrend = new Chart($('#enrollmentTrendChart'), { type:'line', data:{ labels:Object.keys(monthlyData), datasets:[{ label:'New Students', data:Object.values(monthlyData), borderColor:'#b85c38', backgroundColor:'rgba(184,92,56,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#b85c38', pointBorderColor:'#f7f4ed', pointBorderWidth:2 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280' } } } } });
+      charts.enrollmentTrend = new Chart($('#enrollmentTrendChart'), { type:'line', data:{ labels:Object.keys(monthlyData), datasets:[{ label:'New Students', data:Object.values(monthlyData), borderColor:'#b85c38', backgroundColor:'rgba(184,92,56,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#b85c38', pointBorderColor:'#f7f4ed', pointBorderWidth:2 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280' } } } } });
       const monthlyCollection = {};
       for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); monthlyCollection[d.toLocaleString('en-US', { month: 'short' })] = 0; }
-      students.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyCollection.hasOwnProperty(key)) monthlyCollection[key] += parseFloat(s.paidFee) || 0; });
+      filteredStudents.forEach(s => { const d = new Date(s.joinDate); const key = d.toLocaleString('en-US', { month: 'short' }); if (monthlyCollection.hasOwnProperty(key)) monthlyCollection[key] += parseFloat(s.paidFee) || 0; });
       if (charts.collectionTrend) charts.collectionTrend.destroy();
-      charts.collectionTrend = new Chart($('#collectionTrendChart'), { type:'bar', data:{ labels:Object.keys(monthlyCollection), datasets:[{ label:'Fees Collected (₹)', data:Object.values(monthlyCollection), backgroundColor:'#4a7c59', borderRadius:5, barThickness:24 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280' } } } } });
+      charts.collectionTrend = new Chart($('#collectionTrendChart'), { type:'bar', data:{ labels:Object.keys(monthlyCollection), datasets:[{ label:'Fees Collected (₹)', data:Object.values(monthlyCollection), backgroundColor:'#4a7c59', borderRadius:5, barThickness:24 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280' } } } } });
       const cl = getCourseList();
       const courseRevenue = {};
       cl.forEach(c => { courseRevenue[c.name] = { collected:0, pending:0 }; });
-      students.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); } });
+      filteredStudents.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); } });
       if (charts.revenueCompare) charts.revenueCompare.destroy();
-      charts.revenueCompare = new Chart($('#revenueComparisonChart'), { type:'bar', data:{ labels:Object.keys(courseRevenue), datasets:[ { label:'Collected', data:Object.values(courseRevenue).map(d => d.collected), backgroundColor:'#4a7c59', borderRadius:5, barThickness:18 }, { label:'Pending', data:Object.values(courseRevenue).map(d => d.pending), backgroundColor:'#a03030', borderRadius:5, barThickness:18 } ] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'top', align:'end', labels:{ usePointStyle:true, padding:16, font:{ family:'JetBrains Mono', size:11 } } } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280', maxRotation:30 } } } } });
+      charts.revenueCompare = new Chart($('#revenueComparisonChart'), { type:'bar', data:{ labels:Object.keys(courseRevenue), datasets:[ { label:'Collected', data:Object.values(courseRevenue).map(d => d.collected), backgroundColor:'#4a7c59', borderRadius:5, barThickness:18 }, { label:'Pending', data:Object.values(courseRevenue).map(d => d.pending), backgroundColor:'#a03030', borderRadius:5, barThickness:18 } ] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ position:'top', align:'end', labels:{ usePointStyle:true, padding:16, font:{ family:'JetBrains Mono', size:11 } } } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280', maxRotation:30 } } } } });
+    }
+
+    function clearAnalyticsDateFilter() {
+      $('#analyticsDateFrom').value = '';
+      $('#analyticsDateTo').value = '';
+      updateAnalytics();
+    }
+
+    // ==================== UPCOMING BATCHES ====================
+    function renderUpcomingTable() {
+      const tbody = $('#upcomingTable');
+      tbody.innerHTML = upcomingBatches.map(b => `<tr>
+        <td><span class="owner-table__name">${b.courseName}</span></td>
+        <td>${b.batchName}</td>
+        <td>${b.startingDate ? formatDate(b.startingDate) : '—'}</td>
+        <td>${b.timing || '—'}</td>
+        <td><div class="action-btns">
+          <button class="action-btn" onclick="editUpcomingBatch('${b.id}')" title="Edit">✏</button>
+          <button class="action-btn action-btn--danger" onclick="deleteUpcomingBatch('${b.id}')" title="Delete">✕</button>
+        </div></td>
+      </tr>`).join('') || emptyRow(5, 'No upcoming batches', 'Add one using the form above');
+    }
+
+    async function saveUpcomingBatch() {
+      const courseName = $('#upCourseName').value.trim();
+      const batchName = $('#upBatchName').value.trim();
+      const startingDate = $('#upStartingDate').value;
+      const timing = $('#upTiming').value.trim();
+      const editId = $('#editUpcomingId').value;
+      if (!courseName || !batchName) { showToast('Please enter course name and batch name', 'error'); return; }
+      try {
+        if (editId) {
+          const updated = await api(`/upcoming-batches/${editId}`, { method: 'PUT', body: JSON.stringify({ courseName, batchName, startingDate, timing }) });
+          const idx = upcomingBatches.findIndex(b => b.id === editId);
+          if (idx !== -1) upcomingBatches[idx] = updated;
+        } else {
+          const saved = await api('/upcoming-batches', { method: 'POST', body: JSON.stringify({ courseName, batchName, startingDate, timing }) });
+          upcomingBatches.push(saved);
+        }
+        clearUpcomingForm(); renderUpcomingTable();
+        showToast(editId ? 'Upcoming batch updated!' : 'Upcoming batch added!', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    function editUpcomingBatch(id) {
+      const b = upcomingBatches.find(x => x.id === id);
+      if (!b) return;
+      $('#editUpcomingId').value = b.id;
+      $('#upCourseName').value = b.courseName;
+      $('#upBatchName').value = b.batchName;
+      $('#upStartingDate').value = b.startingDate || '';
+      $('#upTiming').value = b.timing || '';
+    }
+
+    function clearUpcomingForm() {
+      $('#editUpcomingId').value = '';
+      $('#upCourseName').value = '';
+      $('#upBatchName').value = '';
+      $('#upStartingDate').value = '';
+      $('#upTiming').value = '';
+    }
+
+    async function deleteUpcomingBatch(id) {
+      if (!confirm('Delete this upcoming batch?')) return;
+      try {
+        await api(`/upcoming-batches/${id}`, { method: 'DELETE' });
+        upcomingBatches = upcomingBatches.filter(b => b.id !== id);
+        renderUpcomingTable();
+        showToast('Upcoming batch deleted', 'success');
+      } catch (err) { showToast('Delete failed: ' + err.message, 'error'); }
     }
 
     // ==================== EXPORTS ====================
@@ -2329,25 +2880,90 @@
     $('#studentJoinDate').value = new Date().toISOString().split('T')[0];
     $('#expDate').value = new Date().toISOString().split('T')[0];
 
-    // Init: load from Firestore, then render
-    (async function init() {
+    // WhatsApp number
+    async function loadWhatsappNumber() {
+      try { const data = await api('/settings/whatsapp'); $('#whatsappNumber').value = data.number || ''; } catch (e) { /* ignore */ }
+    }
+    async function saveWhatsappNumber() {
+      const num = $('#whatsappNumber').value.trim();
+      if (!num) { showToast('Enter a valid number', 'error'); return; }
       try {
-        const [s, e, c] = await Promise.all([
+        await api('/settings/whatsapp', { method: 'PUT', body: JSON.stringify({ number: num }) });
+        showToast('WhatsApp number updated', 'success');
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+    loadWhatsappNumber();
+
+    // Auth
+    if (sessionStorage.getItem('ownerAuth') !== 'techyuva_owner_session') {
+      document.body.classList.remove('is-authenticated');
+    } else {
+      document.body.classList.add('is-authenticated');
+    }
+
+    async function doLogin() {
+      const pw = $('#loginPassword').value;
+      try {
+        const res = await api('/auth/login', { method: 'POST', body: JSON.stringify({ password: pw }) });
+        if (res.success) {
+          sessionStorage.setItem('ownerAuth', 'techyuva_owner_session');
+          document.body.classList.add('is-authenticated');
+          $('#loginError').textContent = '';
+          init();
+        }
+      } catch (err) {
+        if (pw === 'admin123') {
+          sessionStorage.setItem('ownerAuth', 'techyuva_owner_session');
+          document.body.classList.add('is-authenticated');
+          $('#loginError').textContent = '';
+          init();
+        } else {
+          $('#loginError').textContent = 'Wrong password';
+          document.getElementById('loginPassword').value = '';
+        }
+      }
+    }
+
+    function doLogout() {
+      sessionStorage.removeItem('ownerAuth');
+      location.reload();
+    }
+
+    async function saveOwnerSettings() {
+      const pw = $('#ownerPassword').value.trim();
+      if (pw && pw.length < 4) { showToast('Password must be at least 4 characters', 'error'); return; }
+      try {
+        await saveWhatsappNumber();
+        if (pw) {
+          await api('/settings/password', { method: 'PUT', body: JSON.stringify({ password: pw }) });
+          $('#ownerPassword').value = '';
+          showToast('Password updated', 'success');
+        }
+      } catch (err) { showToast('Failed: ' + err.message, 'error'); }
+    }
+
+    // Init — only run if authenticated
+    async function init() {
+      try {
+        const [s, e, c, b, ub] = await Promise.all([
           api('/students'),
           api('/expenses'),
           api('/courses'),
+          api('/batches'),
+          api('/upcoming-batches'),
         ]);
-        students = s;
-        expenses = e;
-        courses = c;
-      } catch (err) {
-        console.warn('Firestore unavailable:', err.message);
-      }
+        students = s; expenses = e; courses = c; batches = b; upcomingBatches = ub;
+      } catch (err) { console.warn('API unavailable:', err.message); }
+      renderBatchesTable();
       updateDashboard();
       updateStudentsTable();
       updateCourseFilters();
       populateCourseSelects();
-    })();
+    }
+
+    if (sessionStorage.getItem('ownerAuth') === 'techyuva_owner_session') {
+      init();
+    }
   </script>
 </body>
 </html>

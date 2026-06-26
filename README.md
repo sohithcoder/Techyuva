@@ -1,110 +1,78 @@
-# TechYuva — Institute Management System
+# TechYuva — Online Coding Institute (v2)
 
-Full-stack institute management dashboard for TechYuva coding institute.
-- **Frontend**: HTML/CSS/JS (vanilla, no framework)
-- **Backend**: Node.js + Express + Firebase Firestore
-- **Dashboard**: Student registration, fee tracking, expense management, analytics
+An editorial, Awwwards-style website for **TechYuva**, an online
+institute teaching **Java · C++ · Python**. Built with vanilla HTML, CSS, and JS
+— no frameworks, no build step.
 
----
+## ✨ Features
 
-## 🚀 Quick Start (Local Dev)
+- **Live hero terminal** — types real code for each language, "compiles" it, and
+  prints friendly output on a loop. Surrounded by a breathing glow orb, rotating
+  dashed rings, and floating language chips.
+- **Courses** — Java Mastery, C++ Engineering, Python Pro tracks with modules,
+  durations, and enroll buttons.
+- **Student Zone** — login card + a dashboard preview with animated progress
+  bars, XP stats, a live-class indicator, and quick links.
+- **Owner Dashboard** — student registration, fee tracking, course reports, and analytics.
+- **Study Zone** — career paths, placement prep, job board, study materials, and practice tests.
+- **Practice tests** — a full quiz engine with a circular timer, instant
+  feedback, and an analysis screen (score donut, time-per-question bar chart,
+  per-topic strengths, and full answer review).
+- **Polish** — custom cursor, magnetic buttons, scroll reveals, tilt cards,
+  grain overlay, marquee, and full `prefers-reduced-motion` support.
 
-### 1. Firebase Setup
+## v2 Changes
 
-1. Go to [Firebase Console](https://console.firebase.google.com/project/techyuya/settings/serviceaccounts)
-2. Click **"Generate New Private Key"** → download the JSON file
-3. Save it as `backend/firebase-key.json`
+- Firebase Firestore backend (`backend/server.js`) for persistent data
+- Multi-page architecture: index, courses, study zone, owner dashboard
+- Vercel deployment with serverless API routes
+- Firebase Web SDK on all pages for client-side analytics
 
-### 2. Backend
+## 🚀 Run it
 
 ```bash
+# Frontend only
+python -m http.server 8000
+# or open index.html directly
+
+# With backend (requires Firebase service account)
 cd backend
 npm install
+node server.js
 ```
 
-Create `backend/.env`:
+## 📁 Structure
+
 ```
-FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-key.json
-PORT=3001
+index.html        # landing page
+menu.html         # courses page
+studyzone.html    # study zone
+owner.html        # owner dashboard
+style.css         # all styles (tokens, layout, animations)
+script.js         # preloader, cursor, quiz engine, analysis, terminal typewriter
+api.js            # frontend API client
+vercel.json       # Vercel serverless config
+backend/
+  server.js       # Express + Firebase Admin API
+  api/index.js    # Vercel serverless entry
 ```
 
-Start:
-```bash
-npm start
-```
+## 🔐 Environment Variables (Vercel)
 
-### 3. Frontend
+| Name | Description |
+|---|---|
+| `FIREBASE_PROJECT_ID` | Firebase project ID |
+| `FIREBASE_CLIENT_EMAIL` | Service account client email |
+| `FIREBASE_PRIVATE_KEY` | Service account private key |
 
-Open `owner.html` in browser. The dashboard loads data from Firestore automatically.
+## 🎨 Stack
+
+- HTML / CSS / Vanilla JS
+- Node.js / Express (backend)
+- Firebase Admin SDK + Firestore
+- Chart.js (owner dashboard)
+- Fonts: Instrument Serif, Space Grotesk, JetBrains Mono (Google Fonts)
 
 ---
 
-## ☁️ Deploy to Vercel
-
-### One-Click Deploy
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-### Manual Steps
-
-1. **Push to GitHub**:
-```bash
-git add .
-git commit -m "feat: Firestore backend + owner dashboard"
-git push origin main
-```
-
-2. **Import Project** in [Vercel](https://vercel.com/new)
-
-3. **Add Environment Variables** in Vercel Dashboard → Settings:
-   - `FIREBASE_SERVICE_ACCOUNT_JSON` → Paste your full Firebase service account JSON as a single line
-   - `FIREBASE_PROJECT_ID` → `techyuya`
-
-4. **Deploy** — Vercel auto-detects the config.
-
----
-
-## 📁 Project Structure
-
-```
-Techyuva/
-├── owner.html          ← Owner dashboard (admin panel)
-├── index.html          ← Landing/home page
-├── menu.html           ← Courses listing
-├── studyzone.html      ← Student zone
-├── style.css           ← All styles
-├── script.js           ← Frontend JS
-├── vercel.json         ← Vercel deployment config
-│
-└── backend/
-    ├── server.js       ← Express API + Firestore routes
-    ├── api/index.js    ← Vercel serverless entry
-    ├── package.json
-    └── .env            ← Local config
-```
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-| GET | `/api/students` | List all students |
-| POST | `/api/students` | Register student |
-| PUT | `/api/students/:id` | Update student |
-| DELETE | `/api/students/:id` | Delete student |
-| POST | `/api/students/:id/payments` | Record payment |
-| GET | `/api/courses` | List courses |
-| POST | `/api/courses` | Add course |
-| PUT | `/api/courses/:id` | Update course |
-| DELETE | `/api/courses/:id` | Delete course |
-| GET | `/api/expenses` | List expenses |
-| POST | `/api/expenses` | Add expense |
-| DELETE | `/api/expenses/:id` | Delete expense |
-| GET | `/api/dashboard` | Dashboard stats |
-| GET | `/api/analytics` | Full analytics data |
-
-## 🛠 Built With
-
-- **Express** — Node.js web framework
-- **Firebase Admin SDK** — Firestore database
-- **Chart.js** — Data visualizations
-- **Vanilla JS** — Zero framework overhead
+© 2026 TechYuva

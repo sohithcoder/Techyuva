@@ -3,94 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TechYuva — Learn Java · C++ · Python Online</title>
-  <meta name="description" content="TechYuva — an online coding institute. Master Java, C++ and Python with live classes, real projects, and a student zone built for results." />
+  <title>TechYuva Computers — No.1 Computer Training Institute in Eluru</title>
+  <meta name="description" content="TechYuva Computers is the No.1 Computer Training Institute in Eluru (Since 2014). 100% practical & job-oriented training with real-time projects, expert faculty & personalized guidance." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase Web SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArg4bQAOblW-EHTRsEJi25pDsBODf2x0M",
+      authDomain: "techyuva-19645.firebaseapp.com",
+      projectId: "techyuva-19645",
+      storageBucket: "techyuva-19645.firebasestorage.app",
+      messagingSenderId: "266294653012",
+      appId: "1:266294653012:web:cc2199e3f0c2a0e25a7dc1",
+      measurementId: "G-T73CGDZN71"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 </head>
 <body data-theme="paper">
 
-  <!-- ===== Scroll progress bar ===== -->
+  <!-- ===== Scroll Progress ===== -->
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div>
 
-  <!-- ===== Preloader (terminal boot screen) ===== -->
-  <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader__bg" aria-hidden="true"></div>
-    <div class="preloader__terminal">
-      <div class="preloader__tbar">
-        <div class="preloader__dots"><i></i><i></i><i></i></div>
-        <span class="preloader__ttitle">techyuva — boot</span>
+  <!-- ===== File Explorer Nav ===== -->
+  <header class="nav" id="nav">
+    <button class="nav__expand" id="navExpand" aria-label="Show explorer">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="nav__explorer" id="navExplorer">
+      <div class="nav__explorer-head">
+        <span class="nav__explorer-title">MENU</span>
+        <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
-      <div class="preloader__tbody">
-        <pre class="preloader__log" id="preLog"></pre>
-        <div class="preloader__bottom">
-          <div class="preloader__bar"><span id="preBar"></span></div>
-          <span class="preloader__count" id="preCount">00%</span>
+      <div class="nav__tree" id="navTree">
+        <div class="nav__tree-item nav__tree-item--root">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span>techyuva</span>
+        </div>
+        <div class="nav__tree-children">
+          <a href="index.html" class="nav__tree-item is-active" data-file="main">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Main</span>
+          </a>
+          <a href="menu.html" class="nav__tree-item" data-file="courses">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Courses</span>
+          </a>
+          <a href="studyzone.html" class="nav__tree-item" data-file="study-zone">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Study Zone</span>
+          </a>
+          <a href="owner.html" class="nav__tree-item" data-file="owner">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Owner</span>
+          </a>
         </div>
       </div>
     </div>
-    <span class="preloader__word">TechYuva</span>
-  </div>
-
-  <!-- ===== Custom cursor ===== -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-dot" id="cursorDot"></div>
-
-  <!-- ===== Binary rain background ===== -->
-  <canvas class="binary-rain" id="binaryRain" aria-hidden="true"></canvas>
-
-  <!-- ===== Grain overlay ===== -->
-  <div class="grain" aria-hidden="true"></div>
-
-  <!-- ===== 3D floating shapes (decorative, background) ===== -->
-  <div class="shapes" aria-hidden="true">
-    <div class="shape shape--cube"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="shape shape--pyramid"><i></i><i></i><i></i><i></i></div>
-    <div class="shape shape--ring"></div>
-  </div>
-
-  <!-- ===== Navigation ===== -->
-  <header class="nav" id="nav">
-    <a href="#top" class="nav__logo" data-magnetic>
-      <span class="nav__logo-mark">T.</span>echYuva
-    </a>
-    <nav class="nav__links">
-      <a href="#about" class="nav__link" data-magnetic>Why</a>
-      <a href="#courses" class="nav__link" data-magnetic>Courses</a>
-      <a href="#zone" class="nav__link" data-magnetic>Student Zone</a>
-      <a href="#analysis" class="nav__link" data-magnetic>Practice</a>
-    </nav>
-    <a href="#courses" class="btn btn--small" data-magnetic>
-      <span>Enroll now</span>
-      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
+    <div class="nav__bar">
+      <a href="#top" class="nav__logo">
+        <span class="nav__logo-mark"><img src="unnamed.webp" alt="TechYuva" /></span>
+        <div class="nav__logo-text">
+          <span class="nav__logo-name">TechYuva</span>
+          <span class="nav__logo-sub">ISO Certified Coding Institute</span>
+        </div>
+      </a>
+      <div class="nav__actions">
+        <button class="nav__cmd" id="cmdPalette">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <a href="menu.html" class="btn btn--small">
+          <span>$ enroll</span>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
   </header>
+
+  <!-- ===== Command Palette ===== -->
+  <div class="cmd-palette" id="cmdPaletteOverlay" hidden>
+    <div class="cmd-palette__backdrop"></div>
+    <div class="cmd-palette__modal">
+      <div class="cmd-palette__input-wrap">
+        <span class="cmd-palette__prompt">$</span>
+        <input type="text" class="cmd-palette__input" id="cmdInput" placeholder="Type a command or search..." autocomplete="off" />
+      </div>
+      <div class="cmd-palette__results" id="cmdResults"></div>
+    </div>
+  </div>
 
   <main id="top">
 
     <!-- ===== Hero ===== -->
     <section class="hero">
       <div class="hero__content">
-        <p class="hero__eyebrow reveal">Online coding institute · Live + self-paced</p>
-        <h1 class="hero__title">
-          <span class="line"><span>Code with</span></span>
-          <span class="line"><span><em>intention</em>,</span></span>
-          <span class="line"><span>build with <em class="accent">insight</em>.</span></span>
+        <p class="hero__eyebrow reveal">Practical coaching · Real results</p>
+        <h1 class="hero__title" id="heroTitle">
+          <span class="line"><span>Learn <em>today</em>,</span></span>
+          <span class="line"><span>Lead <em class="accent">tomorrow</em>.</span></span>
         </h1>
         <div class="hero__bottom">
           <p class="hero__copy reveal">
-            TechYuva is an online institute for Java, C++ and Python.
-            Structured tracks, real projects, and a student zone that
-            turns every lesson into measurable progress.
+            TechYuva Computers — No.1 Computer Training Institute in Eluru (Since 2014).
+            Trusted by students, job seekers & professionals for 100% practical,
+            job-oriented training with real-time projects, expert faculty & personalized guidance.
           </p>
           <div class="hero__actions reveal">
-            <a href="#courses" class="btn btn--primary" data-magnetic>
-              <span>Explore courses</span>
+            <a href="menu.html" class="btn btn--primary" id="heroEnroll">
+              <span class="btn__text">$ techyuva enroll</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a href="#zone" class="link-arrow" data-magnetic>Student zone</a>
+            <a href="#zone" class="link-arrow">Student zone →</a>
           </div>
         </div>
 
@@ -101,21 +135,16 @@
         </div>
       </div>
 
-      <!-- Terminal as the hero centerpiece -->
+      <!-- White Paper Terminal -->
       <div class="hero__terminal">
         <div class="hero__orb" aria-hidden="true"></div>
         <div class="hero__ring hero__ring--1" aria-hidden="true"></div>
         <div class="hero__ring hero__ring--2" aria-hidden="true"></div>
 
-        <div class="terminal reveal" data-tilt>
+        <div class="terminal reveal">
           <div class="terminal__bar">
             <div class="terminal__dots"><i></i><i></i><i></i></div>
-            <span class="terminal__title" id="termTitle">techyuva — java</span>
-            <div class="terminal__langs" role="tablist">
-              <button class="term-tab is-active" data-term="java" data-magnetic>Java</button>
-              <button class="term-tab" data-term="cpp" data-magnetic>C++</button>
-              <button class="term-tab" data-term="python" data-magnetic>Python</button>
-            </div>
+            <span class="terminal__title" id="termTitle">techyuva — welcome</span>
           </div>
           <div class="terminal__body">
             <pre class="terminal__code" id="termCode"></pre>
@@ -127,229 +156,66 @@
           </div>
         </div>
 
-        <!-- friendly floating language / symbol chips -->
-        <div class="hero__chips" aria-hidden="true">
-          <span class="hero__chip is-accent" style="top:2%;left:-5%;--rot:-8deg;animation-delay:0s">Java</span>
-          <span class="hero__chip" style="top:9%;right:-6%;--rot:6deg;animation-delay:.8s">C++</span>
-          <span class="hero__chip" style="bottom:15%;right:-4%;--rot:-5deg;animation-delay:1.4s">Python</span>
-          <span class="hero__chip is-accent" style="bottom:3%;left:5%;--rot:7deg;animation-delay:2s">{ }</span>
-          <span class="hero__chip" style="top:46%;left:-8%;--rot:-4deg;animation-delay:1s">&lt;/&gt;</span>
-          <span class="hero__chip is-accent" style="bottom:42%;right:2%;--rot:9deg;animation-delay:.4s">();</span>
-        </div>
       </div>
 
       <div class="hero__scroll" aria-hidden="true"><span></span></div>
     </section>
 
-    <!-- ===== Marquee ===== -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee__track">
-        <span>Java</span><i>✶</i><span>C++</span><i>✶</i><span>Python</span><i>✶</i><span>DSA</span><i>✶</i>
-        <span>Java</span><i>✶</i><span>C++</span><i>✶</i><span>Python</span><i>✶</i><span>DSA</span><i>✶</i>
-        <span>Java</span><i>✶</i><span>C++</span><i>✶</i><span>Python</span><i>✶</i><span>DSA</span><i>✶</i>
-      </div>
-    </div>
-
     <!-- ===== Why / Features ===== -->
-    <section class="section" id="about">
+    <section class="section" id="trending">
       <div class="section__head">
         <span class="section__index reveal">01</span>
-        <h2 class="section__title reveal">Built for the way<br/>you actually <em>learn</em> to code</h2>
+        <h2 class="section__title reveal" data-ascii-title>Trending <em>Courses</em></h2>
+        <p class="section__sub reveal">What's hot right now. Pick one and start learning today.</p>
       </div>
-      <div class="features">
-        <article class="feature reveal" data-tilt>
-          <span class="feature__num">a.</span>
-          <h3>Live + recorded</h3>
-          <p>Attend live cohort classes or watch the recorded session later. One clear path per language — no endless tutorial maze.</p>
-          <div class="feature__art feature__art--rings"><i></i><i></i><i></i></div>
-        </article>
-        <article class="feature reveal" data-tilt>
-          <span class="feature__num">b.</span>
-          <h3>Instant analysis</h3>
-          <p>Every practice test scores accuracy, pace, and topic strength — rendered the moment you finish, not buried in a PDF.</p>
-          <div class="feature__art feature__art--bars"><i></i><i></i><i></i><i></i><i></i></div>
-        </article>
-        <article class="feature reveal" data-tilt>
-          <span class="feature__num">c.</span>
-          <h3>Honest review</h3>
-          <p>Every answer revisited side-by-side with the correct one, so a bug never happens twice.</p>
-          <div class="feature__art feature__art--check">
-            <svg viewBox="0 0 48 48" fill="none"><path class="check-path" d="M10 25l9 9 19-20" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </article>
+      <div class="courses" id="trendingList">
+        <article class="course"><div class="course__content"><div class="skeleton skeleton--title"></div><div class="skeleton skeleton--text"></div><div class="skeleton skeleton--text skeleton--text-sm"></div></div></article>
+        <article class="course"><div class="course__content"><div class="skeleton skeleton--title"></div><div class="skeleton skeleton--text"></div><div class="skeleton skeleton--text skeleton--text-sm"></div></div></article>
       </div>
     </section>
 
-    <!-- ===== Courses ===== -->
-    <section class="section section--dark" id="courses">
+    <!-- ===== Upcoming Batches ===== -->
+    <section class="section section--dark" id="schedule">
       <div class="section__head">
         <span class="section__index reveal">02</span>
-        <h2 class="section__title reveal">Pick a course.<br/><em>Begin.</em></h2>
-        <p class="section__sub reveal">Three core tracks. Each ends with projects, a certificate, and access to the student zone.</p>
+        <h2 class="section__title reveal" data-ascii-title>Upcoming <em>Batches</em></h2>
+        <p class="section__sub reveal">New batches starting soon. Reserve your seat before they fill up.</p>
       </div>
-
-      <div class="courses" id="courseList">
-
-        <!-- Java -->
-        <article class="course reveal" data-magnetic>
-          <div class="course__head">
-            <span class="course__index">01</span>
-            <span class="course__lang">Java</span>
-            <span class="course__badge">Backend · OOP · DSA</span>
-          </div>
-          <h3 class="course__name">Java Mastery</h3>
-          <p class="course__desc">From syntax to Spring-ready backends. Strong OOP, collections, multithreading and competitive DSA.</p>
-          <ul class="course__modules">
-            <li>Core syntax &amp; control flow</li>
-            <li>OOP, interfaces, generics</li>
-            <li>Collections &amp; Streams API</li>
-            <li>DSA patterns in Java</li>
-            <li>Mini project: REST backend</li>
-          </ul>
-          <div class="course__foot">
-            <span class="course__duration">12 weeks · 48 sessions</span>
-            <button class="course__cta" data-subject="java" data-magnetic>Enroll <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          </div>
-        </article>
-
-        <!-- C++ -->
-        <article class="course reveal" data-magnetic>
-          <div class="course__head">
-            <span class="course__index">02</span>
-            <span class="course__lang">C++</span>
-            <span class="course__badge">Systems · CP · DSA</span>
-          </div>
-          <h3 class="course__name">C++ Engineering</h3>
-          <p class="course__desc">Memory, pointers and the STL. Built for competitive programming and system-level performance.</p>
-          <ul class="course__modules">
-            <li>Modern C++ syntax</li>
-            <li>Pointers, references, memory</li>
-            <li>STL &amp; algorithm complexity</li>
-            <li>OOP &amp; templates</li>
-            <li>Mini project: CP problem set</li>
-          </ul>
-          <div class="course__foot">
-            <span class="course__duration">10 weeks · 40 sessions</span>
-            <button class="course__cta" data-subject="cpp" data-magnetic>Enroll <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          </div>
-        </article>
-
-        <!-- Python -->
-        <article class="course reveal" data-magnetic>
-          <div class="course__head">
-            <span class="course__index">03</span>
-            <span class="course__lang">Python</span>
-            <span class="course__badge">Automation · Data · Web</span>
-          </div>
-          <h3 class="course__name">Python Pro</h3>
-          <p class="course__desc">Scripting to data science. Clean Python, libraries, and a launchpad into ML and web automation.</p>
-          <ul class="course__modules">
-            <li>Pythonic syntax &amp; data types</li>
-            <li>Functions, OOP, modules</li>
-            <li>NumPy, Pandas, Matplotlib</li>
-            <li>Web scraping &amp; automation</li>
-            <li>Mini project: Data dashboard</li>
-          </ul>
-          <div class="course__foot">
-            <span class="course__duration">8 weeks · 32 sessions</span>
-            <button class="course__cta" data-subject="python" data-magnetic>Enroll <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          </div>
-        </article>
+      <div class="schedule-wrap" style="margin:0 auto;max-width:900px;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.78rem;">
+          <thead>
+            <tr style="background:var(--paper-2);border-bottom:2px solid var(--line);">
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Course</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Batch</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Starting Date</th>
+              <th style="padding:.85rem 1.1rem;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);">Timing</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleTable"><tr><td colspan="4"><table style="width:100%;" class="skeleton-table"><tr><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td></tr><tr><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td></tr><tr><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td><td><div class="skeleton skeleton--text"></div></td></tr></table></td></tr></tbody>
+        </table>
       </div>
-
-      <p class="courses__note reveal">
-        Not sure where to start?
-        <button class="link-arrow" id="takePlacement" data-magnetic>Take a placement test</button>
-      </p>
     </section>
 
-    <!-- ===== Student Zone ===== -->
+    <!-- ===== Student Zone Glimpse ===== -->
     <section class="section" id="zone">
       <div class="section__head">
         <span class="section__index reveal">03</span>
-        <h2 class="section__title reveal">Student <em>Zone</em></h2>
-        <p class="section__sub reveal">Everything you need after enrollment — track progress, download notes, join cohorts, and message mentors.</p>
+        <h2 class="section__title reveal" data-ascii-title>Latest from <em>Study Zone</em></h2>
+        <p class="section__sub reveal">Recent updates — roadmaps, jobs, materials, and mock tests.</p>
       </div>
-
-      <div class="zone">
-
-        <!-- Login card -->
-        <div class="zone__login reveal" data-tilt>
-          <div class="zone__login-inner">
-            <span class="zone__tag">Access</span>
-            <h3>Welcome back, coder</h3>
-            <form class="zone__form" id="zoneLogin" novalidate>
-              <label class="field">
-                <span>Student ID / Email</span>
-                <input type="text" name="email" placeholder="you@techyuva.in" autocomplete="username" />
-              </label>
-              <label class="field">
-                <span>Password</span>
-                <input type="password" name="pass" placeholder="••••••••" autocomplete="current-password" />
-              </label>
-              <button type="submit" class="btn btn--primary btn--full" data-magnetic><span>Enter zone</span></button>
-              <p class="zone__hint">New here? <a href="#courses">Pick a course</a> to get your ID.</p>
-            </form>
-          </div>
-          <div class="zone__login-art" aria-hidden="true">
-            <div class="floating-dots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          </div>
-        </div>
-
-        <!-- Dashboard preview -->
-        <div class="zone__dash reveal">
-          <div class="dash__top">
-            <span class="dash__label">Dashboard preview</span>
-            <span class="dash__status"><i></i> Live cohort</span>
-          </div>
-
-          <div class="dash__progress">
-            <div class="dash__course">
-              <div class="dash__course-head"><strong>Java Mastery</strong><span>64%</span></div>
-              <div class="progress"><span style="--p:64%"></span></div>
-            </div>
-            <div class="dash__course">
-              <div class="dash__course-head"><strong>DSA Practice</strong><span>38%</span></div>
-              <div class="progress"><span style="--p:38%"></span></div>
-            </div>
-            <div class="dash__course">
-              <div class="dash__course-head"><strong>Capstone Project</strong><span>12%</span></div>
-              <div class="progress"><span style="--p:12%"></span></div>
-            </div>
-          </div>
-
-          <div class="dash__stats">
-            <div class="dash__stat"><b>27</b><small>classes attended</small></div>
-            <div class="dash__stat"><b>9</b><small>projects shipped</small></div>
-            <div class="dash__stat"><b>1,240</b><small>XP earned</small></div>
-          </div>
-
-          <div class="dash__next">
-            <span class="dash__next-label">Up next</span>
-            <div class="dash__next-item">
-              <span class="dash__next-time">Today · 7:00 PM</span>
-              <strong>Live: Generics &amp; Collections deep-dive</strong>
-              <button class="btn btn--small" data-magnetic><span>Join class</span></button>
-            </div>
-          </div>
-
-          <div class="dash__resources">
-            <span class="dash__resources-label">Quick links</span>
-            <div class="dash__resources-grid">
-              <a href="#" class="resource" data-magnetic><span>📄</span> Notes &amp; PDFs</a>
-              <a href="#" class="resource" data-magnetic><span>💻</span> Code playground</a>
-              <a href="#" class="resource" data-magnetic><span>🏆</span> Leaderboard</a>
-              <a href="#" class="resource" data-magnetic><span>💬</span> Mentor chat</a>
-            </div>
-          </div>
-        </div>
+      <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:.6rem;" id="zoneUpdates">
+        <div class="skeleton skeleton--card" style="height:72px;"></div>
+        <div class="skeleton skeleton--card" style="height:72px;"></div>
+        <div class="skeleton skeleton--card" style="height:72px;"></div>
       </div>
+      <p style="text-align:center;margin-top:1.5rem;">
+        <a href="studyzone.html" class="link-arrow" style="font-size:.85rem;">View full Study Zone →</a>
+      </p>
     </section>
-
-    <!-- ===== Quiz ===== -->
-    <section class="quiz" id="quiz" hidden>
+    <!-- Quiz overlay -->
+    <div class="quiz" id="quiz" hidden>
       <div class="quiz__top">
-        <button class="quiz__quit" id="quizQuit" data-magnetic>✕ <span>Quit</span></button>
+        <button class="quiz__quit" id="quizQuit">✕ <span>Quit</span></button>
         <span class="quiz__subject" id="quizSubject">Java</span>
         <div class="quiz__timer">
           <svg viewBox="0 0 44 44">
@@ -366,13 +232,13 @@
         <div class="quiz__options" id="quizOptions"></div>
       </div>
       <p class="quiz__hint">Press <kbd>1</kbd>–<kbd>4</kbd> to answer</p>
-    </section>
+    </div>
 
     <!-- ===== Results / Analysis ===== -->
     <section class="results section" id="analysis" hidden>
       <div class="section__head">
         <span class="section__index">04</span>
-        <h2 class="section__title">Your <em>analysis</em></h2>
+        <h2 class="section__title" data-ascii-title>Your <em>analysis</em></h2>
       </div>
 
       <div class="results__grid">
@@ -406,29 +272,268 @@
       </div>
 
       <div class="results__actions">
-        <button class="btn btn--primary" id="retryBtn" data-magnetic><span>Retake test</span></button>
-        <button class="btn" id="newSubjectBtn" data-magnetic><span>Another subject</span></button>
+        <button class="btn btn--primary" id="retryBtn"><span>Retake test</span></button>
+        <button class="btn" id="newSubjectBtn"><span>Another subject</span></button>
       </div>
     </section>
 
-    <!-- ===== CTA ===== -->
-    <section class="cta">
-      <div class="cta__orb" aria-hidden="true"></div>
-      <h2 class="cta__title">
-        <span class="line"><span>Ready when</span></span>
-        <span class="line"><span><em>you</em> are.</span></span>
-      </h2>
-      <a href="#courses" class="btn btn--primary btn--big" data-magnetic><span>Start coding</span></a>
+    <!-- ===== YouTube Channel ===== -->
+    <section class="section" id="youtube">
+      <div class="section__head">
+        <span class="section__index reveal">04</span>
+        <h2 class="section__title reveal" data-ascii-title>Watch <em>on YouTube</em></h2>
+        <p class="section__sub reveal">Tutorials, project walkthroughs & coding tips from Lokesh TechYuva.</p>
+      </div>
+      <div class="reveal yt-section" style="max-width:900px;margin:0 auto;padding:0 var(--pad);">
+        <div class="yt-channel-card">
+          <div class="yt-channel-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-1.94C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 1.94A29.94 29.94 0 001 11.75a29.94 29.94 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-1.94 29.94 29.94 0 00.46-5.25 29.94 29.94 0 00-.46-5.39z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <h3 class="yt-channel-card__name">Lokesh TechYuva</h3>
+            <p class="yt-channel-card__sub">YouTube Channel</p>
+          </div>
+          <a href="https://www.youtube.com/@lokesh-techyuva1984" target="_blank" rel="noopener" class="btn btn--primary" style="margin-left:auto;">
+            <span>$ subscribe</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <div class="yt-videos">
+          <a href="https://www.youtube.com/@lokesh-techyuva1984/videos" target="_blank" rel="noopener" class="yt-video-card">
+            <div class="yt-video-card__thumb">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M10 8l6 4-6 4V8z" fill="var(--accent)"/></svg>
+            </div>
+            <div class="yt-video-card__info">
+              <span class="yt-video-card__title">View All Videos</span>
+              <span class="yt-video-card__meta">Latest tutorials & projects</span>
+            </div>
+          </a>
+          <a href="https://www.youtube.com/@lokesh-techyuva1984/playlists" target="_blank" rel="noopener" class="yt-video-card">
+            <div class="yt-video-card__thumb">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M10 8l6 4-6 4V8z" fill="var(--accent)"/></svg>
+            </div>
+            <div class="yt-video-card__info">
+              <span class="yt-video-card__title">Browse Playlists</span>
+              <span class="yt-video-card__meta">Organized by topic</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Location ===== -->
+    <section class="section" id="location">
+      <div class="section__head">
+        <span class="section__index reveal">05</span>
+        <h2 class="section__title reveal" data-ascii-title>Our <em>Location</em></h2>
+        <p class="section__sub reveal">Visit our campus — where learning meets real-world skills.</p>
+      </div>
+      <div class="reveal" style="max-width:900px;margin:0 auto;border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+        <iframe src="https://maps.google.com/maps?q=Tech+Yuva+Computers+Eluru&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="340" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="TechYuva Location"></iframe>
+      </div>
     </section>
   </main>
 
+  <!-- ===== Contact ===== -->
+  <section class="section" id="contact">
+    <div class="section__head">
+      <span class="section__index reveal">06</span>
+      <h2 class="section__title reveal" data-ascii-title>Get in <em>Touch</em></h2>
+      <p class="section__sub reveal">Questions? We'd love to hear from you.</p>
+    </div>
+    <div class="reveal contact-grid">
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="contact-card__label">Phone</div>
+        <a href="tel:+919876543210" class="contact-card__value">+91 98765 43210</a>
+        <a href="tel:+919876543211" class="contact-card__value">+91 98765 43211</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="contact-card__label">Email</div>
+        <a href="mailto:hello@techyuva.com" class="contact-card__value">hello@techyuva.com</a>
+        <a href="mailto:support@techyuva.com" class="contact-card__value">support@techyuva.com</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="contact-card__label">Follow Us</div>
+        <div class="contact-card__socials">
+          <a href="https://instagram.com/techyuva" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+          </a>
+          <a href="https://facebook.com/techyuva" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3V2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://linkedin.com/company/techyuva" target="_blank" rel="noopener" class="social-link" aria-label="LinkedIn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="9" width="4" height="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:1.5rem;">
+      <div class="ratings-row">
+        <span class="ratings-row__stars">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill-opacity=".8"/></svg>
+        </span>
+        <span class="ratings-row__score">4.9</span>
+        <span class="ratings-row__sep">·</span>
+        <a href="https://g.page/techyuva" target="_blank" rel="noopener" class="ratings-row__link">Google Reviews</a>
+        <span class="ratings-row__sep">·</span>
+        <a href="https://www.justdial.com/Eluru/Tech-Yuva-Computers" target="_blank" rel="noopener" class="ratings-row__link">Justdial</a>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== Footer ===== -->
   <footer class="footer">
-    <span class="footer__logo">T.echYuva</span>
-    <p>Online coding institute. Built for learners, by engineers.</p>
+    <span class="footer__logo">>_TechYuva</span>
+    <p>Best Computer Training Institute in Eluru. Since 2014.</p>
     <span class="footer__year">© 2026 TechYuva</span>
   </footer>
 
+  <div class="footer-credits">
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
+
   <script src="script.js"></script>
+  <script>
+    // API helpers (inlined — no module imports for file:// compatibility)
+    const API_BASE = (!window.location.hostname || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3001/api'
+      : window.location.origin + '/api';
+
+    async function api(path, options = {}) {
+      const config = { headers: { 'Content-Type': 'application/json' }, ...options };
+      const res = await fetch(`${API_BASE}${path}`, config);
+      if (!res.ok) { const err = await res.json().catch(() => ({ error: res.statusText })); throw new Error(err.error || 'API error'); }
+      const text = await res.text();
+      return text ? JSON.parse(text) : [];
+    }
+
+    async function getCourses() { return api('/courses'); }
+    async function getBatches(courseId) {
+      const query = courseId ? `?courseId=${encodeURIComponent(courseId)}` : '';
+      return api('/batches' + query);
+    }
+    function formatCurrency(n) { return '₹' + (parseFloat(n) || 0).toLocaleString('en-IN'); }
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    function countdownLabel(startingDate) {
+      if (!startingDate) return '';
+      const now = new Date(); now.setHours(0,0,0,0);
+      const start = new Date(startingDate); start.setHours(0,0,0,0);
+      const diff = start - now;
+      if (diff <= 0) return '<span style="color:var(--good);">Started</span>';
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      if (days <= 1) return '<span style="color:var(--bad);animation:pulse 1s infinite;">Starting tomorrow</span>';
+      if (days <= 7) return '<span style="color:var(--accent);font-weight:600;">' + days + ' days to go</span>';
+      return '<span style="color:var(--ink-soft);">' + days + ' days</span>';
+    }
+
+    async function loadSchedule() {
+      const tbody = document.getElementById('scheduleTable');
+      if (!tbody) return;
+      try {
+        const upcoming = await api('/upcoming-batches');
+        if (!upcoming.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state__title">No upcoming batches</div><div class="empty-state__desc">Check back soon for new batches!</div></div></td></tr>'; return; }
+        let rows = '', even = false;
+        upcoming.forEach(b => {
+          const bg = even ? 'var(--paper-2)' : 'var(--paper)';
+          const cell = 'padding:.7rem 1.1rem;border-bottom:1px solid var(--line);color:var(--ink);';
+          rows += '<tr style="background:' + bg + ';">' +
+            '<td style="' + cell + 'font-weight:600;">' + b.courseName + '</td>' +
+            '<td style="' + cell + '">' + b.batchName + '</td>' +
+            '<td style="' + cell + 'font-family:var(--font-mono);">' + (b.startingDate ? formatDate(b.startingDate) + '<br><span style="font-size:.65rem;">' + countdownLabel(b.startingDate) + '</span>' : '—') + '</td>' +
+            '<td style="' + cell + 'font-family:var(--font-mono);">' + (b.timing || '—') + '</td></tr>';
+          even = !even;
+        });
+        tbody.innerHTML = rows;
+      } catch (err) { tbody.innerHTML = '<tr><td colspan="4">Unable to load</td></tr>'; }
+    }
+
+    async function loadTrendingCourses() {
+      const container = document.getElementById('trendingList');
+      if (!container) return;
+      try {
+        const raw = await api('/courses?trending=true');
+        const courses = Array.isArray(raw) ? raw : [];
+        if (!courses.length) {
+          container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">No trending courses right now. Check the full <a href="menu.html" style="color:var(--accent);">course list</a>.</p>';
+          return;
+        }
+        const batchesByCourse = {};
+        const batchRes = await Promise.all(courses.map(c => getBatches(c.id).catch(() => [])));
+        courses.forEach((c, i) => { batchesByCourse[c.id] = batchRes[i]; });
+        container.innerHTML = courses.map((c, idx) => {
+          const batches = batchesByCourse[c.id] || [];
+          const batchTags = batches.map(b => '<span class="course__batch-tag">' + b.name + '</span>').join('');
+          return '<article class="course"><div class="course__content"><div class="course__head"><span class="course__index">' + String(idx + 1).padStart(2, '0') + '</span><span class="course__lang">' + c.name.split(' ')[0] + '</span><span class="course__badge">' + (c.badge || c.name) + '</span></div><h3 class="course__name">' + c.name + '</h3><p class="course__desc">' + (c.description || 'Comprehensive course with hands-on projects and live mentoring.') + '</p>' + (batchTags ? '<div class="course__batches">' + batchTags + '</div>' : '') + '<div class="course__foot"><span class="course__duration">' + (c.duration || 'Self-paced') + (c.endDate ? ' · ends ' + formatDate(c.endDate) : '') + '</span><a class="course__cta" href="menu.html"><span class="cta__text">$ view details</span><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div></article>';
+        }).join('');
+      } catch (err) { container.innerHTML = '<p class="courses__note" style="grid-column:1/-1;">Unable to load trending.</p>'; }
+    }
+    async function loadZoneUpdates() {
+      const ctr = document.getElementById('zoneUpdates');
+      if (!ctr) return;
+      const colors = { 'career-roadmap':'#d4784a','placement-guideline':'#3d8b63','job-opening':'#4075a8','study-material':'#7b5ea7','mock-test':'#c74552' };
+      const labels = { 'career-roadmap':'Career','placement-guideline':'Placement','job-opening':'Job','study-material':'Material','mock-test':'Mock Test' };
+      try {
+        const items = await api('/studyzone');
+        const recent = (items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+        if (!recent.length) { ctr.innerHTML = '<p style="text-align:center;color:var(--ink-soft);padding:1rem;">No updates yet.</p>'; return; }
+        ctr.innerHTML = recent.map(item => {
+          const m = item.meta || {}; let tags = '';
+          if (item.type === 'career-roadmap' && Array.isArray(m.skills)) tags += m.skills.slice(0, 3).map(s => '<span class="sz-tag">' + s + '</span>').join('');
+          if (item.type === 'job-opening') { if (m.company) tags += '<span class="sz-tag sz-tag--a">' + m.company + '</span>'; if (m.location) tags += '<span class="sz-tag">' + m.location + '</span>'; }
+          if (item.type === 'study-material') { if (m.fileType) tags += '<span class="sz-tag">' + m.fileType + '</span>'; if (m.size) tags += '<span class="sz-tag">' + m.size + '</span>'; }
+          if (item.type === 'mock-test') { if (m.difficulty) tags += '<span class="sz-tag sz-tag--a">' + m.difficulty + '</span>'; if (m.topic) tags += '<span class="sz-tag">' + m.topic + '</span>'; }
+          const c = colors[item.type] || '#888';
+          const d = new Date(item.createdAt || Date.now());
+          return '<a class="sz-update-card" href="studyzone.html" style="--accent:' + c + '">' +
+            '<div class="sz-update__body"><div class="sz-update__top"><h3 class="sz-update__title">' + item.title + '</h3>' +
+            '<svg class="sz-update__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+            '<p class="sz-update__desc">' + (item.description || '') + '</p>' +
+            '<div class="sz-update__tags">' +
+            '<span class="sz-tag sz-tag--a" style="background:' + c + '15;color:' + c + ';border-color:' + c + '30;">' + (labels[item.type] || item.type) + '</span>' +
+            tags + '<span class="sz-update__date">' + d.toLocaleDateString('en-IN', { day:'numeric', month:'short' }) + '</span></div></div></a>';
+        }).join('');
+      } catch (err) { ctr.innerHTML = '<p style="text-align:center;color:var(--ink-soft);">Unable to load.</p>'; }
+    }
+    loadTrendingCourses();
+    loadSchedule();
+    loadZoneUpdates();
+    (async function loadWaNumber() {
+      try {
+        const data = await api('/settings/whatsapp');
+        if (data && data.number) {
+          const wa = document.getElementById('waFloat');
+          if (wa) wa.href = 'https://wa.me/' + data.number;
+        }
+      } catch (e) { /* use default */ }
+    })();
+  </script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/919876543210" target="_blank" rel="noopener" class="wa-float" id="waFloat" aria-label="Chat on WhatsApp">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
 </body>
 </html>
