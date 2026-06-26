@@ -329,8 +329,13 @@ kbd {
   html { overflow-x: hidden; }
   .hero { grid-template-columns: 1fr; gap: 2rem; padding-top: clamp(5rem, 10vh, 7rem); padding-bottom: 2rem; }
   .hero__title { font-size: clamp(2rem, 8vw, 3rem); }
-  .hero__terminal { max-width: 100%; }
+  .hero__terminal { max-width: 100%; margin: 0 auto; }
+  .hero__orb, .hero__ring { display: none; }
   .hero__chips { display: none; }
+  .terminal__body { padding: .8rem 1rem; min-height: 120px; }
+  .terminal__code, .terminal__out { font-size: .65rem; }
+  .terminal__bar { padding: .5rem .8rem; }
+  .terminal__title { font-size: .65rem; }
   .hero__bottom { flex-direction: column; gap: 1rem; }
   .hero__copy { max-width: 100%; font-size: .88rem; }
   .hero__stats { gap: 1rem; }
@@ -1899,11 +1904,6 @@ kbd {
 .section:first-of-type { border-top: none; }
 
 @media (max-width: 480px) {
-  .hero__terminal { overflow: hidden; }
-  .hero__orb { width: 280px !important; height: 280px !important; }
-  .hero__ring { display: none; }
-  .terminal__body { padding: .8rem; min-height: 160px; }
-  .terminal__code, .terminal__out { font-size: .65rem; }
   .hero__actions .btn { width: 100%; justify-content: center; }
 }
 
