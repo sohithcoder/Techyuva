@@ -1203,20 +1203,33 @@ const SoundFX = (() => {
     document.addEventListener('click', function(e) {
       var tag = e.target.tagName;
       if (tag === 'BUTTON' || tag === 'A' || e.target.closest('button') || e.target.closest('a')) {
-        playClick();
-        if (navigator.vibrate) navigator.vibrate(10);
+        var el = e.target.closest('button') || e.target.closest('a');
+        if (el && el.classList.contains('btn--primary')) playPrimary();
+        else playClick();
+        if (navigator.vibrate) navigator.vibrate(el && el.classList.contains('btn--primary') ? 20 : 10);
       }
     });
+    document.addEventListener('scroll', function() {
+      if (navigator.vibrate) navigator.vibrate(5);
+    }, {once:true});
+
+    window.addEventListener('load', function() {
+      playChime();
+      if (navigator.vibrate) navigator.vibrate([15,30,15]);
+    });
   }
-  function playClick() {
+  function playTone(freq, dur, vol, type) {
     if (!ctx) return;
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sine'; osc.frequency.value = 800;
-    gain.gain.value = 0.02;
-    osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-    osc.stop(ctx.currentTime + 0.05);
+    osc.type = type || 'sine'; osc.frequency.value = freq;
+    gain.gain.value = vol || 0.06;
+    osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.stop(ctx.currentTime + dur);
   }
+  function playClick() { playTone(1000, 0.06, 0.06); }
+  function playPrimary() { playTone(600, 0.04, 0.06); playTone(900, 0.04, 0.04); setTimeout(function(){ playTone(1200, 0.04, 0.04); }, 30); }
+  function playChime() { playTone(523, 0.15, 0.05); playTone(659, 0.15, 0.04); playTone(784, 0.2, 0.03); }
   return { init };
 })();
