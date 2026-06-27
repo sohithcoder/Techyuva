@@ -993,6 +993,7 @@ const Terminal = (() => {
   const elOut    = $("#termOut");
   const elTitle  = $("#termTitle");
   const elStatus = $("#termStatus");
+  if (!elCode || !elOut) return { init: () => {} }; // terminal removed, no-op
   const tabs     = $$(".term-tab");
 
   const SNIPPETS = {

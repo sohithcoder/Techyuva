@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b85c38" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="TechYuva" />
+  <link rel="manifest" href="manifest.json" />
   <title>TechYuva Computers — No.1 Computer Training Institute in Eluru</title>
   <meta name="description" content="TechYuva Computers is the No.1 Computer Training Institute in Eluru (Since 2014). 100% practical & job-oriented training with real-time projects, expert faculty & personalized guidance." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -134,31 +139,6 @@
           <div class="stat"><span class="stat__num" data-count="45">0</span><span class="stat__suffix">+</span><p>hands-on projects</p></div>
         </div>
       </div>
-
-      <!-- White Paper Terminal -->
-      <div class="hero__terminal">
-        <div class="hero__orb" aria-hidden="true"></div>
-        <div class="hero__ring hero__ring--1" aria-hidden="true"></div>
-        <div class="hero__ring hero__ring--2" aria-hidden="true"></div>
-
-        <div class="terminal reveal">
-          <div class="terminal__bar">
-            <div class="terminal__dots"><i></i><i></i><i></i></div>
-            <span class="terminal__title" id="termTitle">techyuva — welcome</span>
-          </div>
-          <div class="terminal__body">
-            <pre class="terminal__code" id="termCode"></pre>
-            <div class="terminal__out" id="termOut" aria-live="polite"></div>
-          </div>
-          <div class="terminal__statusbar">
-            <span class="terminal__status" id="termStatus"><i></i> idle</span>
-            <span class="terminal__cursor-info">UTF-8 · LF · techyuva</span>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="hero__scroll" aria-hidden="true"><span></span></div>
     </section>
 
     <!-- ===== Why / Features ===== -->
@@ -534,6 +514,12 @@
   <a href="https://wa.me/919876543210" target="_blank" rel="noopener" class="wa-float" id="waFloat" aria-label="Chat on WhatsApp">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    }
+  </script>
 
 </body>
 </html>

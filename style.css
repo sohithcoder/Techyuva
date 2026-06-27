@@ -329,9 +329,8 @@ kbd {
   html { overflow-x: hidden; }
 
   /* ─── Hero ─── */
-  .hero { grid-template-columns: 1fr; gap: 0; padding: 5rem 1rem 1.5rem; min-height: auto; text-align: center; }
-  .hero__content { text-align: center; }
-  .hero__terminal, .hero__orb, .hero__ring, .hero__chips, .hero__scroll { display: none; }
+  .hero { padding: 5rem 1rem 2rem; min-height: auto; }
+  .hero__content { max-width: 100%; }
   .hero__eyebrow { font-size: .65rem; margin-bottom: .8rem; letter-spacing: .12em; justify-content: center; }
   .hero__title { font-size: clamp(1.8rem, 10vw, 2.6rem); line-height: 1.08; }
   .line > span { transform-origin: center top; }
@@ -575,16 +574,18 @@ kbd {
    ============================================================ */
 .hero {
   min-height: 100svh;
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: clamp(2rem, 5vw, 5rem);
+  justify-content: center;
+  text-align: center;
   padding: clamp(7rem, 14vh, 9rem) var(--pad) 5rem;
   padding-left: calc(var(--nav-edge) + var(--pad));
   position: relative;
 }
 
-.hero__content { position: relative; z-index: 2; min-width: 0; }
+.hero__content { position: relative; z-index: 2; max-width: 700px; margin: 0 auto; }
+.hero__eyebrow { justify-content: center; }
 
 .hero__eyebrow {
   font-family: var(--font-mono);
@@ -619,17 +620,20 @@ kbd {
 .lines-in .line:nth-child(3) > span { transition-delay: .2s; }
 
 .hero__bottom {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 2rem; margin-top: 2.4rem; flex-wrap: wrap;
+  display: flex; flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem; margin-top: 2.4rem;
 }
-.hero__copy { max-width: 38ch; color: var(--ink-soft); font-size: .98rem; line-height: 1.65; }
-.hero__actions { display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
+.hero__copy { max-width: 48ch; color: var(--ink-soft); font-size: .98rem; line-height: 1.65; text-align: center; }
+.hero__actions { display: flex; align-items: center; justify-content: center; gap: 1.6rem; flex-wrap: wrap; }
 
 .hero__stats {
   display: flex; gap: clamp(1.6rem, 4vw, 3.4rem);
   margin-top: clamp(2.6rem, 6vh, 4rem);
   padding-top: 1.8rem;
   border-top: 1px solid var(--line);
+  justify-content: center;
   flex-wrap: wrap;
 }
 .stat__num, .stat__suffix {
