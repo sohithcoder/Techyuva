@@ -2084,20 +2084,13 @@ kbd {
   color: var(--ink-soft);
   letter-spacing: .03em;
 }
-@media (max-width: 900px) {
-  .footer-credits { padding: .65rem var(--pad); }
-}
-
-/* ============================================================
-   BOTTOM NAV (MOBILE)
-   ============================================================ */
 .bottom-nav {
-  display: none;
   position: fixed; bottom: 0; left: 0; right: 0;
   z-index: 900;
   background: var(--paper);
   border-top: 1px solid var(--line);
-  padding: .3rem 1rem calc(.3rem + env(safe-area-inset-bottom));
+  padding: .4rem 1rem .5rem;
+  display: flex;
   justify-content: space-around;
   align-items: center;
 }
@@ -2117,9 +2110,13 @@ kbd {
   z-index: 0; pointer-events: none;
 }
 
+@media (min-width: 901px) {
+  .bottom-nav { display: none; }
+  body { padding-bottom: 0; }
+}
+
 @media (max-width: 900px) {
-  .bottom-nav { display: flex; }
-  body { padding-bottom: 70px; }
+  body { padding-bottom: 68px; }
 }
 
 /* Owner — hidden discreet link */
