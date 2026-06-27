@@ -558,6 +558,17 @@
       if (a && l) { l.style.left = a.offsetLeft+'px'; l.style.width = a.offsetWidth+'px'; }
     })();
 
+    /* ─── Swipe Nav ─── */
+    (function(){
+      var pages = ['index.html','menu.html','studyzone.html'];
+      var sx=0, ex=0;
+      document.addEventListener('touchstart',function(e){sx=e.changedTouches[0].screenX},{passive:true});
+      document.addEventListener('touchend',function(e){
+        ex=e.changedTouches[0].screenX; var d=sx-ex, i=pages.indexOf('index.html');
+        if(Math.abs(d)>80){if(navigator.vibrate)navigator.vibrate(10);if(d>0&&i<2)location=pages[i+1];if(d<0&&i>0)location=pages[i-1];}
+      },{passive:true});
+    })();
+
     /* ─── Service Worker ─── */
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(regs) {
