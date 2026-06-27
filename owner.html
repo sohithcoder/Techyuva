@@ -2997,7 +2997,7 @@
             regNo: s['reg no'] || '', name: s['name'] || '', phone: s['phone'] || '',
             phone2: s['phone2'] || '', address: s['address'] || '', reference: s['reference'] || '',
             paymentMode: paymentMode, course: s['course'] || '', batch: batch,
-            joinDate: s['join date'] || '', expectedEndDate: s['expected end'] || '',
+            joinDate: fixDate(s['join date']), expectedEndDate: fixDate(s['expected end']),
             totalFee: totalFee, paidFee: paidFee, status: status, payments: payments,
             courseStatus: courseStatus, certificateIssued: certificate
           };
@@ -3025,6 +3025,15 @@
       }
       result.push(current.trim());
       return result;
+    }
+
+    function fixDate(d) {
+      if (!d || d === '2/21/1900') return '';
+      var parts = d.split('/');
+      if (parts.length === 3) {
+        return parts[2] + '-' + parts[0].padStart(2,'0') + '-' + parts[1].padStart(2,'0');
+      }
+      return d;
     }
 
     // ==================== UTILITIES ====================
