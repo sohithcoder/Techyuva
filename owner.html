@@ -2504,7 +2504,7 @@
       if (!file) return;
       var reader = new FileReader();
       reader.onload = async function(e) {
-        var lines = e.target.result.split('\n');
+        var lines = e.target.result.replace(/\r/g,'').split('\n');
         if (lines.length < 2) { showToast('CSV empty', 'error'); return; }
         var headers = lines[0].split(',');
         var ci = 0, bi = 0, courseMap = {};
@@ -3020,10 +3020,10 @@
       for (var i = 0; i < line.length; i++) {
         var ch = line[i];
         if (ch === '"') { inQuotes = !inQuotes; continue; }
-        if (ch === ',' && !inQuotes) { result.push(current); current = ''; continue; }
+        if (ch === ',' && !inQuotes) { result.push(current.trim()); current = ''; continue; }
         current += ch;
       }
-      result.push(current);
+      result.push(current.trim());
       return result;
     }
 
