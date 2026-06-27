@@ -2116,7 +2116,7 @@ kbd {
 
 /* Back to Top */
 .btt {
-  position: fixed; bottom: 140px; right: 1rem;
+  position: fixed; bottom: 140px; left: 1rem;
   z-index: 900;
   width: 40px; height: 40px;
   border-radius: 50%; border: 1px solid var(--line);

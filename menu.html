@@ -684,24 +684,6 @@
     }
 
     loadCourses();
-
-    // code particles
-    (function(){
-      var chars = ['{ }','fn()','=>','[]','&&','#','||','const','< />','*'];
-      var header = document.querySelector('.course-page__head');
-      if (!header) return;
-      header.style.position = 'relative';
-      function spawn(){
-        var s = document.createElement('span');
-        s.textContent = chars[Math.floor(Math.random()*chars.length)];
-        s.style.cssText = 'position:absolute;font-family:var(--font-mono);font-size:'+(10+Math.random()*8)+'px;color:var(--accent);opacity:0;left:'+(Math.random()*90)+'%;bottom:0;pointer-events:none;transition:all '+(2+Math.random()*3)+'s linear';
-        header.appendChild(s);
-        requestAnimationFrame(function(){ s.style.opacity = 0.12; s.style.bottom = '100%'; });
-        setTimeout(function(){ s.remove(); }, 3500);
-      }
-      setInterval(function(){ spawn(); }, 800);
-      for (var i=0;i<4;i++) setTimeout(spawn, i*300);
-    })();
   </script>
 </body>
 </html>
