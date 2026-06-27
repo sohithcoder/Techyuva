@@ -2088,3 +2088,40 @@ kbd {
   .footer-credits { padding: .65rem var(--pad); }
 }
 
+/* ============================================================
+   BOTTOM NAV (MOBILE)
+   ============================================================ */
+.bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 900;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: .3rem 1rem calc(.3rem + env(safe-area-inset-bottom));
+  justify-content: space-around;
+  align-items: center;
+}
+.bottom-nav__item {
+  display: flex; flex-direction: column; align-items: center; gap: .15rem;
+  padding: .35rem .6rem; border-radius: 10px;
+  color: var(--ink-faint); text-decoration: none;
+  font-family: var(--font-mono); font-size: .58rem;
+  transition: color .3s; position: relative; z-index: 1;
+}
+.bottom-nav__item.is-active { color: var(--accent); }
+.bottom-nav__item.is-active span { font-weight: 600; }
+.bottom-nav__liquid {
+  position: absolute; top: .25rem; height: calc(100% - .5rem);
+  background: var(--accent-soft); border-radius: 10px;
+  transition: left .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1);
+  z-index: 0; pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .bottom-nav { display: flex; }
+  body { padding-bottom: 70px; }
+}
+
+/* Owner — hidden discreet link */
+.footer-credits a { color: inherit; text-decoration: none; opacity: 1; }
+
