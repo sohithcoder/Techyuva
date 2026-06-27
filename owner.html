@@ -1147,6 +1147,9 @@
               <span>Export CSV</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
+            <button class="owner-section__action" style="color:var(--bad);border-color:var(--bad);" onclick="clearAllStudents()">
+              <span>Clear All</span>
+            </button>
             <button class="owner-section__action" onclick="triggerImport()">
               <span>Import CSV</span>
               <svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5m0 0-6 6m6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2968,6 +2971,18 @@
 
     function triggerImport() { document.getElementById('importFile').click(); }
 
+    async function clearAllStudents() {
+      if (!confirm('Delete ALL students? This cannot be undone.')) return;
+      if (!confirm('Are you sure? Type OK to confirm...')) return;
+      var count = 0;
+      for (var i = students.length - 1; i >= 0; i--) {
+        try { await api('/students/' + students[i].id, { method:'DELETE' }); count++; } catch(e) {}
+      }
+      students = [];
+      updateStudentsTable(); updateDashboard(); updateFeesTable(); updateCourses();
+      showToast('Deleted ' + count + ' students', 'success');
+    }
+
     async function importStudents() {
       var file = document.getElementById('importFile').files[0];
       if (!file) return;
@@ -2993,8 +3008,10 @@
           var payments = paidFee > 0 ? [{ id:Date.now()+i, amount:paidFee, date:s['join date']||new Date().toISOString().split('T')[0], mode:paymentMode }] : [];
           var courseStatus = (s['course status'] || '').toLowerCase() === 'drop' ? 'dropped' : 'ongoing';
           var certificate = (s['certificate'] || '').toLowerCase() === 'yes' ? 'yes' : 'no';
+          var regNo = s['reg no'] || '';
+          if (regNo && students.find(function(x){ return x.regNo === regNo; })) continue;
           var body = {
-            regNo: s['reg no'] || '', name: s['name'] || '', phone: s['phone'] || '',
+            regNo: regNo, name: s['name'] || '', phone: s['phone'] || '',
             phone2: s['phone2'] || '', address: s['address'] || '', reference: s['reference'] || '',
             paymentMode: paymentMode, course: s['course'] || '', batch: batch,
             joinDate: fixDate(s['join date']), expectedEndDate: fixDate(s['expected end']),
