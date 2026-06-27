@@ -452,8 +452,8 @@
   </footer>
 
   <div class="footer-credits">
-    <span>Designed by Sohith · +91 9640248157</span>
     <a href="owner.html">admin</a>
+    <span>Designed by Sohith · +91 9640248157</span>
     <span>Designed by Neeraj · +91 9493007173</span>
   </div>
 
@@ -472,6 +472,24 @@
     </a>
     <div class="bottom-nav__liquid"></div>
   </nav>
+
+  <script>
+    (function(){
+      var pages = ['index.html','menu.html','studyzone.html'];
+      var touchStartX = 0, touchEndX = 0;
+      document.addEventListener('touchstart', function(e){ touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+      document.addEventListener('touchend', function(e){
+        touchEndX = e.changedTouches[0].screenX;
+        var diff = touchStartX - touchEndX;
+        var idx = pages.indexOf('menu.html');
+        if (Math.abs(diff) > 80) {
+          if (navigator.vibrate) navigator.vibrate(10);
+          if (diff > 0 && idx < pages.length - 1) window.location = pages[idx + 1];
+          if (diff < 0 && idx > 0) window.location = pages[idx - 1];
+        }
+      }, {passive:true});
+    })();
+  </script>
 
   <script>
     (function(){

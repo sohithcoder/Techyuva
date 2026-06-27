@@ -2076,13 +2076,25 @@ kbd {
    ============================================================ */
 .footer-credits {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: .4rem .8rem;
   padding: .65rem var(--pad);
   border-top: 1px solid var(--line);
   font-family: var(--font-mono);
   font-size: .68rem;
   color: var(--ink-soft);
   letter-spacing: .03em;
+  flex-wrap: wrap;
+}
+.footer-credits span { white-space: nowrap; }
+.footer-credits a { color: inherit; text-decoration: none; opacity: 1; }
+
+@media (max-width: 900px) {
+  .footer-credits {
+    flex-direction: column; align-items: center; text-align: center;
+    gap: .2rem; padding: .5rem 1rem; font-size: .62rem;
+  }
+  .footer-credits a { font-size: .55rem; order: -1; padding-bottom: .15rem; }
 }
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
