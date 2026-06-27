@@ -3015,19 +3015,46 @@
   <button class="admin-help" id="adminHelp" onclick="toggleAdminHelp()" title="Help">?</button>
   <div class="tour-overlay" id="adminTourOverlay" hidden>
     <div class="tour-backdrop" onclick="toggleAdminHelp()"></div>
-    <div class="tour-card">
-      <div class="tour-step">Quick Guide</div>
-      <h3>Owner Dashboard</h3>
-      <p style="text-align:left;font-size:.75rem;line-height:1.6;">
-        <b>Tabs</b> — Register, Students, Fees, Courses, Expenses, Analytics, Study Zone, Upcoming.<br>
-        <b>Register</b> — Add a new student with course and batch.<br>
-        <b>Settings</b> — Change WhatsApp number and admin password.<br>
-        <b>Logout</b> — Exit dashboard (top Settings card).
-      </p>
+    <div class="tour-card" style="max-width:360px;">
+      <div class="tour-step" id="adminTourStep">1/9</div>
+      <h3 id="adminTourTitle">Welcome</h3>
+      <p id="adminTourDesc" style="text-align:left;font-size:.72rem;line-height:1.6;"></p>
       <div class="tour-actions">
-        <button class="btn btn--primary" onclick="toggleAdminHelp()"><span>$ got it</span></button>
+        <button class="btn" onclick="toggleAdminHelp()"><span>$ close</span></button>
+        <button class="btn btn--primary" id="adminTourNext"><span>$ next</span></button>
       </div>
     </div>
   </div>
+  <script>
+    var adminSteps = [
+      { title:'Dashboard Overview', desc:'Top stats show total students, fees collected, pending amount, active courses. Below are this month summaries and payment status charts.' },
+      { title:'1. Register Tab', desc:'Fill student name, reg no, phone, address, course, batch, join date & total fee. Click <b>$ register student</b>. Student gets added instantly.' },
+      { title:'2. Students Tab', desc:'View all records. <b>Search</b> by name/reg no. <b>Filter</b> by course, batch, status, date. Use <b>✏</b> to edit, <b>₹</b> to record payment, <b>✕</b> to delete. <b>Export CSV</b> or <b>Print</b> for records.' },
+      { title:'3. Fees Tab', desc:'Track payment status of every student. Filter by paid/partial/pending. Click <b>₹</b> to add new payment. Progress bar shows collection rate. Footer shows totals.' },
+      { title:'4. Courses Tab', desc:'Add/Edit courses with name, fee, end date, badge, info link (Know More URL). Mark courses as <b>Trending</b> to show on homepage. Manage batches below.' },
+      { title:'5. Expenses Tab', desc:'Record institute expenses — name, amount, mode (cash/online), date. View all spending with filters. Export to CSV.' },
+      { title:'6. Analytics Tab', desc:'Full financial picture. Set <b>date range</b> to filter. Charts: enrollment trend, fee collection, course revenue. Online vs offline breakdown.' },
+      { title:'7. Study Zone Tab', desc:'Add resources for students — roadmaps, job openings, study materials, mock tests. Choose type, enter title, description, link.' },
+      { title:'8. Upcoming Tab', desc:'Add upcoming batches shown on main page. Enter course name, batch name, starting date & timing. Appears in the Upcoming Batches section with countdown.' }
+    ];
+    var adminIdx = 0;
+    function toggleAdminHelp() {
+      var el = document.getElementById('adminTourOverlay');
+      if (el.hidden) { adminIdx = 0; showAdminTour(); } else { el.hidden = true; }
+    }
+    function showAdminTour() {
+      var s = adminSteps[adminIdx];
+      document.getElementById('adminTourStep').textContent = (adminIdx+1)+'/'+adminSteps.length;
+      document.getElementById('adminTourTitle').textContent = s.title;
+      document.getElementById('adminTourDesc').innerHTML = s.desc;
+      document.getElementById('adminTourNext').innerHTML = adminIdx === adminSteps.length-1 ? '<span>$ done</span>' : '<span>$ next</span>';
+      document.getElementById('adminTourOverlay').hidden = false;
+    }
+    document.getElementById('adminTourNext').addEventListener('click', function(){
+      adminIdx++;
+      if (adminIdx >= adminSteps.length) { document.getElementById('adminTourOverlay').hidden = true; return; }
+      showAdminTour();
+    });
+  </script>
 </body>
 </html>

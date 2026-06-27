@@ -407,37 +407,6 @@
     <div class="bottom-nav__liquid"></div>
   </nav>
 
-  <!-- Swipe Navigation -->
-  <script>
-    (function(){
-      var pages = ['index.html','menu.html','studyzone.html'];
-      var current = 'index.html';
-      var touchStartX = 0, touchEndX = 0;
-      document.addEventListener('touchstart', function(e){ touchStartX = e.changedTouches[0].screenX; }, {passive:true});
-      document.addEventListener('touchend', function(e){
-        touchEndX = e.changedTouches[0].screenX;
-        var diff = touchStartX - touchEndX;
-        var idx = pages.indexOf(current);
-        if (Math.abs(diff) > 80) {
-          if (navigator.vibrate) navigator.vibrate(10);
-          if (diff > 0 && idx < pages.length - 1) window.location = pages[idx + 1];
-          if (diff < 0 && idx > 0) window.location = pages[idx - 1];
-        }
-      }, {passive:true});
-    })();
-  </script>
-
-  <script>
-    (function(){
-      var active = document.querySelector('.bottom-nav__item.is-active');
-      var liquid = document.querySelector('.bottom-nav__liquid');
-      if (active && liquid) {
-        liquid.style.left = active.offsetLeft + 'px';
-        liquid.style.width = active.offsetWidth + 'px';
-      }
-    })();
-  </script>
-
   <script src="script.js"></script>
   <script>
     // API helpers (inlined — no module imports for file:// compatibility)
@@ -567,19 +536,6 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(regs) {
-        regs.forEach(function(r) { r.unregister(); });
-      }).then(function() {
-        navigator.serviceWorker.register('/sw.js?v=2').catch(function(){});
-      });
-      navigator.serviceWorker.addEventListener('message', function(e) {
-        if (e.data === 'update') location.reload();
-      });
-    }
-  </script>
-
   <!-- Walkthrough Tour -->
   <div class="tour-overlay" id="tourOverlay" hidden>
     <div class="tour-backdrop"></div>
@@ -595,23 +551,44 @@
   </div>
 
   <script>
+    /* ─── Liquid Bar ─── */
+    (function(){
+      var a = document.querySelector('.bottom-nav__item.is-active');
+      var l = document.querySelector('.bottom-nav__liquid');
+      if (a && l) { l.style.left = a.offsetLeft+'px'; l.style.width = a.offsetWidth+'px'; }
+    })();
+
+    /* ─── Service Worker ─── */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        regs.forEach(function(r) { r.unregister(); });
+      }).then(function() {
+        navigator.serviceWorker.register('/sw.js?v=2').catch(function(){});
+      });
+      navigator.serviceWorker.addEventListener('message', function(e) {
+        if (e.data === 'update') location.reload();
+      });
+    }
+
+    /* ─── Tour ─── */
     var tourSteps = [
-      { title: 'Welcome', desc: 'TechYuva — Best Computer Training Institute in Eluru. Let us show you around.', el: null },
-      { title: 'Trending Courses', desc: 'Explore our most popular courses. Tap any to see details and enroll.', el: '#trending' },
-      { title: 'Upcoming Batches', desc: 'Check batch starting dates and timings. Countdown shows days remaining.', el: '#schedule' },
-      { title: 'Study Zone', desc: 'Free resources — roadmaps, job openings, mock tests. All at your fingertips.', el: '#zone' },
-      { title: 'Get in Touch', desc: 'Contact us anytime. Phone, email, or follow us on social media.', el: '#contact' }
+      { title:'Welcome', desc:'TechYuva — Best Computer Training Institute in Eluru. Let us show you around.', el:null },
+      { title:'Trending Courses', desc:'Explore our most popular courses. Tap any to see details and enroll.', el:'#trending' },
+      { title:'Upcoming Batches', desc:'Check batch starting dates and timings. Countdown shows days remaining.', el:'#schedule' },
+      { title:'Study Zone', desc:'Free resources — roadmaps, job openings, mock tests.', el:'#zone' },
+      { title:'Location & YouTube', desc:'Find us on the map, and watch tutorials on YouTube.', el:'#youtube' }
     ];
     var tourIdx = 0;
     function showTour() {
       if (localStorage.getItem('tourDone')) return;
       var s = tourSteps[tourIdx];
-      document.getElementById('tourStep').textContent = (tourIdx + 1) + '/' + tourSteps.length;
+      document.getElementById('tourStep').textContent = (tourIdx+1)+'/'+tourSteps.length;
       document.getElementById('tourTitle').textContent = s.title;
       document.getElementById('tourDesc').textContent = s.desc;
-      document.getElementById('tourNext').innerHTML = tourIdx === tourSteps.length - 1 ? '<span>$ finish</span>' : '<span>$ next</span>';
+      document.getElementById('tourNext').innerHTML = tourIdx===tourSteps.length-1 ? '<span>$ finish</span>' : '<span>$ next</span>';
       document.getElementById('tourOverlay').hidden = false;
       if (s.el) { var el = document.querySelector(s.el); if (el) el.scrollIntoView({behavior:'smooth',block:'center'}); }
+      else { window.scrollTo({top:0,behavior:'smooth'}); }
       if (navigator.vibrate) navigator.vibrate(15);
     }
     function nextTour() {
@@ -621,11 +598,11 @@
     }
     function skipTour() {
       document.getElementById('tourOverlay').hidden = true;
-      localStorage.setItem('tourDone', '1');
-      tourIdx = 0;
+      localStorage.setItem('tourDone','1'); tourIdx = 0;
+      window.scrollTo({top:0,behavior:'smooth'});
     }
     document.getElementById('tourNext').addEventListener('click', nextTour);
-    if (!localStorage.getItem('tourDone')) { setTimeout(showTour, 1200); }
+    if (!localStorage.getItem('tourDone')) { setTimeout(showTour, 1500); }
   </script>
 
 </body>
