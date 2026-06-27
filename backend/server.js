@@ -425,7 +425,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/settings/whatsapp', async (req, res) => {
   try {
     const doc = await getDB().collection('settings').doc('whatsapp').get();
-    res.json(doc.exists ? doc.data() : { number: '919876543210' });
+    res.json(doc.exists ? doc.data() : { number: '919848635599' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
