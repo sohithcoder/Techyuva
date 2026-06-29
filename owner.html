@@ -3273,15 +3273,17 @@
   </div>
   <script>
     var adminSteps = [
-      { title:'Dashboard Overview', desc:'Top stats show total students, fees collected, pending amount, active courses. Below are this month summaries and payment status charts.' },
-      { title:'1. Register Tab', desc:'Fill student name, reg no, phone, address, course, batch, join date & total fee. Click <b>$ register student</b>. Student gets added instantly.' },
-      { title:'2. Students Tab', desc:'View all records. <b>Search</b> by name/reg no. <b>Filter</b> by course, batch, status, date. Use <b>✏</b> to edit, <b>₹</b> to record payment, <b>✕</b> to delete. <b>Export CSV</b> or <b>Print</b> for records.' },
-      { title:'3. Fees Tab', desc:'Track payment status of every student. Filter by paid/partial/pending. Click <b>₹</b> to add new payment. Progress bar shows collection rate. Footer shows totals.' },
-      { title:'4. Courses Tab', desc:'Add/Edit courses with name, fee, end date, badge, info link (Know More URL). Mark courses as <b>Trending</b> to show on homepage. Manage batches below.' },
-      { title:'5. Expenses Tab', desc:'Record institute expenses — name, amount, mode (cash/online), date. View all spending with filters. Export to CSV.' },
-      { title:'6. Analytics Tab', desc:'Full financial picture. Set <b>date range</b> to filter. Charts: enrollment trend, fee collection, course revenue. Online vs offline breakdown.' },
-      { title:'7. Study Zone Tab', desc:'Add resources for students — roadmaps, job openings, study materials, mock tests. Choose type, enter title, description, link.' },
-      { title:'8. Upcoming Tab', desc:'Add upcoming batches shown on main page. Enter course name, batch name, starting date & timing. Appears in the Upcoming Batches section with countdown.' }
+      { title:'📊 Dashboard Overview', desc:'Top stats show total students, fees collected, pending amount, active courses. This month summaries + payment status chart. <b>Settings</b> card lets you change WhatsApp number & admin password.' },
+      { title:'📝 1. Register Tab', desc:'Fill student name, reg no, phone, address, course, batch, join date & total fee. Click <b>$ register student</b>. Only name is required — all other fields are optional.' },
+      { title:'👥 2. Students Tab', desc:'View all records. <b>Search</b> by name/reg no. <b>Filter</b> by course, batch, status, date. Use <b>✏</b> to edit, <b>₹</b> to record payment, <b>✕</b> to delete. <b>Export CSV</b> or <b>Print</b> for records. <b>Import CSV</b> to bulk-add students with dedup.' },
+      { title:'💰 3. Fees Tab', desc:'Track payment status of every student. Filter by paid/partial/pending. Click <b>₹</b> to add new payment. Progress bar shows collection rate. Footer shows totals.' },
+      { title:'📚 4. Courses Tab', desc:'Add/Edit courses with name, fee, badge, info link (<b>Know More URL</b> — shows on Courses page). Mark as <b>Trending</b> for homepage. <b>Search</b> filters courses. <b>Import CSV</b> for bulk course+batch creation.' },
+      { title:'💸 5. Expenses Tab', desc:'Record institute expenses — name, amount, mode (cash/online), date. View all spending with filters. Export to CSV. Only name is required.' },
+      { title:'📈 6. Analytics Tab', desc:'Full financial picture. Set <b>date range</b> to filter. Charts: enrollment trend, fee collection, course revenue. Online vs offline breakdown.' },
+      { title:'📖 7. Study Zone Tab', desc:'Add resources for students — roadmaps, job openings, study materials, mock tests. Choose type, enter title, description, link.' },
+      { title:'📅 8. Upcoming Tab', desc:'Add upcoming batches shown on main page. Enter course name, batch name, starting date & timing. Appears in the Upcoming Batches section with countdown. <b>Search</b> to filter.' },
+      { title:'🖼 9. Gallery Tab', desc:'Manage institute photos for the About page. Add <b>image URLs</b> with captions. Images appear in a scrollable gallery on the About page. Delete photos anytime.' },
+      { title:'📝 10. Institute Info', desc:'Update the About page institute description. Edit the <b>title</b> and <b>description</b> text — changes appear instantly on the About page. Click <b>$ save info</b> to publish.' }
     ];
     var adminIdx = 0;
     function toggleAdminHelp() {
