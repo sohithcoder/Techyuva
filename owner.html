@@ -3099,15 +3099,8 @@
           init();
         }
       } catch (err) {
-        if (pw === 'admin123') {
-          sessionStorage.setItem('ownerAuth', 'techyuva_owner_session');
-          document.body.classList.add('is-authenticated');
-          $('#loginError').textContent = '';
-          init();
-        } else {
-          $('#loginError').textContent = 'Wrong password';
-          document.getElementById('loginPassword').value = '';
-        }
+        $('#loginError').textContent = 'Wrong password';
+        document.getElementById('loginPassword').value = '';
       }
     }
 
