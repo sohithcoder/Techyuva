@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b85c38" />
+  <link rel="manifest" href="manifest.json" />
+  <title>About — Lokesh Devathati | TechYuva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .about-page { padding: clamp(5rem, 12vh, 8rem) var(--pad) 3rem; padding-left: calc(var(--nav-edge) + var(--pad)); max-width: 860px; margin: 0 auto; }
+    .about-hero { display: flex; gap: 1.5rem; align-items: flex-start; margin-bottom: 2.5rem; flex-wrap: wrap; }
+    .about-avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; font-family: var(--font-display); font-size: 2.2rem; color: var(--accent); flex-shrink: 0; border: 2px solid var(--accent); }
+    .about-hero__info h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 400; line-height: 1.15; color: var(--ink); }
+    .about-hero__info h1 em { font-style: italic; color: var(--accent); }
+    .about-hero__pronouns { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-soft); margin-top: .2rem; }
+    .about-hero__title { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; margin-top: .4rem; line-height: 1.5; }
+    .about-hero__location { font-family: var(--font-mono); font-size: .65rem; color: var(--ink-faint); margin-top: .3rem; display: flex; align-items: center; gap: .3rem; }
+    .about-hero__location svg { width: 14px; height: 14px; }
+
+    .about-section { margin-bottom: 2.5rem; }
+    .about-section h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; margin-bottom: 1rem; color: var(--ink); display: flex; align-items: center; gap: .5rem; }
+    .about-section h2::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+    .about-section p { font-size: .92rem; line-height: 1.75; color: var(--ink); margin-bottom: .8rem; }
+
+    .about-exp { border-left: 2px solid var(--line); padding-left: 1.2rem; }
+    .about-exp__item { margin-bottom: 1.5rem; position: relative; }
+    .about-exp__item::before { content: ''; position: absolute; left: calc(-1.2rem - 5px); top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .about-exp__role { font-family: var(--font-display); font-size: 1rem; font-weight: 400; color: var(--ink); }
+    .about-exp__company { font-family: var(--font-mono); font-size: .78rem; color: var(--accent); margin-bottom: .15rem; }
+    .about-exp__meta { font-family: var(--font-mono); font-size: .65rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; display: flex; gap: .5rem; flex-wrap: wrap; }
+
+    .about-skills { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .about-skill { font-family: var(--font-mono); font-size: .65rem; padding: .3em .7em; border-radius: 100px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+
+    @media (max-width: 900px) {
+      .about-page { padding: 4.5rem 1rem 2rem; max-width: 100%; }
+      .about-avatar { width: 72px; height: 72px; font-size: 1.8rem; }
+      .about-section p { font-size: .85rem; line-height: 1.65; }
+    }
+    @media (max-width: 420px) {
+      .about-hero { flex-direction: column; align-items: center; text-align: center; }
+      .about-hero__info { text-align: center; }
+      .about-hero__location { justify-content: center; }
+    }
+  </style>
+</head>
+<body data-theme="paper">
+
+  <header class="nav" id="nav">
+    <button class="nav__expand" id="navExpand" aria-label="Show explorer">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="nav__explorer" id="navExplorer">
+      <div class="nav__explorer-head">
+        <span class="nav__explorer-title">MENU</span>
+        <button class="nav__explorer-toggle" id="explorerToggle" aria-label="Toggle explorer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="nav__tree" id="navTree">
+        <div class="nav__tree-item nav__tree-item--root">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span>techyuva</span>
+        </div>
+        <div class="nav__tree-children">
+          <a href="index.html" class="nav__tree-item" data-file="main">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Main</span>
+          </a>
+          <a href="menu.html" class="nav__tree-item" data-file="courses">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Courses</span>
+          </a>
+          <a href="studyzone.html" class="nav__tree-item" data-file="study-zone">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Study Zone</span>
+          </a>
+          <a href="about.html" class="nav__tree-item is-active" data-file="about">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 4H8L6 2H2v12h12V4z" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>About</span>
+          </a>
+          <a href="owner.html" class="nav__tree-item" data-file="owner">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="currentColor" stroke-width="1.2"/><path d="M10 2v3h3" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span>Owner</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="nav__bar">
+      <a href="index.html#top" class="nav__logo">
+        <span class="nav__logo-mark"><img src="Blue White Bold Playful Kids Clothing Logo.png" alt="TechYuva" /></span>
+        <div class="nav__logo-text">
+          <span class="nav__logo-name">TechYuva</span>
+          <span class="nav__logo-sub">ISO Certified Coding Institute</span>
+        </div>
+      </a>
+      <div class="nav__actions">
+        <a href="index.html" class="link-arrow" style="font-size:.78rem;">← Back home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="about-page">
+
+    <div class="about-hero reveal">
+      <div class="about-avatar">LD</div>
+      <div class="about-hero__info">
+        <h1>Lokesh <em>Devathati</em></h1>
+        <p class="about-hero__pronouns">He/Him</p>
+        <p class="about-hero__title">Asst Professor · IT Trainer · Freelancer · Career Counsellor · Developer · Designer</p>
+        <p class="about-hero__location">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          West Godavari, Andhra Pradesh, India
+        </p>
+      </div>
+    </div>
+
+    <div class="about-section reveal">
+      <h2>About</h2>
+      <p>With over 20 years of experience in computer science education and technical training, I bring a unique blend of strong academic foundation and real-world practical expertise. My teaching journey spans from computer fundamentals to advanced domains including C, Java, Python, Machine Learning, Data Science, and Artificial Intelligence.</p>
+      <p>I specialize in simplifying complex technical concepts and transforming them into hands-on, industry-relevant learning experiences. My expertise includes data preprocessing, model development, basic deep learning concepts, and real-world ML applications, equipping students with skills aligned to current industry demands.</p>
+      <p>Beyond programming and AI, I have extensive hands-on experience in technical documentation, Excel-based analytics and reporting, accounting using Tally, and designing professional digital assets such as certificates, invitations, and academic materials.</p>
+      <p>I am also skilled in website design and basic web application development, and I actively mentor students for job readiness, interview preparation, and campus placements — focusing on technical skills, problem-solving ability, communication, and professional confidence.</p>
+      <p>Driven by a passion for emerging technologies and education, I continuously upskill to stay aligned with evolving trends in AI, automation, and data-driven decision making. I take pride in creating an engaging learning environment that bridges the gap between theory and real-world application, empowering learners to succeed in today's competitive and technology-driven job market.</p>
+    </div>
+
+    <div class="about-section reveal">
+      <h2>Experience</h2>
+      <div class="about-exp">
+        <div class="about-exp__item">
+          <div class="about-exp__company">Tech Yuva Computers · Full-time</div>
+          <div class="about-exp__role">Head Of Faculty & Director</div>
+          <div class="about-exp__meta">Jun 2016 – Present · 10 yrs 1 mo · India · On-site</div>
+        </div>
+        <div class="about-exp__item">
+          <div class="about-exp__company">Eluru College of Engineering & Technology · Part-time</div>
+          <div class="about-exp__role">Asst Professor & Technical Trainer</div>
+          <div class="about-exp__meta">Aug 2021 – Present · 4 yrs 11 mos · Eluru · On-site</div>
+          <div class="about-skills" style="margin-top:.5rem;">
+            <span class="about-skill">Machine Learning</span>
+            <span class="about-skill">Python</span>
+          </div>
+        </div>
+        <div class="about-exp__item">
+          <div class="about-exp__company">APDDCF LTD · Full-time</div>
+          <div class="about-exp__role">Tally Accountant</div>
+          <div class="about-exp__meta">Apr 2018 – Jul 2021 · 3 yrs 4 mos · Eluru, Andhra Pradesh, India</div>
+        </div>
+        <div class="about-exp__item">
+          <div class="about-exp__company">Ch.S.D. St. Theresa's College for Women</div>
+          <div class="about-exp__role">Computer Facilitator</div>
+          <div class="about-exp__meta">Jun 2009 – May 2017 · 8 yrs</div>
+        </div>
+        <div class="about-exp__item">
+          <div class="about-exp__company">SkillPro</div>
+          <div class="about-exp__role">Computer Facilitator</div>
+          <div class="about-exp__meta">Jul 2009 – Jun 2011 · 2 yrs</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-section reveal">
+      <h2>Expertise</h2>
+      <div class="about-skills">
+        <span class="about-skill">C</span>
+        <span class="about-skill">Java</span>
+        <span class="about-skill">Python</span>
+        <span class="about-skill">Machine Learning</span>
+        <span class="about-skill">Data Science</span>
+        <span class="about-skill">AI</span>
+        <span class="about-skill">Deep Learning</span>
+        <span class="about-skill">Tally</span>
+        <span class="about-skill">Excel Analytics</span>
+        <span class="about-skill">Technical Documentation</span>
+        <span class="about-skill">Web Development</span>
+        <span class="about-skill">Career Counselling</span>
+        <span class="about-skill">Interview Preparation</span>
+        <span class="about-skill">Campus Placements</span>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <span class="footer__logo">>_TechYuva</span>
+    <p>Best Computer Training Institute in Eluru. Since 2014.</p>
+    <span class="footer__year">&copy; 2026 TechYuva</span>
+  </footer>
+
+  <div class="footer-credits">
+    <a href="owner.html">admin</a>
+    <span>Designed by Sohith · +91 9640248157</span>
+    <span>Designed by Neeraj · +91 9493007173</span>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="bottom-nav__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="menu.html" class="bottom-nav__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Courses</span>
+    </a>
+    <a href="studyzone.html" class="bottom-nav__item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 12v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Study</span>
+    </a>
+    <div class="bottom-nav__liquid"></div>
+  </nav>
+
+</body>
+</html>
