@@ -3286,12 +3286,15 @@
       { title:'📝 10. Institute Info', desc:'Update the About page institute description. Edit the <b>title</b> and <b>description</b> text — changes appear instantly on the About page. Click <b>$ save info</b> to publish.' }
     ];
     var adminIdx = 0;
+    var adminTabMap = ['','register','students','fees','courses','expenses','analytics','studyzone','upcoming','gallery','gallery'];
     function toggleAdminHelp() {
       var el = document.getElementById('adminTourOverlay');
       if (el.hidden) { adminIdx = 0; showAdminTour(); } else { el.hidden = true; }
     }
     function showAdminTour() {
       var s = adminSteps[adminIdx];
+      var tabName = adminTabMap[adminIdx];
+      if (tabName) { var tab = document.querySelector('[data-tab="' + tabName + '"]'); if (tab) tab.click(); }
       document.getElementById('adminTourStep').textContent = (adminIdx+1)+'/'+adminSteps.length;
       document.getElementById('adminTourTitle').textContent = s.title;
       document.getElementById('adminTourDesc').innerHTML = s.desc;
