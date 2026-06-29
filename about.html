@@ -298,11 +298,6 @@
     }
     typeRole();
 
-    /* floating badges */
-    var hero = document.querySelector('.about-hero');
-    var tags = ['Python','ML','AI','Java','Tally','C','Data','SQL'];
-    if (hero) { for (var i=0;i<tags.length;i++) { (function(tag,idx){ setTimeout(function(){ var b = document.createElement('span'); b.className='about-float-badge'; b.textContent=tag; b.style.setProperty('--dur',(3+Math.random()*4)+'s'); b.style.setProperty('--delay',(Math.random()*2)+'s'); b.style.left=(10+Math.random()*75)+'%'; b.style.top=(10+Math.random()*70)+'%'; hero.appendChild(b); },idx*200); })(tags[i],i); } }
-
     /* animated counters */
     (function(){
       var stats = document.querySelectorAll('.about-stat__num[data-count]');

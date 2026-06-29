@@ -2386,6 +2386,8 @@
 
     async function saveBatch() {
       const courseName = $('#batchCourse').value;
+      const name = $('#batchName').value.trim();
+      const duration = parseInt($('#batchDuration').value) || 0;
       const timing = $('#batchTiming').value.trim();
       const editId = $('#editBatchId').value;
       if (!courseName || !name) { showToast('Select course and enter batch name', 'error'); return; }
