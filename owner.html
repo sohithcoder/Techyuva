@@ -1432,6 +1432,12 @@
           </button>
         </div>
         <div class="owner-section__body">
+          <div class="toolbar" style="margin-top:.5rem;">
+            <div class="search-box" style="max-width:100%;">
+              <span class="search-icon">$</span>
+              <input type="text" placeholder="Search courses..." id="courseSearchAdmin" oninput="updateCourses()" />
+            </div>
+          </div>
           <div class="owner-table-wrap" style="margin-bottom:1.4rem;">
             <table class="owner-table">
               <thead>
@@ -1757,6 +1763,12 @@
             <button class="btn" onclick="clearUpcomingForm()">
               <span>$ clear</span>
             </button>
+          </div>
+          <div class="toolbar" style="margin-top:.5rem;">
+            <div class="search-box" style="max-width:100%;">
+              <span class="search-icon">$</span>
+              <input type="text" placeholder="Search upcoming..." id="upcomingSearch" oninput="renderUpcomingTable()" />
+            </div>
           </div>
           <div class="owner-table-wrap" style="margin-top:1.2rem;">
             <table class="owner-table">
@@ -2419,7 +2431,8 @@
 
     // ==================== COURSES ====================
     function updateCourses() {
-      const courseList = getCourseList();
+      const search = ($('#courseSearchAdmin').value || '').toLowerCase();
+      const courseList = getCourseList().filter(c => !search || c.name.toLowerCase().includes(search));
       const courseData = {};
       courseList.forEach(c => { courseData[c.name] = { students:0, totalRevenue:0, collected:0, pending:0 }; });
       students.forEach(s => { if (courseData[s.course]) { courseData[s.course].students++; courseData[s.course].totalRevenue += parseFloat(s.totalFee) || 0; courseData[s.course].collected += parseFloat(s.paidFee) || 0; courseData[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); }});
@@ -2868,8 +2881,10 @@
 
     // ==================== UPCOMING BATCHES ====================
     function renderUpcomingTable() {
+      const search = ($('#upcomingSearch').value || '').toLowerCase();
+      const filtered = upcomingBatches.filter(b => !search || b.courseName.toLowerCase().includes(search) || b.batchName.toLowerCase().includes(search));
       const tbody = $('#upcomingTable');
-      tbody.innerHTML = upcomingBatches.map(b => `<tr>
+      tbody.innerHTML = filtered.map(b => `<tr>
         <td><span class="owner-table__name">${b.courseName}</span></td>
         <td>${b.batchName}</td>
         <td>${b.startingDate ? formatDate(b.startingDate) : '—'}</td>
