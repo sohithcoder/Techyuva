@@ -2173,7 +2173,7 @@
       const joinDate = $('#studentJoinDate').value;
       const expectedEndDate = $('#studentExpectedEndDate').value;
       const totalFee = parseFloat($('#studentTotalFee').value) || 0;
-      if (!name || !course || !batch || !joinDate) { showToast('Please fill name, course, batch, and join date', 'error'); return; }
+      if (!name || !course || !joinDate) { showToast('Please fill name, course, and join date', 'error'); return; }
       const newStudent = { regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee: 0, status: 'Pending', payments: [] };
       try {
         const saved = await api('/students', { method: 'POST', body: JSON.stringify({ regNo, name, phone, phone2, address, reference, paymentMode, course, batch, courseStatus:'ongoing', certificateIssued:'no', joinDate, expectedEndDate, totalFee, paidFee: 0, status: 'Pending', payments: [] }) });
