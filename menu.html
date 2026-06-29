@@ -445,6 +445,13 @@
       <button class="is-active" data-filter="all">All</button>
     </div>
 
+    <div class="course-search" style="max-width:600px;margin:0 auto 1.5rem;">
+      <div class="search-box" style="max-width:100%;">
+        <span class="search-icon">$</span>
+        <input type="text" id="courseSearch" placeholder="Search courses..." oninput="filterCourses()" style="font-family:var(--font-mono);font-size:.82rem;padding:.7rem .9rem .7rem 2.4rem;width:100%;border:1px solid var(--line);border-radius:10px;background:var(--paper-2);color:var(--ink);box-sizing:border-box;" />
+      </div>
+    </div>
+
     <!-- Course Grid -->
     <div class="course-grid" id="courseGrid">
       <!-- Courses loaded dynamically from backend -->
@@ -612,7 +619,19 @@
       $$('button', filterContainer).forEach(b => b.classList.remove('is-active'));
       btn.classList.add('is-active');
       applyFilter(btn.dataset.filter);
+      filterCourses();
     });
+
+    function filterCourses() {
+      var search = (document.getElementById('courseSearch').value || '').toLowerCase();
+      var cards = $$('.course-card', grid);
+      cards.forEach(function(card) {
+        var name = (card.querySelector('.course-card__title') || {}).textContent || '';
+        var desc = (card.querySelector('.course-card__desc') || {}).textContent || '';
+        var match = !search || name.toLowerCase().includes(search) || desc.toLowerCase().includes(search) || card.dataset.course.includes(search);
+        card.style.display = match ? '' : 'none';
+      });
+    }
 
     function slugify(text) {
       return String(text).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
