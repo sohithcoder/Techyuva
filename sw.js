@@ -1,4 +1,4 @@
-const CACHE = 'techyuva-v4';
+const CACHE = 'techyuva-v5';
 
 self.addEventListener('install', e => {
   self.skipWaiting();

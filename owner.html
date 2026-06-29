@@ -1971,6 +1971,14 @@
             </select>
           </div>
           <div class="field">
+            <span>Course Status</span>
+            <select id="editCourseStatus">
+              <option value="ongoing">Ongoing</option>
+              <option value="dropped">Dropped</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div class="field">
             <span>Total Fee (₹)</span>
             <input type="number" id="editTotalFee" />
           </div>
@@ -2102,7 +2110,7 @@
     function updateDashboard() {
       const totalStudents = students.length;
       const totalCollected = students.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const totalPending = students.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const totalPending = students.reduce((sum, s) => sum + (s.courseStatus === 'dropped' ? 0 : ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0))), 0);
       const activeCourses = [...new Set(students.map(s => s.course))].filter(c => c).length;
       $('#dashTotalStudents').textContent = totalStudents;
       $('#dashFeesCollected').textContent = '₹' + totalCollected.toLocaleString('en-IN');
@@ -2284,6 +2292,7 @@
       $('#editBatch').value = s.batch || '';
       $('#editPaymentMode').value = s.paymentMode || 'offline';
       $('#editCertificate').value = s.certificateIssued || 'no';
+      $('#editCourseStatus').value = s.courseStatus || 'ongoing';
       $('#editTotalFee').value = s.totalFee; $('#editPaidFee').value = s.paidFee; $('#editStatus').value = s.status;
       $('#editModal').classList.add('is-active');
     }
@@ -2298,6 +2307,7 @@
         course: $('#editCourse').value, batch: $('#editBatch').value,
         paymentMode: $('#editPaymentMode').value,
         certificateIssued: $('#editCertificate').value,
+        courseStatus: $('#editCourseStatus').value,
         totalFee: parseFloat($('#editTotalFee').value) || 0, paidFee: parseFloat($('#editPaidFee').value) || 0,
         status: $('#editStatus').value,
         expectedEndDate: calcExpectedEndDate(s.joinDate, $('#editBatch').value),
@@ -2357,7 +2367,7 @@
     // ==================== FEES ====================
     function updateFeesTable() {
       const totalCollected = students.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
-      const totalPending = students.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const totalPending = students.reduce((sum, s) => sum + (s.courseStatus === 'dropped' ? 0 : ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0))), 0);
       const fullyPaid = students.filter(s => s.status === 'Paid').length;
       const partialPending = students.filter(s => s.status !== 'Paid').length;
       $('#feeTotalCollected').textContent = '₹' + totalCollected.toLocaleString('en-IN');
@@ -2903,7 +2913,7 @@
 
       const feesCollected = filteredStudents.reduce((sum, s) => sum + (parseFloat(s.paidFee) || 0), 0);
       const totalExp = filteredExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      const pendingFees = filteredStudents.reduce((sum, s) => sum + ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0)), 0);
+      const pendingFees = filteredStudents.reduce((sum, s) => sum + (s.courseStatus === 'dropped' ? 0 : ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0))), 0);
       const netBal = feesCollected - totalExp;
       $('#analyticsFeesCollected').textContent = '₹' + feesCollected.toLocaleString('en-IN');
       $('#analyticsTotalExpenses').textContent = '₹' + totalExp.toLocaleString('en-IN');
