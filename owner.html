@@ -2525,7 +2525,7 @@
       const courseList = getCourseList().filter(c => !search || c.name.toLowerCase().includes(search));
       const courseData = {};
       courseList.forEach(c => { courseData[c.name] = { students:0, totalRevenue:0, collected:0, pending:0 }; });
-      students.forEach(s => { if (courseData[s.course]) { courseData[s.course].students++; courseData[s.course].totalRevenue += parseFloat(s.totalFee) || 0; courseData[s.course].collected += parseFloat(s.paidFee) || 0; courseData[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); }});
+      students.forEach(s => { if (courseData[s.course]) { courseData[s.course].students++; courseData[s.course].totalRevenue += parseFloat(s.totalFee) || 0; courseData[s.course].collected += parseFloat(s.paidFee) || 0; courseData[s.course].pending += (s.courseStatus === 'dropped' ? 0 : ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0))); }});
       const tbody = $('#coursesTable');
       tbody.innerHTML = courseList.map(c => {
         const data = courseData[c.name] || { students:0, totalRevenue:0, collected:0, pending:0 };
@@ -2969,7 +2969,7 @@
       const cl = getCourseList();
       const courseRevenue = {};
       cl.forEach(c => { courseRevenue[c.name] = { collected:0, pending:0 }; });
-      filteredStudents.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0); } });
+      filteredStudents.forEach(s => { if (courseRevenue[s.course]) { courseRevenue[s.course].collected += parseFloat(s.paidFee) || 0; courseRevenue[s.course].pending += (s.courseStatus === 'dropped' ? 0 : ((parseFloat(s.totalFee) || 0) - (parseFloat(s.paidFee) || 0))); } });
       if (charts.revenueCompare) charts.revenueCompare.destroy();
       charts.revenueCompare = new Chart($('#revenueComparisonChart'), { type:'bar', data:{ labels:Object.keys(courseRevenue), datasets:[ { label:'Collected', data:Object.values(courseRevenue).map(d => d.collected), backgroundColor:'#4a7c59', borderRadius:5, barThickness:18 }, { label:'Pending', data:Object.values(courseRevenue).map(d => d.pending), backgroundColor:'#a03030', borderRadius:5, barThickness:18 } ] }, options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{ position:'top', align:'end', labels:{ usePointStyle:true, padding:16, font:{ family:'JetBrains Mono', size:11 } } } }, scales:{ y:{ beginAtZero:true, grid:{ color:'#e8e3d6' }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#9CA3AF', callback:v => '₹' + (v / 1000) + 'k' } }, x:{ grid:{ display:false }, ticks:{ font:{ family:'JetBrains Mono', size:10 }, color:'#6B7280', maxRotation:30 } } } } });
     }
@@ -3103,7 +3103,7 @@
         filename = 'course_reports.csv'; headers = ['Course','Students','Total Revenue','Collected','Pending','Collection Rate %'];
         const cl = getCourseList();
         const cd = {}; cl.forEach(c => { cd[c.name] = { students:0, total:0, collected:0, pending:0 }; });
-        students.forEach(s => { if (cd[s.course]) { cd[s.course].students++; cd[s.course].total += parseFloat(s.totalFee)||0; cd[s.course].collected += parseFloat(s.paidFee)||0; cd[s.course].pending += (parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0); } });
+        students.forEach(s => { if (cd[s.course]) { cd[s.course].students++; cd[s.course].total += parseFloat(s.totalFee)||0; cd[s.course].collected += parseFloat(s.paidFee)||0; cd[s.course].pending += (s.courseStatus === 'dropped' ? 0 : ((parseFloat(s.totalFee)||0)-(parseFloat(s.paidFee)||0))); } });
         data = Object.entries(cd).map(([course, d]) => ({ Course:course, Students:d.students, 'Total Revenue':d.total, Collected:d.collected, Pending:d.pending, 'Collection Rate %':d.total > 0 ? Math.round((d.collected/d.total)*100) : 0 }));
       }
       if (data.length === 0) { showToast('No data to export', 'error'); return; }
