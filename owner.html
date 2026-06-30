@@ -1344,6 +1344,17 @@
               <input type="url" id="courseInfoLink" placeholder="https://example.com/course-info" />
             </div>
             <div class="field">
+              <span>Registration Type</span>
+              <select id="courseRegType" onchange="toggleGoogleFormLink()">
+                <option value="whatsapp">WhatsApp</option>
+                <option value="googleform">Google Form</option>
+              </select>
+            </div>
+            <div class="field" id="googleFormLinkField" style="display:none;">
+              <span>Google Form Link</span>
+              <input type="url" id="courseGoogleFormLink" placeholder="https://forms.google.com/..." />
+            </div>
+            <div class="field">
               <span>Trending</span>
               <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font:inherit;color:var(--ink);margin-top:.3rem;">
                 <input type="checkbox" id="courseTrending" style="width:18px;height:18px;accent-color:var(--accent);" />
@@ -2542,16 +2553,18 @@
       const badge = $('#courseBadge').value.trim();
       const infoLink = $('#courseInfoLink').value.trim();
       const trending = $('#courseTrending').checked;
+      const regType = $('#courseRegType').value;
+      const googleFormLink = $('#courseGoogleFormLink').value.trim();
       const editId = $('#editCourseId').value;
       if (!name) { showToast('Please enter a course name', 'error'); return; }
       try {
         if (editId) {
-          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, fee, badge, infoLink, trending }) });
+          const updated = await api(`/courses/${editId}`, { method: 'PUT', body: JSON.stringify({ name, fee, badge, infoLink, trending, registrationType: regType, googleFormLink }) });
           const idx = courses.findIndex(c => c.id === editId);
           if (idx !== -1) courses[idx] = updated;
         } else {
           if (courses.find(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Course already exists', 'error'); return; }
-          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, fee, badge, infoLink, trending }) });
+          const saved = await api('/courses', { method: 'POST', body: JSON.stringify({ name, fee, badge, infoLink, trending, registrationType: regType, googleFormLink }) });
           courses.push(saved);
         }
         clearCourseForm(); updateCourses(); updateCourseFilters();
@@ -2569,6 +2582,9 @@
       $('#courseFee').value = c.fee || ''; $('#courseBadge').value = c.badge || '';
       $('#courseInfoLink').value = c.infoLink || '';
       $('#courseTrending').checked = !!c.trending;
+      $('#courseRegType').value = c.registrationType || 'whatsapp';
+      $('#courseGoogleFormLink').value = c.googleFormLink || '';
+      toggleGoogleFormLink();
       $('#courseName').focus();
     }
 
@@ -2589,6 +2605,12 @@
       $('#editCourseId').value = '';
       $('#courseName').value = '';
       $('#courseFee').value = ''; $('#courseBadge').value = ''; $('#courseInfoLink').value = ''; $('#courseTrending').checked = false;
+      $('#courseRegType').value = 'whatsapp'; $('#courseGoogleFormLink').value = '';
+      $('#googleFormLinkField').style.display = 'none';
+    }
+
+    function toggleGoogleFormLink() {
+      $('#googleFormLinkField').style.display = $('#courseRegType').value === 'googleform' ? '' : 'none';
     }
 
     function triggerCoursesImport() { document.getElementById('importCoursesFile').click(); }

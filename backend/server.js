@@ -191,7 +191,7 @@ app.post('/api/courses', async (req, res) => {
   try {
     const d = req.body;
     const ref = await getDB().collection('courses').add({
-      name: d.name, description: d.description || '', duration: d.duration || '', endDate: d.endDate || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', infoLink: d.infoLink || '', modules: Array.isArray(d.modules) ? d.modules : [], order: parseInt(d.order) || 0, trending: !!d.trending, createdAt: new Date().toISOString()
+      name: d.name, description: d.description || '', duration: d.duration || '', endDate: d.endDate || '', fee: parseFloat(d.fee) || 0, badge: d.badge || '', infoLink: d.infoLink || '', registrationType: d.registrationType || 'whatsapp', googleFormLink: d.googleFormLink || '', modules: Array.isArray(d.modules) ? d.modules : [], order: parseInt(d.order) || 0, trending: !!d.trending, createdAt: new Date().toISOString()
     });
     const doc = await ref.get();
     res.json(formatDoc(doc));
@@ -205,7 +205,7 @@ app.put('/api/courses/:id', async (req, res) => {
     const doc = await docRef.get();
     if (!doc.exists) return res.status(404).json({ error: 'Course not found' });
     const update = {};
-    ['name','description','duration','endDate','badge','infoLink','modules'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
+    ['name','description','duration','endDate','badge','infoLink','registrationType','googleFormLink','modules'].forEach(f => { if (d[f] !== undefined) update[f] = d[f]; });
     if (d.fee !== undefined) update.fee = parseFloat(d.fee);
     if (d.order !== undefined) update.order = parseInt(d.order);
     if (d.hasOwnProperty('trending')) update.trending = !!d.trending;

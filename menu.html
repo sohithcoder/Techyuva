@@ -696,10 +696,13 @@
                     <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                     <span>Know More</span>
                   </a>` : ''}
-                  <a class="course-card__cta" href="https://wa.me/${whatsappNumber}?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener">
+                  ${c.registrationType === 'googleform' && c.googleFormLink ? `<a class="course-card__cta" href="${c.googleFormLink}" target="_blank" rel="noopener">
                     <span>Register</span>
                     <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </a>
+                  </a>` : `<a class="course-card__cta" href="https://wa.me/${whatsappNumber}?text=Hi%20TechYuva%2C%20I%20want%20to%20register%20for%20${encodeURIComponent(c.name)}.%20Please%20share%20the%20next%20steps." target="_blank" rel="noopener">
+                    <span>Register</span>
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </a>`}
                 </div>
               </div>
             </article>`;
