@@ -2176,12 +2176,13 @@ body { animation: pageIn .35s ease-out; }
   font-family: var(--font-mono); font-size: .58rem;
   transition: color .3s; position: relative; z-index: 1;
 }
-.bottom-nav__item.is-active { color: var(--ink); font-weight: 600; }
+.bottom-nav__item.is-active { color: var(--ink); font-weight: 600; position: relative; z-index: 2; }
+.bottom-nav__item.is-active span { position: relative; z-index: 2; }
 .bottom-nav__liquid {
   position: absolute; top: .25rem; height: calc(100% - .5rem);
-  background: var(--accent-soft); border-radius: 10px;
+  background: var(--accent-soft); border-radius: 10px; opacity: .7;
   transition: left .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1);
-  z-index: 0; pointer-events: none;
+  z-index: 1; pointer-events: none;
 }
 
 @media (min-width: 901px) {
