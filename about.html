@@ -293,6 +293,14 @@
 
   <script src="script.js"></script>
   <script>
+    /* liquid bar */
+    (function(){
+      var a = document.querySelector('.bottom-nav__item.is-active');
+      var l = document.querySelector('.bottom-nav__liquid');
+      if (a && l) { l.style.left = a.offsetLeft+'px'; l.style.width = a.offsetWidth+'px'; }
+    })();
+  </script>
+  <script>
     /* load institute info + gallery */
     (async function(){
       var API = window.location.origin + '/api';
